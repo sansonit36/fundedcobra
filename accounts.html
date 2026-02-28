@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+        <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1765985323943547');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riverton Markets - Account Selection</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/accounts.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Satoshi:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        @font-face {
+            font-family: 'Clash Display';
+            src: url('https://cdn.jsdelivr.net/npm/@typopro/web-clash-display@3.4.10/TypoPRO-ClashDisplay-Semibold.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <!-- Header will be dynamically inserted here by header.js -->
+    </nav>
+
+    <div class="account-selection-container">
+        <header class="account-header">
+            <h1 class="account-title">Choose Your Weapon</h1>
+        </header>
+        
+        <main class="account-main">
+            <div class="funding-button-container">
+                <button class="btn btn-primary btn-large">
+                    Instant Funding
+                </button>
+            </div>
+            
+            <div class="account-sizes-container">
+                <button class="account-size-btn" data-size="1250">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$1.25K</span>
+                </button>
+                <button class="account-size-btn" data-size="3500">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$3.5K</span>
+                </button>
+                <button class="account-size-btn" data-size="5000">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$5K</span>
+                </button>
+                <button class="account-size-btn active" data-size="10000">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$10K</span>
+                </button>
+                <button class="account-size-btn" data-size="25000">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$25K</span>
+                </button>
+                <button class="account-size-btn" data-size="50000">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$50K</span>
+                </button>
+                <button class="account-size-btn" data-size="100000">
+                    <span class="outer-ring"><span class="inner-dot"></span></span>
+                    <span class="label">$100K</span>
+                </button>
+            </div>
+            
+            <!-- Mobile pricing section - visible only on mobile -->
+            <div class="account-details-card mobile-pricing-section" id="mobile-pricing">
+                <div class="account-details-grid">
+                    <div class="account-info-section">
+                        <div class="account-heading">
+                            <h2 class="account-size-title" id="mobile-title">$10K Instant Funding</h2>
+                            <div class="account-badge" id="mobile-badge">
+                                <span class="badge-icon">⚡</span>
+                                <span class="badge-text">Instant Access</span>
+                            </div>
+                        </div>
+                        
+                        <div class="account-pricing">
+                            <div class="discount-badge-price" id="mobile-discount-badge" style="display: none;"></div>
+                            <p class="pricing-label">One-time fee</p>
+                            <p class="pricing-amount" id="mobile-price">$229</p>
+                            <p id="mobile-discount-info" style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.5rem;">✓ Refundable after 5 payouts</p>
+                            <button class="btn btn-discount-inline apply-discount-btn" id="mobile-apply-btn" style="display: none;"></button>
+                            <div class="discount-note" id="mobile-discount-note" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 8px;"></div>
+                        </div>
+                        
+                        <a href="https://account.rivertonmarkets.com/" class="btn btn-primary btn-full-width">
+                            Get Funded Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Desktop pricing section - visible only on desktop -->
+            <div class="account-details-card desktop-pricing-section" id="desktop-pricing">
+                <div class="account-details-grid">
+                    <div class="account-info-section">
+                        <div class="account-heading">
+                            <h2 class="account-size-title" id="desktop-title">$10K Instant Funding</h2>
+                            <div class="account-badge" id="desktop-badge">
+                                <span class="badge-icon">⚡</span>
+                                <span class="badge-text">Instant Access</span>
+                            </div>
+                        </div>
+                        
+                        <div class="account-pricing">
+                            <div class="discount-badge-price" id="desktop-discount-badge" style="display: none;"></div>
+                            <p class="pricing-label">One-time fee</p>
+                            <p class="pricing-amount" id="desktop-price">$229</p>
+                            <p id="desktop-discount-info" style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.5rem;">✓ 100% refundable after 5 successful payouts</p>
+                            <button class="btn btn-discount-inline apply-discount-btn" id="desktop-apply-btn" style="display: none;"></button>
+                            <div class="discount-note" id="desktop-discount-note" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 8px;"></div>
+                        </div>
+                        
+                        <a href="https://account.rivertonmarkets.com/" class="btn btn-primary btn-full-width">
+                            Get Funded Now
+                        </a>
+                    </div>
+                    
+                    <div class="account-features-section">
+                        <h3 class="features-title">Account Features:</h3>
+                        <div class="features-list" id="desktop-features">
+                            <!-- Features will be dynamically updated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>RIVERTON</h3>
+                <p>The Trader's Private Bank</p>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/profile.php?id=61572670919108" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/rivertonmarkets/" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.youtube.com" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Products</h4>
+                <ul>
+                    <li><a href="https://account.rivertonmarkets.com/">Account Tiers</a></li>
+                    <li><a href="payouts.html">Payout Process</a></li>
+                    <li><a href="rules.html">Trading Rules</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="reviews.html">Reviews</a></li>
+                    <li><a href="careers.html">Careers</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Contact Us</h4>
+                <ul>
+                    <li><a href="mailto:Support@rivertonmarkets.com">Support@rivertonmarkets.com</a></li>
+                    <li><a href="tel:+447414236273">+44 7414 236273</a></li>
+                    <li>Unit A1, 17 Heron Road</li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="disclosure.html">Risk Disclosure</a></li>
+                    <li><a href="compliance.html">Compliance</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Riverton Markets. The Trader's Private Bank. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+    <!-- Confetti CSS -->
+    <style>
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f0f;
+            position: absolute;
+            animation: confetti-fall linear forwards;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes discount-reveal {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .discount-revealed {
+            animation: discount-reveal 0.6s ease-out;
+        }
+    </style>
+    
+    <script>
+        // Account pricing data
+        const specialPricing = {
+            '1250': { name: '$1.25K Instant Funding', price: 39, discounted: 35.10, code: 'WELCOME10', discount: '10%' },
+            '3500': { name: '$3.5K Instant Funding', price: 89, discounted: 80.10, code: 'WELCOME10', discount: '10%' },
+            '5000': { name: '$5K Instant Funding', price: 119, discounted: 107.10, code: 'WELCOME10', discount: '10%' }
+        };
+        
+        const premiumPricing = {
+            '10000': { name: '$10K Instant Funding', price: 229, discounted: 114.50, code: 'RAMADAN50', discount: '50%' },
+            '25000': { name: '$25K Instant Funding', price: 559, discounted: 279.50, code: 'RAMADAN50', discount: '50%' },
+            '50000': { name: '$50K Instant Funding', price: 799, discounted: 399.50, code: 'RAMADAN50', discount: '50%' },
+            '100000': { name: '$100K Instant Funding', price: 999, discounted: 499.50, code: 'RAMADAN50', discount: '50%' }
+        };
+        
+        let discountApplied = false;
+        
+        // Confetti function
+        function createConfetti(x, y) {
+            const colors = ['#10b981', '#059669', '#34d399', '#6ee7b7', '#ffd700', '#ff6b6b', '#4ecdc4', '#f59e0b'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = Math.random() * 10 + 5;
+                const left = x + (Math.random() - 0.5) * 300;
+                const animationDuration = Math.random() * 3 + 2;
+                
+                confetti.style.backgroundColor = color;
+                confetti.style.width = size + 'px';
+                confetti.style.height = size + 'px';
+                confetti.style.left = left + 'px';
+                confetti.style.top = y + 'px';
+                confetti.style.animationDuration = animationDuration + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, animationDuration * 1000);
+            }
+        }
+        
+        // Apply discount function
+        function applyDiscount(btnId, section) {
+            const size = document.querySelector('.account-size-btn.active')?.getAttribute('data-size');
+            if (!size) return;
+            
+            const isSpecial = specialPricing[size];
+            const isPremium = premiumPricing[size];
+            const acc = isSpecial || isPremium;
+            if (!acc) return;
+            
+            discountApplied = true;
+            
+            // Get button and create confetti
+            const btn = document.getElementById(btnId);
+            const rect = btn.getBoundingClientRect();
+            createConfetti(rect.left + rect.width / 2, rect.top);
+            
+            // Hide button
+            btn.style.display = 'none';
+            
+            // Update prices
+            const priceEl = document.getElementById(section + '-price');
+            const infoEl = document.getElementById(section + '-discount-info');
+            const noteEl = document.getElementById(section + '-discount-note');
+            const savings = Math.round((acc.price - acc.discounted) * 100) / 100;
+            
+            priceEl.classList.add('discount-revealed');
+            priceEl.innerHTML = '<span style="text-decoration: line-through; opacity: 0.5; font-size: 1.2rem;">$' + acc.price + '</span><br><span style="font-size: 2.5rem; color: ' + (isSpecial ? '#f59e0b' : '#10b981') + '; font-weight: 700;">$' + acc.discounted.toFixed(2) + '</span>';
+            infoEl.innerHTML = '<span style="color: ' + (isSpecial ? '#f59e0b' : '#10b981') + '; font-weight: 700;">You save $' + savings.toFixed(0) + ' (' + acc.discount + ')</span>';
+            
+            const bgColor = isSpecial ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)';
+            const borderColor = isSpecial ? 'rgba(245, 158, 11, 0.4)' : 'rgba(16, 185, 129, 0.4)';
+            const textColor = isSpecial ? '#f59e0b' : '#10b981';
+            
+            noteEl.style.background = 'linear-gradient(135deg, ' + bgColor + ', ' + bgColor + ')';
+            noteEl.style.border = '1px solid ' + borderColor;
+            noteEl.innerHTML = '<p style="margin: 0; color: ' + textColor + '; font-size: 0.9rem; font-weight: 600;">🎊 Discount Activated! Use code <strong style="cursor: pointer;" class="copy-code">' + acc.code + '</strong> at checkout. <span class="copy-feedback" style="display: none; color: #ffd700; margin-left: 5px;">✓ Copied!</span></p>';
+            noteEl.style.display = 'block';
+            noteEl.classList.add('discount-revealed');
+            
+            setTimeout(() => {
+                priceEl.classList.remove('discount-revealed');
+                noteEl.classList.remove('discount-revealed');
+            }, 600);
+            
+            // Setup copy functionality
+            noteEl.querySelector('.copy-code')?.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(() => {
+                    const feedback = noteEl.querySelector('.copy-feedback');
+                    if (feedback) {
+                        feedback.style.display = 'inline';
+                        setTimeout(() => feedback.style.display = 'none', 2000);
+                    }
+                });
+            });
+        }
+        
+        // Account size selection
+        document.querySelectorAll('.account-size-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.account-size-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Update account details based on selection
+                const size = this.getAttribute('data-size');
+                updateAccountDetails(size);
+                
+                // Scroll the active button into view
+                this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                
+                // On mobile devices, scroll to the mobile pricing section to make it visible
+                if (window.innerWidth <= 992) {
+                    const mobilePricingSection = document.querySelector('.mobile-pricing-section');
+                    if (mobilePricingSection) {
+                        // Small delay to ensure content is updated before scrolling
+                        setTimeout(() => {
+                            mobilePricingSection.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start',
+                                inline: 'nearest'
+                            });
+                        }, 100);
+                    }
+                }
+            });
+        });
+        
+        function updateAccountDetails(size) {
+            const isSpecial = specialPricing[size];
+            const isPremium = premiumPricing[size];
+            const acc = isSpecial || isPremium;
+            
+            if (!acc) return;
+            
+            // Update both mobile and desktop pricing sections
+            const sections = ['mobile', 'desktop'];
+            
+            sections.forEach(section => {
+                const titleEl = document.getElementById(section + '-title');
+                const priceEl = document.getElementById(section + '-price');
+                const infoEl = document.getElementById(section + '-discount-info');
+                const badgeEl = document.getElementById(section + '-discount-badge');
+                const btnEl = document.getElementById(section + '-apply-btn');
+                const noteEl = document.getElementById(section + '-discount-note');
+                
+                titleEl.textContent = acc.name;
+                
+                const savings = Math.round((acc.price - acc.discounted) * 100) / 100;
+                
+                if (discountApplied) {
+                    // Show discounted state
+                    priceEl.innerHTML = '<span style="text-decoration: line-through; opacity: 0.5; font-size: 1.2rem;">$' + acc.price + '</span><br><span style="font-size: 2.5rem; color: ' + (isSpecial ? '#f59e0b' : '#10b981') + '; font-weight: 700;">$' + acc.discounted.toFixed(2) + '</span>';
+                    infoEl.innerHTML = '<span style="color: ' + (isSpecial ? '#f59e0b' : '#10b981') + '; font-weight: 700;">You save $' + savings.toFixed(0) + ' (' + acc.discount + ')</span>';
+                    btnEl.style.display = 'none';
+                    noteEl.style.display = 'block';
+                } else {
+                    // Show original price with discount button
+                    badgeEl.textContent = acc.discount + ' ' + (isSpecial ? 'SPECIAL OFFER' : 'RAMADAN KAREEM SALE');
+                    badgeEl.style.background = 'linear-gradient(135deg, ' + (isSpecial ? '#f59e0b, #d97706' : '#10b981, #059669') + ')';
+                    badgeEl.style.display = 'block';
+                    badgeEl.style.color = 'white';
+                    badgeEl.style.padding = '0.5rem 1rem';
+                    badgeEl.style.borderRadius = '0.5rem';
+                    badgeEl.style.fontSize = '0.85rem';
+                    badgeEl.style.fontWeight = '700';
+                    badgeEl.style.marginBottom = '0.5rem';
+                    
+                    priceEl.innerHTML = '$' + acc.price;
+                    priceEl.style.fontSize = '2rem';
+                    priceEl.style.color = 'white';
+                    priceEl.style.fontWeight = '700';
+                    
+                    infoEl.innerHTML = 'Save $' + savings.toFixed(0) + ' with code ' + acc.code;
+                    infoEl.style.color = '#94a3b8';
+                    
+                    btnEl.textContent = '🎉 Claim ' + acc.discount + ' OFF Now';
+                    btnEl.style.display = 'inline-block';
+                    btnEl.style.background = 'linear-gradient(135deg, ' + (isSpecial ? '#f59e0b, #d97706' : '#10b981, #059669') + ')';
+                    btnEl.style.border = 'none';
+                    btnEl.style.animation = 'pulse 2s ease-in-out infinite';
+                    btnEl.style.marginTop = '1rem';
+                    
+                    noteEl.style.display = 'none';
+                }
+            });
+            
+            // Update desktop features dynamically
+            const featuresContainer = document.getElementById('desktop-features');
+            if (featuresContainer) {
+                let featuresHTML = '';
+                
+                if (isSpecial) {
+                    // Special accounts: No Profit Target, Daily Payouts, No minimum trading days
+                    featuresHTML = `
+                        <div class="feature-item">
+                            <span class="feature-label">Profit Target</span>
+                            <span class="feature-value" style="color: #f59e0b; font-weight: 700;">⚡ NONE ⚡</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Payouts</span>
+                            <span class="feature-value" style="color: #f59e0b; font-weight: 700;">⚡ Daily Available ⚡</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Daily Drawdown</span>
+                            <span class="feature-value">8%</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Overall Drawdown</span>
+                            <span class="feature-value">12%</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Min Trading Days</span>
+                            <span class="feature-value" style="color: #f59e0b; font-weight: 700;">NONE</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Leverage</span>
+                            <span class="feature-value">up to 1:100</span>
+                        </div>
+                    `;
+                } else if (isPremium) {
+                    // Premium accounts: Withdrawal Target, Weekly Payouts, Profit Split
+                    featuresHTML = `
+                        <div class="feature-item">
+                            <span class="feature-label">Withdrawal Target</span>
+                            <span class="feature-value">5%</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Profit Split</span>
+                            <span class="feature-value" style="color: #00CC99; font-weight: 700;">50%</span>
+                        </div>
+                        <div class="feature-item" style="grid-column: 1 / -1;">
+                            <span class="feature-label" style="font-size: 0.75rem; color: #94a3b8; font-style: italic;">↑ Increases to 90% after 5 payouts</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Daily Drawdown</span>
+                            <span class="feature-value">8%</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Overall Drawdown</span>
+                            <span class="feature-value">12%</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Leverage</span>
+                            <span class="feature-value">up to 1:100</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Fee Refund</span>
+                            <span class="feature-check">✓</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-label">Payouts</span>
+                            <span class="feature-value">Weekly</span>
+                        </div>
+                    `;
+                }
+                
+                featuresContainer.innerHTML = featuresHTML;
+            }
+            
+            // Add animation class to all cards
+            document.querySelectorAll('.account-details-card').forEach(card => {
+                card.classList.remove('updated');
+                void card.offsetWidth;
+                card.classList.add('updated');
+                setTimeout(() => card.classList.remove('updated'), 600);
+            });
+        }
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+        
+        // Scroll hint functionality for account sizes
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.account-sizes-container');
+            const firstButton = container.querySelector('.account-size-btn:first-child');
+            
+            function updateScrollHints() {
+                if (container.scrollWidth > container.clientWidth) {
+                    container.classList.add('show-scroll-hints');
+                } else {
+                    container.classList.remove('show-scroll-hints');
+                }
+            }
+            
+            // Check on load
+            updateScrollHints();
+            
+            // Check on resize
+            window.addEventListener('resize', updateScrollHints);
+            
+            // Scroll to show first button on page load
+            if (firstButton) {
+                setTimeout(() => {
+                    container.scrollTo({ left: 0, behavior: 'smooth' });
+                    container.classList.add('scroll-hint');
+                    setTimeout(() => container.classList.remove('scroll-hint'), 3000);
+                }, 100);
+            }
+            
+            // Update scroll hints when scrolling
+            container.addEventListener('scroll', function() {
+                container.classList.remove('show-scroll-hints');
+                clearTimeout(container.scrollTimer);
+                container.scrollTimer = setTimeout(() => updateScrollHints(), 150);
+            });
+            
+            // Setup discount buttons
+            document.getElementById('mobile-apply-btn')?.addEventListener('click', function() {
+                applyDiscount('mobile-apply-btn', 'mobile');
+            });
+            
+            document.getElementById('desktop-apply-btn')?.addEventListener('click', function() {
+                applyDiscount('desktop-apply-btn', 'desktop');
+            });
+            
+            // Initialize with default account
+            const defaultSize = document.querySelector('.account-size-btn.active')?.getAttribute('data-size') || '10000';
+            updateAccountDetails(defaultSize);
+        });
+    </script>
+    <script src="scripts/header.js"></script>
+</body>
+</html>

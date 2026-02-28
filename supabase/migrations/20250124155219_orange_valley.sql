@@ -1,0 +1,128 @@
+-- Drop existing policies
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Admins can update all profiles" ON profiles;
+
+-- Create new policies
+CREATE POLICY "Users can view own profile"
+  ON profiles FOR SELECT
+  TO authenticated
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile"
+  ON profiles FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+-- Create admin policies using profiles table
+CREATE POLICY "Admins can view all profiles"
+  ON profiles FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+      AND p.role = 'admin'
+      AND p.status = 'active'
+    )
+  );
+
+CREATE POLICY "Admins can update all profiles"
+  ON profiles FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+      AND p.role = 'admin'
+      AND p.status = 'active'
+    )
+  );
+
+-- Update get_users function to use profiles table
+CREATE OR REPLACE FUNCTION get_users()
+RETURNS TABLE (
+  id uuid,
+  email text,
+  name text,
+  role text,
+  status text,
+  created_at timestamptz,
+  updated_at timestamptz
+) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_role text;
+  v_user_status text;
+BEGIN
+  -- Get user's role and status
+  SELECT role, status INTO v_user_role, v_user_status
+  FROM profiles
+  WHERE id = auth.uid();
+
+  -- Return data based on role
+  IF v_user_role = 'admin' AND v_user_status = 'active' THEN
+    RETURN QUERY
+    SELECT 
+      p.id,
+      p.email,
+      p.name,
+      p.role,
+      p.status,
+      p.created_at,
+      p.updated_at
+    FROM profiles p
+    ORDER BY p.created_at DESC;
+  ELSE
+    -- Return only the user's own profile
+    RETURN QUERY
+    SELECT 
+      p.id,
+      p.email,
+      p.name,
+      p.role,
+      p.status,
+      p.created_at,
+      p.updated_at
+    FROM profiles p
+    WHERE p.id = auth.uid();
+  END IF;
+END;
+$$;
+
+-- Grant execute permission on the function
+GRANT EXECUTE ON FUNCTION get_users() TO authenticated;
+
+-- Ensure admin user exists and has correct role
+DO $$ 
+DECLARE
+  v_user_id uuid;
+BEGIN
+  -- Get admin user ID
+  SELECT id INTO v_user_id
+  FROM auth.users
+  WHERE email = 'admin@admin.com';
+
+  -- Update admin profile if exists
+  IF v_user_id IS NOT NULL THEN
+    INSERT INTO profiles (id, email, role, status, created_at, updated_at)
+    VALUES (
+      v_user_id,
+      'admin@admin.com',
+      'admin',
+      'active',
+      now(),
+      now()
+    )
+    ON CONFLICT (id) DO UPDATE
+    SET
+      role = 'admin',
+      status = 'active',
+      updated_at = now();
+  END IF;
+END $$;

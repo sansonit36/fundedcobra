@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply antialiased text-base;
+  }
+
+  /* Improve touch targets */
+  button, 
+  [role="button"],
+  input,
+  select,
+  a {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Responsive text sizes */
+  h1 { @apply text-2xl md:text-3xl lg:text-4xl; }
+  h2 { @apply text-xl md:text-2xl lg:text-3xl; }
+  h3 { @apply text-lg md:text-xl lg:text-2xl; }
+}
+
+@layer components {
+  .card-gradient {
+    background: linear-gradient(135deg, #2A2D3E 0%, #1F2937 100%);
+  }
+  
+  .card-gradient-success {
+    background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+  }
+  
+  .card-gradient-warning {
+    background: linear-gradient(135deg, #92400e 0%, #78350f 100%);
+  }
+  
+  .card-gradient-danger {
+    background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-effect-dark {
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  /* Mobile-first responsive container */
+  .container-responsive {
+    @apply w-full px-4 mx-auto;
+    max-width: 100%;
+    
+    @screen sm {
+      max-width: 640px;
+    }
+    
+    @screen md {
+      max-width: 768px;
+    }
+    
+    @screen lg {
+      max-width: 1024px;
+    }
+    
+    @screen xl {
+      max-width: 1280px;
+    }
+  }
+
+  /* Responsive grid system */
+  .grid-responsive {
+    @apply grid gap-4 w-full;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  /* Mobile menu styles */
+  .mobile-menu {
+    @apply fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out;
+  }
+
+  .mobile-menu.open {
+    @apply translate-x-0;
+  }
+
+  .mobile-menu.closed {
+    @apply -translate-x-full;
+  }
+
+  /* Responsive table wrapper */
+  .table-responsive-wrapper {
+    @apply w-full overflow-x-auto -mx-4 px-4;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Responsive images */
+  .img-responsive {
+    @apply max-w-full h-auto object-cover;
+  }
+
+  /* Touch-friendly buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg transition-colors;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Form elements */
+  .form-input {
+    @apply w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50;
+    min-height: 44px;
+  }
+
+  /* Modal responsive padding */
+  .modal-responsive {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8;
+  }
+
+  /* Responsive spacing utilities */
+  .spacing-responsive {
+    @apply p-4 sm:p-6 md:p-8 lg:p-10;
+  }
+}
+
+/* Shimmer animation for discount banner */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
