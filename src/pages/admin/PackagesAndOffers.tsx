@@ -521,7 +521,7 @@ export default function PackagesAndOffers() {
                   value={offerForm.title}
                   onChange={(e) => setOfferForm({ ...offerForm, title: e.target.value })}
                   className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
-                  placeholder="Ramadan Kareem Offer"
+                  placeholder="We’re Growing Sale"
                   required
                 />
               </div>
@@ -548,7 +548,7 @@ export default function PackagesAndOffers() {
                     value={offerForm.discount_code}
                     onChange={(e) => setOfferForm({ ...offerForm, discount_code: e.target.value.toUpperCase() })}
                     className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 font-mono"
-                    placeholder="RAMADAN50"
+                    placeholder="GROWING50"
                     required
                   />
                 </div>

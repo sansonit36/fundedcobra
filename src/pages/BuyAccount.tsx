@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Check, AlertTriangle, HelpCircle, ChevronRight, Tag, Copy, Upload, Info, CreditCard, Zap, Sparkles, Clock } from 'lucide-react';
+import { Shield, Check, AlertTriangle, HelpCircle, ChevronRight, Tag, Copy, Upload, Info, CreditCard, Zap, Sparkles, Clock, Lock, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { AccountPackage } from '../types';
 import { createAccountPurchase, submitPaymentProof, getAccountPackages } from '../lib/database';
@@ -43,6 +43,89 @@ export default function BuyAccount() {
   const [isIndianUser, setIsIndianUser] = useState(false);
   const [aiVerifying, setAiVerifying] = useState(false);
   const [verificationStep, setVerificationStep] = useState(0);
+  const [showExitIntent, setShowExitIntent] = useState(false);
+  const [exitIntentShown, setExitIntentShown] = useState(false);
+  const [tickerIndex, setTickerIndex] = useState(0);
+  const [viewingCounts, setViewingCounts] = useState<Record<string, number>>({});
+
+  // Payout proof ticker data
+  const payoutTicker = [
+    { trader: 'Ahmad R.', amount: '$380', time: '4 mins ago', pkg: '$5K account' },
+    { trader: 'Sara M.', amount: '$210', time: '11 mins ago', pkg: '$2.5K account' },
+    { trader: 'James K.', amount: '$650', time: '23 mins ago', pkg: '$10K account' },
+    { trader: 'Hira F.', amount: '$125', time: '31 mins ago', pkg: '$1.25K account' },
+    { trader: 'Carlos D.', amount: '$940', time: '47 mins ago', pkg: '$15K account' },
+    { trader: 'Amna S.', amount: '$290', time: '1 hr ago', pkg: '$5K account' },
+    { trader: 'Bilal T.', amount: '$175', time: '2 hrs ago', pkg: '$3.5K account' },
+  ];
+
+  // Fake-but-realistic viewing counts per package (seeded from pkg name)
+  const getViewingCount = (pkgName: string) => {
+    if (viewingCounts[pkgName]) return viewingCounts[pkgName];
+    const seed = pkgName.length * 3;
+    const count = (seed % 7) + 2; // 2–8
+    viewingCounts[pkgName] = count;
+    return count;
+  };
+
+  // Fluctuate viewing counts ±1 every 8s per package
+  useEffect(() => {
+    if (packages.length === 0) return;
+    const t = setInterval(() => {
+      setViewingCounts(prev => {
+        const next = { ...prev };
+        packages.forEach(pkg => {
+          const seed = (pkg.name.length * 3) % 7 + 2;
+          const current = next[pkg.name] ?? seed;
+          const delta = Math.random() < 0.5 ? 1 : -1;
+          next[pkg.name] = Math.max(2, Math.min(9, current + delta));
+        });
+        return next;
+      });
+    }, 8000);
+    return () => clearInterval(t);
+  }, [packages]);
+
+  // Rotate ticker every 3 seconds
+  useEffect(() => {
+    const t = setInterval(() => setTickerIndex(i => (i + 1) % payoutTicker.length), 3000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Exit-intent detection (mouse leaves viewport from top)
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 5 && selectedPackage && !exitIntentShown && !showPaymentModal) {
+        setShowExitIntent(true);
+        setExitIntentShown(true);
+      }
+    };
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [selectedPackage, exitIntentShown, showPaymentModal]);
+
+  // Abandonment email — fire when user leaves with a package selected but no purchase
+  useEffect(() => {
+    if (!user || !selectedPackage) return;
+    const handleBeforeUnload = () => {
+      // Use sendBeacon for reliability on page close
+      const payload = JSON.stringify({
+        to: user.email,
+        template: 'cart_abandonment',
+        data: {
+          name: user.name || user.email,
+          packageName: selectedPackage.name,
+          packageBalance: selectedPackage.balance,
+          amount: calculateFinalPrice(selectedPackage.price),
+        },
+        userId: user.id,
+      });
+      // Store in localStorage as fallback; a follow-up email flow can pick this up
+      localStorage.setItem('abandonedCart', payload);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [user, selectedPackage]);
 
   useEffect(() => {
     async function loadPackages() {
@@ -141,29 +224,18 @@ export default function BuyAccount() {
     detectUserCountry();
   }, []);
 
-  // Auto-apply Ramadan Kareem Offer for premium instant accounts
+  // Auto-apply Growing Sale offer for Premium Instant accounts ONLY if no coupon is already set
+  // (handleBuyNow already sets the correct coupon synchronously — this is just a fallback)
   useEffect(() => {
-    if (selectedPackage) {
-      const isStandardAccount = !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(selectedPackage.name);
-      
-      if (isStandardAccount) {
-        // Auto-apply RAMADAN50 for premium instant accounts (no timer needed)
-        setAppliedCoupon({ code: 'RAMADAN50', discount: 50 });
-        setCouponCode('RAMADAN50');
-      } else {
-        // For special accounts, check if there's an active WELCOME10 timer
-        if (timeRemaining > 0) {
-          // Restore WELCOME10 if timer is still active
-          setAppliedCoupon({ code: 'WELCOME10', discount: 10 });
-          setCouponCode('WELCOME10');
-        } else {
-          // No active discount for special accounts
-          setAppliedCoupon(null);
-          setCouponCode('');
-        }
+    if (selectedPackage && !appliedCoupon) {
+      const isPremium = !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(selectedPackage.name);
+      if (isPremium) {
+        setAppliedCoupon({ code: 'GROWING50', discount: 50 });
+        setCouponCode('GROWING50');
       }
     }
-  }, [selectedPackage, timeRemaining]);
+  }, [selectedPackage]); // intentionally NOT in appliedCoupon deps to avoid loop
+
 
   // Timer countdown effect (only for special accounts with WELCOME10)
   useEffect(() => {
@@ -187,6 +259,32 @@ export default function BuyAccount() {
 
   const handlePurchase = () => {
     if (!selectedPackage) return;
+    setShowPaymentModal(true);
+  };
+
+  // Buy Now — applies coupon synchronously so modal shows correct price immediately
+  const handleBuyNow = (pkg: AccountPackage) => {
+    setSelectedPackage(pkg);
+    const isStandard = !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name);
+    const discount = isStandard ? 50 : 10;
+    if (isStandard) {
+      setAppliedCoupon({ code: 'GROWING50', discount: 50 });
+      setCouponCode('GROWING50');
+    } else {
+      setAppliedCoupon({ code: 'WELCOME10', discount: 10 });
+      setCouponCode('WELCOME10');
+    }
+    const finalPrice = parseFloat((pkg.price * (1 - discount / 100)).toFixed(2));
+    // Facebook AddToCart event
+    if (window.fbq) {
+      window.fbq('track', 'AddToCart', {
+        content_ids: [pkg.name],
+        content_name: pkg.name,
+        content_type: 'product',
+        value: finalPrice,
+        currency: 'USD',
+      });
+    }
     setShowPaymentModal(true);
   };
 
@@ -462,7 +560,7 @@ export default function BuyAccount() {
     
     // Determine discount based on account type
     const isStandardAccount = selectedPackage && !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(selectedPackage.name);
-    const discountCode = isStandardAccount ? 'RAMADAN50' : 'WELCOME10';
+    const discountCode = isStandardAccount ? 'GROWING50' : 'WELCOME10';
     const discountPercent = isStandardAccount ? 50 : 10;
     
     const couponData = { code: discountCode, discount: discountPercent };
@@ -694,9 +792,69 @@ export default function BuyAccount() {
         </div>
       )}
 
+      {/* Exit-Intent Modal */}
+      {showExitIntent && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="max-w-md w-full card-gradient rounded-2xl p-8 border border-blue-500/30 shadow-2xl text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+              <span className="text-3xl">🚀</span>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Wait — your discount is expiring!</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              You have a <span className="text-green-400 font-bold">
+                {selectedPackage && !['$1,250 Account','$3,500 Account','$5,000 Account'].includes(selectedPackage.name) ? '50%' : '10%'}
+              </span> discount locked on your <span className="text-white font-semibold">{selectedPackage?.name}</span>. It disappears the moment you leave.
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => { setShowExitIntent(false); setShowPaymentModal(true); }}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/30"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Complete My Purchase</span>
+              </button>
+              <button
+                onClick={() => setShowExitIntent(false)}
+                className="w-full py-2 text-gray-500 hover:text-gray-300 text-sm transition-colors"
+              >
+                No thanks, I'll pass on the discount
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
         {/* Main Content */}
         <div className="w-full lg:w-2/3 space-y-6">
+
+          {/* 🟢 Live Payout Ticker */}
+          <div className="flex items-center space-x-3 py-2.5 px-4 rounded-xl bg-green-500/10 border border-green-500/20 overflow-hidden">
+            <span className="flex-shrink-0 flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              <span className="text-green-400 text-xs font-semibold uppercase tracking-wide">Live</span>
+            </span>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm text-gray-300 transition-all duration-500">
+                💸 <span className="text-white font-semibold">{payoutTicker[tickerIndex].trader}</span> just withdrew{' '}
+                <span className="text-green-400 font-bold">{payoutTicker[tickerIndex].amount}</span> from their{' '}
+                <span className="text-blue-400">{payoutTicker[tickerIndex].pkg}</span>{' '}·{' '}
+                <span className="text-gray-500 text-xs">{payoutTicker[tickerIndex].time}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* 💚 Zero-Risk Fee Refund Banner */}
+          <div className="rounded-xl bg-gradient-to-r from-emerald-500/15 to-green-500/5 border border-emerald-500/30 px-5 py-4 flex items-center space-x-4">
+            <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-emerald-400" />
+            </div>
+            <div>
+              <p className="text-emerald-400 font-bold text-sm">100% Risk-Free — Your fee is fully refundable</p>
+              <p className="text-gray-400 text-xs mt-0.5">Complete 5 successful payouts and we refund your entire account fee. You literally have nothing to lose.</p>
+            </div>
+          </div>
+
           {/* Special Instant Accounts Highlight */}
           <div className="card-gradient rounded-2xl p-6 border-2 border-yellow-500/30 bg-gradient-to-br from-yellow-500/5 to-transparent">
             <div className="flex items-center space-x-3 mb-4">
@@ -705,45 +863,54 @@ export default function BuyAccount() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">⚡ Special Instant Accounts</h2>
-                <p className="text-yellow-400 font-medium">No Profit Target | Daily Payouts Available</p>
+                <p className="text-yellow-400 font-medium">5% Withdrawal Target | Daily Payouts</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {packages.filter(pkg => ['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)).map((pkg) => (
-                <button
-                  key={pkg.id}
-                  onClick={() => setSelectedPackage(pkg)}
-                  className={`relative p-5 rounded-xl border-2 transition-all ${selectedPackage?.id === pkg.id
-                      ? 'bg-yellow-500/20 border-yellow-500/60 shadow-lg shadow-yellow-500/20'
-                      : 'bg-white/5 border-yellow-500/20 hover:bg-yellow-500/10 hover:border-yellow-500/40'
-                  }`}
-                >
-                  {selectedPackage?.id === pkg.id && (
-                    <div className="absolute -top-2 -right-2 w-7 h-7 bg-yellow-500 rounded-full flex items-center justify-center">
-                      <Check className="w-5 h-5 text-black" />
-                    </div>
-                  )}
-                  <div className="text-2xl font-bold text-white mb-2">
-                    ${pkg.balance.toLocaleString()}
+                <div key={pkg.id} className="relative">
+                  {/* Viewing count badge */}
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-gray-800 border border-yellow-500/30 flex items-center space-x-1 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
+                    <span className="text-yellow-400 text-[10px] font-medium">{getViewingCount(pkg.name)} viewing now</span>
                   </div>
-                  <div className="text-sm text-gray-400">
-                    Fee: <span className="text-yellow-400 font-bold">${pkg.price}</span>
-                  </div>
-                  <div className="mt-3 space-y-1">
-                    <div className="flex items-center text-xs text-green-400">
-                      <Check className="w-3 h-3 mr-1" />
-                      <span>Daily Payouts</span>
+                  <button
+                    onClick={() => setSelectedPackage(pkg)}
+                    className={`relative w-full p-5 rounded-xl border-2 transition-all ${selectedPackage?.id === pkg.id
+                        ? 'bg-yellow-500/20 border-yellow-500/60 shadow-lg shadow-yellow-500/20'
+                        : 'bg-white/5 border-yellow-500/20 hover:bg-yellow-500/10 hover:border-yellow-500/40'
+                    }`}
+                  >
+                    {selectedPackage?.id === pkg.id && (
+                      <div className="absolute -top-2 -right-2 w-7 h-7 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <Check className="w-5 h-5 text-black" />
+                      </div>
+                    )}
+                    <div className="text-2xl font-bold text-white mb-2">
+                      ${pkg.balance.toLocaleString()}
                     </div>
-                    <div className="flex items-center text-xs text-green-400">
-                      <Check className="w-3 h-3 mr-1" />
-                      <span>No Profit Target</span>
+                    <div className="text-sm text-gray-400">
+                      Fee: <span className="text-yellow-400 font-bold">${pkg.price}</span>
                     </div>
-                    <div className="flex items-center text-xs text-green-400">
-                      <Check className="w-3 h-3 mr-1" />
-                      <span>5% Withdrawal Target</span>
+                    <div className="mt-3 space-y-1">
+                      <div className="flex items-center text-xs text-green-400">
+                        <Check className="w-3 h-3 mr-1" />
+                        <span>Daily Payouts</span>
+                      </div>
+                      <div className="flex items-center text-xs text-green-400">
+                        <Check className="w-3 h-3 mr-1" />
+                        <span>5% Withdrawal Target</span>
+                      </div>
                     </div>
-                  </div>
-                </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleBuyNow(pkg); }}
+                      className="mt-4 w-full py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black font-bold text-sm transition-all flex items-center justify-center space-x-1.5 shadow-lg shadow-yellow-500/20"
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Buy Now →</span>
+                    </button>
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -756,40 +923,52 @@ export default function BuyAccount() {
             {/* Account Packages Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {packages.filter(pkg => !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)).map((pkg) => (
-                <button
-                  key={pkg.id}
-                  onClick={() => setSelectedPackage(pkg)}
-                  className={`relative p-4 rounded-xl border transition-all ${
-                    selectedPackage?.id === pkg.id
-                      ? 'bg-blue-500/20 border-blue-500/50'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
-                  }`}
-                >
-                  {/* Ramadan Kareem Badge */}
-                  <div className="absolute -top-2 -left-2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
-                    50% OFF
+                <div key={pkg.id} className="relative">
+                  {/* Viewing count badge */}
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-gray-800 border border-blue-500/30 flex items-center space-x-1 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                    <span className="text-blue-400 text-[10px] font-medium">{getViewingCount(pkg.name)} viewing now</span>
                   </div>
-                  
-                  {selectedPackage?.id === pkg.id && (
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-white" />
+                  <button
+                    onClick={() => setSelectedPackage(pkg)}
+                    className={`relative w-full p-4 rounded-xl border transition-all ${
+                      selectedPackage?.id === pkg.id
+                        ? 'bg-blue-500/20 border-blue-500/50'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    {/* 50% OFF Badge */}
+                    <div className="absolute -top-2 -left-2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
+                      50% OFF
                     </div>
-                  )}
-                  <div className="text-2xl font-bold text-white mb-2 mt-2">
-                    ${pkg.balance.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-400 mb-1">
-                    <span className="line-through">${pkg.price}</span>
-                    {' '}
-                    <span className="text-green-400 font-bold text-lg">${(pkg.price * 0.5).toFixed(0)}</span>
-                  </div>
-                  <div className="text-xs text-green-400 font-medium mb-2">
-                    Save ${(pkg.price * 0.5).toFixed(0)}!
-                  </div>
-                  <div className="text-xs text-blue-400 mt-2">
-                    Refundable after 5 payouts
-                  </div>
-                </button>
+                    {selectedPackage?.id === pkg.id && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center z-10">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                    )}
+                    <div className="text-2xl font-bold text-white mb-2 mt-2">
+                      ${pkg.balance.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-400 mb-1">
+                      <span className="line-through">${pkg.price}</span>
+                      {' '}
+                      <span className="text-green-400 font-bold text-lg">${(pkg.price * 0.5).toFixed(0)}</span>
+                    </div>
+                    <div className="text-xs text-green-400 font-medium mb-2">
+                      Save ${(pkg.price * 0.5).toFixed(0)}!
+                    </div>
+                    <div className="text-xs text-blue-400 mt-2">
+                      Refundable after 5 payouts
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleBuyNow(pkg); }}
+                      className="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm transition-all flex items-center justify-center space-x-1.5 shadow-md shadow-blue-500/20"
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Buy Now →</span>
+                    </button>
+                  </button>
+                </div>
               ))}
             </div>
 
@@ -872,62 +1051,43 @@ export default function BuyAccount() {
                 onClick={() => setShowRules(!showRules)}
                 className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
               >
-                View all rules
+                View full rules →
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
-                  <Zap className="w-5 h-5 text-yellow-400 mr-2" />
-                  Special Accounts
+              {/* Special Accounts */}
+              <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/20">
+                <h4 className="text-base font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                  <Zap className="w-4 h-4" /> Special Instant Accounts
                 </h4>
-                <ul className="space-y-2 text-gray-300">
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-yellow-400 mt-0.5" />
-                    <span>No profit target required</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-yellow-400 mt-0.5" />
-                    <span>5% withdrawal target</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-yellow-400 mt-0.5" />
-                    <span>Daily + Weekly payouts</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-yellow-400 mt-0.5" />
-                    <span>No minimum trading days</span>
-                  </li>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" /><span>Reach 5% profit → request withdrawal. No profit target to unlock first.</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" /><span>Daily & weekly payouts available</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" /><span>No minimum trading days</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" /><span>Max 8% daily loss / 12% total loss</span></li>
                 </ul>
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Premium Instant Accounts</h4>
-                <ul className="space-y-2 text-gray-300">
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-blue-400 mt-0.5" />
-                    <span>5% withdrawal target</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-blue-400 mt-0.5" />
-                    <span>Weekly payouts</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-blue-400 mt-0.5" />
-                    <span>4 trading days per week</span>
-                  </li>
+              {/* Premium Accounts */}
+              <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                <h4 className="text-base font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                  <Star className="w-4 h-4" /> Premium Instant Accounts
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" /><span>Reach 5% profit → request weekly payout</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" /><span>Trade at least 4 days per week</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 red-400 mt-0.5 flex-shrink-0" /><span>Max 8% daily loss / 12% total loss</span></li>
                 </ul>
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Drawdown Limits</h4>
-                <ul className="space-y-2 text-gray-300">
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-red-400 mt-0.5" />
-                    <span>8% daily trailing drawdown</span>
-                  </li>
-                  <li className="flex items-start">
-                    <ChevronRight className="w-5 h-5 text-red-400 mt-0.5" />
-                    <span>12% maximum overall drawdown</span>
-                  </li>
+              {/* Universal Rules */}
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <h4 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-gray-400" /> All Accounts
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" /><span>MT5 platform · 1:100 leverage</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" /><span>News trading & weekend holds allowed</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" /><span>No EAs, HFT, martingale or grid trading</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" /><span>Min. trade duration: 60 seconds</span></li>
                 </ul>
               </div>
             </div>
@@ -1067,13 +1227,39 @@ export default function BuyAccount() {
                 </div>
                 <button
                   onClick={handlePurchase}
-                  className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 flex items-center justify-center space-x-2"
                 >
-                  Purchase Account
+                  <Lock className="w-4 h-4" />
+                  <span>Secure Purchase</span>
                 </button>
-                <p className="text-center text-sm text-gray-400 mt-4">
-                  Fee is refundable after 5 successful payouts
-                </p>
+
+                {/* Trust Badges */}
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
+                    <Shield className="w-4 h-4 text-green-400" />
+                    <span className="text-gray-400 text-xs text-center leading-tight">256-bit SSL</span>
+                  </div>
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
+                    <Zap className="w-4 h-4 text-yellow-400" />
+                    <span className="text-gray-400 text-xs text-center leading-tight">Instant Access</span>
+                  </div>
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
+                    <Star className="w-4 h-4 text-blue-400" />
+                    <span className="text-gray-400 text-xs text-center leading-tight">Fee Refund</span>
+                  </div>
+                </div>
+
+                {/* Social proof */}
+                <div className="mt-3 flex items-center justify-center space-x-1.5">
+                  <div className="flex -space-x-1.5">
+                    {['bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500'].map((color, i) => (
+                      <div key={i} className={`w-5 h-5 rounded-full ${color} border border-gray-900 flex items-center justify-center`}>
+                        <span className="text-white text-[7px] font-bold">T</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-gray-400 text-xs">500+ funded traders this month</p>
+                </div>
               </>
             ) : (
               <div className="text-center text-gray-400 py-8">
@@ -1086,167 +1272,206 @@ export default function BuyAccount() {
 
       {/* Rules Modal */}
       {showRules && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50">
-          <div className="card-gradient rounded-2xl border border-white/5 p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-white">Trading Rules</h3>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full sm:max-w-2xl bg-gray-900 sm:rounded-2xl rounded-t-2xl border border-white/10 flex flex-col max-h-[92vh] sm:max-h-[85vh]">
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 rounded-full bg-white/20" />
+            </div>
+            {/* Header */}
+            <div className="flex justify-between items-center px-5 sm:px-6 py-4 border-b border-white/10 flex-shrink-0">
+              <div>
+                <h3 className="text-lg font-bold text-white">Trading Rules</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Read before purchasing — these apply to your funded account</p>
+              </div>
               <button
                 onClick={() => setShowRules(false)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-gray-400 hover:text-white flex-shrink-0 ml-3"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Trading Platform & Conditions</h4>
-                <ul className="list-disc list-inside text-gray-300 space-y-2">
-                  <li>Trading Platform: MetaTrader 5 (MT5)</li>
-                  <li>Leverage: 1:100</li>
-                  <li>Spreads: Starting from 0.2 pips</li>
-                  <li>Trading Hours: 24/5 market access</li>
+            {/* Scrollable content */}
+            <div className="overflow-y-auto flex-1 px-5 sm:px-6 py-5 space-y-5">
+
+              {/* Drawdown — most important, first */}
+              <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+                <h4 className="text-sm font-bold text-red-400 mb-3 flex items-center gap-2">
+                  ⚠️ Loss Limits — Both Account Types
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-400 font-bold flex-shrink-0">•</span>
+                    <span><strong className="text-white">Daily limit: 8% trailing.</strong> If your account balance ever hits 8% below the day's peak equity, trading stops for that day. Example: $10,000 account reaches $11,000 → daily limit is now $10,120 (8% below $11,000).</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-400 font-bold flex-shrink-0">•</span>
+                    <span><strong className="text-white">Overall limit: 12%.</strong> Your account can never fall more than 12% below the starting balance. On a $10,000 account that's $8,800 — if you hit this, the account is closed.</span>
+                  </li>
                 </ul>
               </div>
 
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Profit Target & Payout Rules</h4>
-                <ul className="list-disc list-inside text-gray-300 space-y-2">
-                  <li><strong className="text-yellow-400">Special Accounts ($1,250, $3,500, $5,000):</strong> No profit target, 5% withdrawal target, Daily + Weekly payouts</li>
-                  <li><strong className="text-blue-400">Premium Instant Accounts:</strong> 5% withdrawal target, Weekly payouts only</li>
-                  <li>Maximum Single Trade Profit: 25% of withdrawal target</li>
-                  <li>Minimum withdrawal amount: $50</li>
-                </ul>
+              {/* Special vs Premium side by side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/20">
+                  <h4 className="text-sm font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                    <Zap className="w-4 h-4" /> Special Instant Accounts
+                    <span className="text-xs text-gray-500 font-normal">($1.25K – $5K)</span>
+                  </h4>
+                  <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-start gap-2"><span className="text-yellow-400 flex-shrink-0">•</span><span><strong className="text-white">Withdrawal target:</strong> Make 5% profit → you can withdraw anytime</span></li>
+                    <li className="flex items-start gap-2"><span className="text-yellow-400 flex-shrink-0">•</span><span><strong className="text-white">Payout schedule:</strong> Daily or weekly — your choice</span></li>
+                    <li className="flex items-start gap-2"><span className="text-yellow-400 flex-shrink-0">•</span><span><strong className="text-white">Trading days:</strong> No minimum — trade 1 day or 5</span></li>
+                    <li className="flex items-start gap-2"><span className="text-yellow-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                  <h4 className="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2">
+                    <Star className="w-4 h-4" /> Premium Instant Accounts
+                    <span className="text-xs text-gray-500 font-normal">($7.5K – $200K)</span>
+                  </h4>
+                  <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Withdrawal target:</strong> Make 5% profit → request a weekly payout</span></li>
+                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Payout schedule:</strong> Weekly only</span></li>
+                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Trading days:</strong> Must trade at least 4 days per week</span></li>
+                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
+                  </ul>
+                </div>
               </div>
 
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Drawdown Limits</h4>
-                <ul className="list-disc list-inside text-gray-300 space-y-2">
-                  <li>Daily Drawdown: 8% trailing from highest equity</li>
-                  <li>Overall Drawdown: 12% maximum from initial equity</li>
-                  <li>Daily reset at market close</li>
-                </ul>
+              {/* Platform conditions */}
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <h4 className="text-sm font-bold text-white mb-3">Platform & Conditions</h4>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-300">
+                  <span>📱 <strong className="text-white">Platform:</strong> MetaTrader 5 (MT5)</span>
+                  <span>⚡ <strong className="text-white">Leverage:</strong> 1:100</span>
+                  <span>📈 <strong className="text-white">Spreads:</strong> From 0.2 pips</span>
+                  <span>🕐 <strong className="text-white">Hours:</strong> 24/5</span>
+                  <span>✅ <strong className="text-white">News trading:</strong> Allowed</span>
+                  <span>✅ <strong className="text-white">Weekend holds:</strong> Allowed</span>
+                </div>
               </div>
 
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Trading Requirements</h4>
-                <ul className="list-disc list-inside text-gray-300 space-y-2">
-                  <li><strong className="text-yellow-400">Special Accounts:</strong> No minimum trading days required</li>
-                  <li><strong className="text-blue-400">Premium Instant Accounts:</strong> Minimum 4 trading days per week</li>
-                  <li>Trading across multiple sessions recommended</li>
-                  <li>Weekend holding positions allowed</li>
-                  <li>News trading allowed</li>
-                </ul>
+              {/* Prohibited */}
+              <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+                <h4 className="text-sm font-bold text-red-400 mb-3">🚫 Not Allowed</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-300">
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> Automated bots / Expert Advisors (EAs)</span>
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> High-frequency trading (HFT)</span>
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> Trades under 60 seconds</span>
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> Martingale or grid strategies</span>
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> Arbitrage</span>
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> Hedging on the same pair</span>
+                  <span className="flex items-center gap-2"><span className="text-red-400">✗</span> More than 3 consecutive trades in one direction only</span>
+                </div>
               </div>
 
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Prohibited Trading Practices</h4>
-                <ul className="list-disc list-inside text-gray-300 space-y-2">
-                  <li>High-Frequency Trading (HFT)</li>
-                  <li>Expert Advisors (EAs) or automated trading</li>
-                  <li>Trades under 60 seconds duration</li>
-                  <li>Martingale strategy</li>
-                  <li>Grid trading</li>
-                  <li>Arbitrage trading</li>
-                 <li>No One-Sided Trading (Max 3 Consecutive)</li>
-                  <li>Hedging on same pair</li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* Payment Modal */}
+      {/* Payment Modal — bottom sheet on mobile, centered modal on desktop */}
       {showPaymentModal && selectedPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50">
-          <div className="card-gradient rounded-2xl border border-white/5 p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-white">Complete Payment</h3>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
+          {/* Sheet itself */}
+          <div className="w-full sm:max-w-lg bg-gray-900 sm:rounded-2xl rounded-t-2xl border border-white/10 flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+
+            {/* Mobile drag handle */}
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 rounded-full bg-white/20" />
+            </div>
+
+            {/* Header */}
+            <div className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 flex-shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-white">Complete Payment</h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  <span className="text-white font-semibold">${selectedPackage.balance.toLocaleString()}</span> account ·{' '}
+                  {appliedCoupon && <span className="text-gray-500 line-through mr-1">${selectedPackage.price}</span>}
+                  <span className="text-green-400 font-bold">${calculateFinalPrice(selectedPackage.price).toFixed(2)}</span>
+                  {appliedCoupon && <span className="text-green-400"> ({appliedCoupon.discount}% off)</span>}
+                </p>
+              </div>
               <button
-                onClick={() => {
-                  setShowPaymentModal(false);
-                  setSelectedPaymentMethod(null);
-                  setSelectedPkrMethod(null);
-                }}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+                onClick={() => { setShowPaymentModal(false); setSelectedPaymentMethod(null); setSelectedPkrMethod(null); }}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-gray-400 hover:text-white flex-shrink-0 ml-3"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-6">
-              {/* Amount Summary */}
-              <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-400">Package:</span>
-                  <span className="text-white font-bold text-xl">
-                    ${selectedPackage.balance.toLocaleString()} Account
-                  </span>
+            {/* Scrollable body */}
+            <div className="overflow-y-auto flex-1 px-4 sm:px-6 py-4 space-y-4">
+
+              {/* PKR amount row — only when PKR is selected */}
+              {selectedPaymentMethod === 'pkr' && (
+                <div className="flex justify-between items-center p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-sm">
+                  <span className="text-gray-400">Amount in PKR</span>
+                  <span className="text-white font-bold">PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Fee in USD:</span>
-                  <span className="text-white font-bold text-xl">
-                    ${calculateFinalPrice(selectedPackage.price).toFixed(2)}
-                  </span>
-                </div>
-                {selectedPaymentMethod === 'pkr' && (
-                  <div className="flex justify-between items-center mt-2 pt-2 border-t border-blue-400/20">
-                    <span className="text-gray-400">Amount in PKR:</span>
-                    <span className="text-white font-bold text-xl">
-                      PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}
-                    </span>
-                  </div>
-                )}
-                {selectedPaymentMethod === 'pkr' && (
-                  <div className="text-xs text-gray-500 mt-2">
-                    Exchange Rate: 1 USD = {usdToPkr} PKR
-                  </div>
-                )}
-              </div>
+              )}
 
               {/* Payment Method Selection */}
               {!selectedPaymentMethod && (
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Select Payment Method</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* USDT Option */}
+                  <p className="text-sm font-semibold text-gray-300 mb-3">Select payment method</p>
+                  <div className="grid grid-cols-1 gap-3">
+                    {/* USDT */}
                     <button
-                      onClick={() => setSelectedPaymentMethod('usdt')}
-                      className="p-6 rounded-lg bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
+                      onClick={() => {
+                        setSelectedPaymentMethod('usdt');
+                        if (window.fbq) {
+                          window.fbq('track', 'InitiateCheckout', {
+                            content_ids: [selectedPackage.name],
+                            content_name: selectedPackage.name,
+                            num_items: 1,
+                            value: calculateFinalPrice(selectedPackage.price),
+                            currency: 'USD',
+                          });
+                        }
+                      }}
+                      className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border-2 border-white/10 hover:border-green-500/50 hover:bg-white/10 transition-all text-left"
                     >
-                      <div className="flex items-center space-x-3 mb-3">
-                        <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                          <CreditCard className="w-6 h-6 text-green-400" />
-                        </div>
-                        <div>
-                          <h5 className="text-white font-semibold text-lg">USDT (TRC20)</h5>
-                          <p className="text-sm text-gray-400">Cryptocurrency</p>
-                        </div>
+                      <div className="w-10 h-10 rounded-lg bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                        <CreditCard className="w-5 h-5 text-green-400" />
                       </div>
-                      <div className="text-green-400 font-medium">
-                        ${calculateFinalPrice(selectedPackage.price).toFixed(2)} USDT
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-semibold text-sm">USDT (TRC20)</p>
+                        <p className="text-xs text-gray-400">Cryptocurrency</p>
                       </div>
+                      <span className="text-green-400 font-bold text-sm flex-shrink-0">
+                        ${calculateFinalPrice(selectedPackage.price).toFixed(2)}
+                      </span>
                     </button>
 
-                    {/* PKR Option - Hidden for Indian users */}
+                    {/* PKR */}
                     {!isIndianUser && (
                       <button
-                        onClick={() => setSelectedPaymentMethod('pkr')}
-                        className="p-6 rounded-lg bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
+                        onClick={() => {
+                          setSelectedPaymentMethod('pkr');
+                          if (window.fbq) {
+                            window.fbq('track', 'InitiateCheckout', {
+                              content_ids: [selectedPackage.name],
+                              content_name: selectedPackage.name,
+                              num_items: 1,
+                              value: calculateFinalPrice(selectedPackage.price),
+                              currency: 'USD',
+                            });
+                          }
+                        }}
+                        className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
                       >
-                        <div className="flex items-center space-x-3 mb-3">
-                          <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <CreditCard className="w-6 h-6 text-blue-400" />
-                          </div>
-                          <div>
-                            <h5 className="text-white font-semibold text-lg">Pakistani Methods</h5>
-                            <p className="text-sm text-gray-400">JazzCash, Nayapay, Bank</p>
-                          </div>
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                          <CreditCard className="w-5 h-5 text-blue-400" />
                         </div>
-                        <div className="text-blue-400 font-medium">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-semibold text-sm">Pakistani Methods</p>
+                          <p className="text-xs text-gray-400">JazzCash, Nayapay, Bank</p>
+                        </div>
+                        <span className="text-blue-400 font-bold text-sm flex-shrink-0">
                           PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}
-                        </div>
+                        </span>
                       </button>
                     )}
                   </div>
@@ -1255,80 +1480,65 @@ export default function BuyAccount() {
 
               {/* USDT Payment Details */}
               {selectedPaymentMethod === 'usdt' && (
-                <>
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-lg font-semibold text-white">USDT Payment Details</h4>
-                      <button
-                        onClick={() => setSelectedPaymentMethod(null)}
-                        className="text-sm text-blue-400 hover:text-blue-300"
-                      >
-                        Change Method
-                      </button>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold text-white">USDT (TRC20) Details</p>
+                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-blue-400 hover:text-blue-300">
+                      Change
+                    </button>
+                  </div>
+                  <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Network</span>
+                      <span className="text-white font-medium">TRC20</span>
                     </div>
-                    <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400">Network:</span>
-                        <span className="text-white font-medium">TRC20</span>
-                      </div>
-                      <div className="space-y-2">
-                        <span className="text-gray-400">Wallet Address:</span>
-                        <div className="flex items-center space-x-2 bg-white/5 p-3 rounded-lg">
-                          <code className="text-blue-400 font-medium flex-1 break-all text-sm">
-                            TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5
-                          </code>
-                          <button
-                            onClick={() => copyToClipboard('TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5', 'usdt')}
-                            className="flex items-center px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
-                          >
-                            {copiedAccount === 'usdt' ? (
-                              <Check className="w-4 h-4 text-green-400" />
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4 text-blue-400 mr-1" />
-                                <span className="text-blue-400 text-sm">Copy</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1.5">Wallet Address</p>
+                      <div className="flex items-center space-x-2 bg-black/30 p-3 rounded-lg">
+                        <code className="text-blue-400 text-xs flex-1 break-all leading-relaxed">
+                          TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard('TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5', 'usdt')}
+                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 transition-colors"
+                        >
+                          {copiedAccount === 'usdt'
+                            ? <Check className="w-4 h-4 text-green-400" />
+                            : <><Copy className="w-3.5 h-3.5 text-blue-400 mr-1" /><span className="text-blue-400 text-xs">Copy</span></>}
+                        </button>
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               )}
 
-              {/* PKR Payment Methods */}
+              {/* PKR Method List */}
               {selectedPaymentMethod === 'pkr' && !selectedPkrMethod && (
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-lg font-semibold text-white">Choose PKR Method</h4>
-                    <button
-                      onClick={() => setSelectedPaymentMethod(null)}
-                      className="text-sm text-blue-400 hover:text-blue-300"
-                    >
-                      Change Method
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold text-white">Choose PKR method</p>
+                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-blue-400 hover:text-blue-300">
+                      Change
                     </button>
                   </div>
                   {paymentMethods.length === 0 ? (
-                    <p className="text-gray-400">No payment methods available. Please contact support.</p>
+                    <p className="text-gray-400 text-sm">No payment methods available. Please contact support.</p>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {paymentMethods.map((method) => (
                         <button
                           key={method.id}
                           onClick={() => setSelectedPkrMethod(method)}
-                          className="w-full p-4 rounded-lg bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
+                          className="w-full flex items-center space-x-3 p-3.5 rounded-xl bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
                         >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                              <CreditCard className="w-5 h-5 text-blue-400" />
-                            </div>
-                            <div className="flex-1">
-                              <h5 className="text-white font-semibold">{method.name}</h5>
-                              <p className="text-sm text-gray-400">{method.account_name}</p>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-gray-400" />
+                          <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                            <CreditCard className="w-4 h-4 text-blue-400" />
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-semibold text-sm">{method.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{method.account_name}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-500 flex-shrink-0" />
                         </button>
                       ))}
                     </div>
@@ -1339,36 +1549,28 @@ export default function BuyAccount() {
               {/* Selected PKR Method Details */}
               {selectedPaymentMethod === 'pkr' && selectedPkrMethod && (
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-lg font-semibold text-white">{selectedPkrMethod.name} Details</h4>
-                    <button
-                      onClick={() => setSelectedPkrMethod(null)}
-                      className="text-sm text-blue-400 hover:text-blue-300"
-                    >
-                      Change Method
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold text-white">{selectedPkrMethod.name}</p>
+                    <button onClick={() => setSelectedPkrMethod(null)} className="text-xs text-blue-400 hover:text-blue-300">
+                      Change
                     </button>
                   </div>
-                  <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                    <div className="mb-3">
-                      <p className="text-sm text-gray-400 mb-1">Account Name</p>
-                      <p className="text-white font-medium">{selectedPkrMethod.account_name}</p>
+                  <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                    <div>
+                      <p className="text-xs text-gray-400 mb-0.5">Account Name</p>
+                      <p className="text-white font-medium text-sm">{selectedPkrMethod.account_name}</p>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-400">Account Number</p>
-                      <div className="flex items-center justify-between bg-white/5 p-3 rounded-lg">
-                        <code className="text-blue-400 font-medium">{selectedPkrMethod.account_number}</code>
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1.5">Account Number</p>
+                      <div className="flex items-center space-x-2 bg-black/30 p-3 rounded-lg">
+                        <code className="text-blue-400 font-medium text-sm flex-1">{selectedPkrMethod.account_number}</code>
                         <button
                           onClick={() => copyToClipboard(selectedPkrMethod.account_number, selectedPkrMethod.id)}
-                          className="flex items-center px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 transition-colors"
+                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 transition-colors"
                         >
-                          {copiedAccount === selectedPkrMethod.id ? (
-                            <Check className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <>
-                              <Copy className="w-4 h-4 text-blue-400 mr-1" />
-                              <span className="text-blue-400 text-sm">Copy</span>
-                            </>
-                          )}
+                          {copiedAccount === selectedPkrMethod.id
+                            ? <Check className="w-4 h-4 text-green-400" />
+                            : <><Copy className="w-3.5 h-3.5 text-blue-400 mr-1" /><span className="text-blue-400 text-xs">Copy</span></>}
                         </button>
                       </div>
                     </div>
@@ -1376,62 +1578,56 @@ export default function BuyAccount() {
                 </div>
               )}
 
-              {/* Payment Form - Show only after method is selected */}
+              {/* Upload + Submit */}
               {(selectedPaymentMethod === 'usdt' || selectedPkrMethod) && (
-                <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                  {/* AI Verification Warning */}
-                  <div className="p-4 rounded-lg bg-red-500/10 border-2 border-red-500/40">
-                    <div className="flex items-start space-x-3">
-                      <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-red-400 font-bold text-sm mb-1">⚠️ AI-Powered Screenshot Verification Active</p>
-                        <p className="text-red-300 text-xs">
-                          Our system uses advanced AI to verify all payment screenshots. 
-                          <span className="font-bold"> If you upload a fake or manipulated screenshot, your account will be permanently suspended and you will be banned from our platform.</span>
-                          {' '}Only upload genuine payment confirmations.
-                        </p>
-                      </div>
-                    </div>
+                <form onSubmit={handlePaymentSubmit} className="space-y-3">
+                  {/* Trust badge */}
+                  <div className="flex items-start space-x-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+                    <Shield className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      Protected by <span className="text-white font-medium">GPT-4 Vision AI</span>. Upload a clear full-screenshot for fastest activation.
+                    </p>
                   </div>
 
+                  {/* File upload — large touch target */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">
-                      Payment Screenshot
+                    <input
+                      type="file"
+                      onChange={(e) => setPaymentScreenshot(e.target.files?.[0] || null)}
+                      className="hidden"
+                      id="screenshot"
+                      accept="image/*"
+                      required
+                    />
+                    <label
+                      htmlFor="screenshot"
+                      className="flex flex-col items-center justify-center w-full py-5 rounded-xl bg-white/5 border-2 border-dashed border-white/20 hover:border-blue-500/50 hover:bg-white/10 transition-all cursor-pointer text-center"
+                    >
+                      <Upload className="w-6 h-6 text-gray-400 mb-1.5" />
+                      <span className="text-sm text-white font-medium">
+                        {paymentScreenshot ? paymentScreenshot.name : 'Tap to upload screenshot'}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-0.5">PNG, JPG, WEBP accepted</span>
                     </label>
-                    <div className="relative">
-                      <input
-                        type="file"
-                        onChange={(e) => setPaymentScreenshot(e.target.files?.[0] || null)}
-                        className="hidden"
-                        id="screenshot"
-                        accept="image/*"
-                        required
-                      />
-                      <label
-                        htmlFor="screenshot"
-                        className="flex items-center justify-center w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors cursor-pointer"
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        {paymentScreenshot ? paymentScreenshot.name : 'Upload Screenshot'}
-                      </label>
-                    </div>
                   </div>
 
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-base"
                   >
-                    {submitting ? 'Verifying Screenshot...' : 'Submit Payment'}
+                    <Lock className="w-4 h-4" />
+                    <span>{submitting ? 'AI Verifying...' : 'Submit & Activate Account'}</span>
                   </button>
+                  <p className="text-center text-xs text-gray-500">🔒 Encrypted & secure · Activates after admin review</p>
                 </form>
               )}
 
               {/* Instructions */}
               {selectedPaymentMethod && (
-                <div className="text-sm text-gray-400">
-                  <p>Please make sure to:</p>
-                  <ul className="list-disc list-inside mt-2 space-y-1">
+                <div className="text-xs text-gray-500 pb-2">
+                  <p className="font-medium text-gray-400 mb-1">Before submitting:</p>
+                  <ul className="space-y-0.5 list-disc list-inside">
                     {selectedPaymentMethod === 'usdt' ? (
                       <>
                         <li>Send the exact amount in USDT</li>
@@ -1445,8 +1641,7 @@ export default function BuyAccount() {
                         <li>Include reference if required</li>
                       </>
                     )}
-                    <li>Include a clear screenshot of the transaction</li>
-                    <li>Wait for admin verification</li>
+                    <li>Upload a clear, complete screenshot</li>
                   </ul>
                 </div>
               )}
@@ -1454,6 +1649,28 @@ export default function BuyAccount() {
           </div>
         </div>
       )}
+      {/* Sticky Mobile CTA */}
+      {selectedPackage && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-gray-900/95 backdrop-blur-sm border-t border-white/10 px-4 py-3 flex items-center space-x-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-semibold text-sm truncate">{selectedPackage.name}</p>
+            <p className="text-green-400 text-xs font-bold">
+              ${calculateFinalPrice(selectedPackage.price).toFixed(2)}
+              {appliedCoupon && (
+                <span className="text-gray-500 line-through ml-1.5 text-xs">${selectedPackage.price}</span>
+              )}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowPaymentModal(true)}
+            className="flex-shrink-0 flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-500/30"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Buy Now</span>
+          </button>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -25,6 +25,7 @@ import AffiliateReferrals from './pages/AffiliateReferrals';
 import AffiliateWithdrawal from './pages/AffiliateWithdrawal';
 import Rejected from './pages/Rejected';
 import SuspiciousPayment from './pages/SuspiciousPayment';
+import LiveSupport from './pages/LiveSupport';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers from './pages/admin/Users';
 import AccountRules from './pages/admin/AccountRules';
@@ -187,6 +188,7 @@ export default function App() {
               <Route path="/affiliate/referrals" element={<AffiliateReferrals />} />
               <Route path="/affiliate/withdrawal" element={<AffiliateWithdrawal />} />
               <Route path="/suspicious-payment" element={<SuspiciousPayment />} />
+              <Route path="/live-support" element={<LiveSupport />} />
             </Route>
 
             {/* Catch all */}
