@@ -71,6 +71,7 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
       let totalEquity = 0;
       let totalInitial = 0;
       let totalTrades = 0;
+      let realizedProfit = 0;
       let dailyPL = 0;
       const today = new Date();
 
@@ -99,6 +100,7 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
 
         if (!tradesError && trades) {
           totalTrades = trades.length;
+          realizedProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0);
           const todayTrades = trades.filter(t => {
             const d = new Date(t.close_time);
             return d.toDateString() === today.toDateString();
@@ -112,7 +114,7 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
         totalInitial = totalBalance;
       }
 
-      const totalProfits = totalEquity - totalInitial;
+      const totalProfits = realizedProfit;
 
       // The calculations for daily and trade array are handled above.
       const activeAccounts = accounts?.filter(acc => acc.status === 'active') || [];
