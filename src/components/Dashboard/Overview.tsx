@@ -21,7 +21,8 @@ export default function Overview() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<'all' | 'active' | 'breached'>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [allAccounts, setAllAccounts] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -56,10 +57,14 @@ export default function Overview() {
 
       if (requestsError) throw requestsError;
 
-      // Filter accounts
+      setAllAccounts(accounts || []);
+
+      // Filter accounts based on groups or specific MT5 Login
       const filteredAccounts = filterType === 'all' 
         ? (accounts || []) 
-        : (accounts?.filter(acc => acc.status === filterType) || []);
+        : filterType === 'active' || filterType === 'breached'
+          ? (accounts?.filter(acc => acc.status === filterType) || [])
+          : (accounts?.filter(acc => acc.mt5_login === filterType) || []);
 
       const mt5Logins = filteredAccounts.map(acc => acc.mt5_login).filter(Boolean);
 
@@ -168,21 +173,37 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
-      <div className="flex space-x-2">
-        {(['all', 'active', 'breached'] as const).map((type) => (
-          <button
-            key={type}
-            onClick={() => setFilterType(type)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-              filterType === type 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/10'
-            }`}
-          >
-            {type} Accounts
-          </button>
-        ))}
+      {/* Filters Dropdown */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/5 border border-white/10 p-4 rounded-2xl gap-4">
+        <div>
+          <h3 className="text-white font-medium">Dashboard Overview</h3>
+          <p className="text-gray-400 text-xs mt-1">Select an account or group to filter statistics.</p>
+        </div>
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="bg-[#0b0e14] border border-white/10 text-white text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-72 p-3 outline-none transition-colors hover:border-white/20"
+        >
+          <optgroup label="Account Groups">
+            <option value="all">All Accounts (Combined)</option>
+            <option value="active">Active Accounts Only</option>
+            <option value="breached">Breached Accounts Only</option>
+          </optgroup>
+          {allAccounts.some(a => a.status === 'active') && (
+            <optgroup label="Specific Active Accounts">
+              {allAccounts.filter(a => a.status === 'active').map(a => (
+                <option key={a.id} value={a.mt5_login}>Account #{a.mt5_login}</option>
+              ))}
+            </optgroup>
+          )}
+          {allAccounts.some(a => a.status === 'breached') && (
+            <optgroup label="Specific Breached Accounts">
+              {allAccounts.filter(a => a.status === 'breached').map(a => (
+                <option key={a.id} value={a.mt5_login}>Account #{a.mt5_login} (Breached)</option>
+              ))}
+            </optgroup>
+          )}
+        </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
