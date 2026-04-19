@@ -96,7 +96,7 @@ export default function Layout() {
                 )}
               </button>
               <div className="flex items-center space-x-3">
-                <img src="/logo.png" alt="FundedCobra Logo" className="h-[120px] object-contain" />
+                <img src="/logo.png" alt="FundedCobra Logo" className="h-10 object-contain" />
               </div>
             </div>
 
