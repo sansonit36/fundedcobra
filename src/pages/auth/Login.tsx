@@ -34,7 +34,7 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center mb-8">
-          <img src="/favicon.png" alt="FundedCobra Logo" className="w-[135px] h-[135px] object-contain drop-shadow-2xl" />
+          <img src="/logo.png" alt="FundedCobra Logo" className="w-[135px] h-[135px] object-contain drop-shadow-2xl" />
         </div>
 
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
