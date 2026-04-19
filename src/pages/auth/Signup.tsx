@@ -127,7 +127,7 @@ export default function Signup() {
 
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <h1 className="text-2xl font-bold text-white text-center mb-2">Create an account</h1>
-          <p className="text-gray-400 text-center mb-6">Get started with Propfirm</p>
+          <p className="text-gray-400 text-center mb-6">Get started with FundedCobra</p>
 
           {error && (
             <div className="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start space-x-3">

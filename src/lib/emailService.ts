@@ -27,17 +27,17 @@ interface EmailParams {
 
 const EMAIL_TEMPLATES = {
   welcome: {
-    subject: 'Welcome to Propfirm - Start Your Trading Journey',
+    subject: 'Welcome to FundedCobra - Start Your Trading Journey',
     html: (data: any) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 40px;">
-          <h1 style="color: #1e3a8a; margin: 0; font-size: 32px;">Welcome to Propfirm</h1>
+          <h1 style="color: #1e3a8a; margin: 0; font-size: 32px;">Welcome to FundedCobra</h1>
         </div>
         
         <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            Thank you for joining Propfirm! We're excited to help you achieve your trading goals.
+            Thank you for joining FundedCobra! We're excited to help you achieve your trading goals.
           </p>
         </div>
 
@@ -83,7 +83,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #fef3c7; padding: 30px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #f59e0b;">
           <h2 style="color: #92400e; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #78350f; font-size: 16px; line-height: 1.6;">
-            You're almost there! Complete your KYC verification to start trading with Propfirm.
+            You're almost there! Complete your KYC verification to start trading with FundedCobra.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            You're registered with Propfirm, but haven't chosen your trading account yet. 
+            You're registered with FundedCobra, but haven't chosen your trading account yet. 
             Don't miss out on this opportunity!
           </p>
         </div>
@@ -195,7 +195,7 @@ const EMAIL_TEMPLATES = {
             </tr>
             <tr>
               <td style="padding: 10px 0;"><strong>Server:</strong></td>
-              <td style="text-align: right;">${data.mt5Server || 'Propfirm-Live'}</td>
+              <td style="text-align: right;">${data.mt5Server || 'FundedCobra-Live'}</td>
             </tr>
           </table>
         </div>
@@ -295,7 +295,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #d1fae5; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #065f46; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #047857; font-size: 16px; line-height: 1.6;">
-            Congratulations! Your identity has been verified. You now have full access to all Propfirm features.
+            Congratulations! Your identity has been verified. You now have full access to all FundedCobra features.
           </p>
         </div>
 
@@ -346,7 +346,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            It's been a week since you joined Propfirm. We noticed you haven't selected your trading account yet.
+            It's been a week since you joined FundedCobra. We noticed you haven't selected your trading account yet.
           </p>
         </div>
 
@@ -412,7 +412,7 @@ const EMAIL_TEMPLATES = {
   },
 
   inactive_user: {
-    subject: 'We Miss You! Come Back to Propfirm',
+    subject: 'We Miss You! Come Back to FundedCobra',
     html: (data: any) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 40px;">
@@ -427,7 +427,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="margin-bottom: 30px;">
-          <h3 style="color: #1f2937;">What's New at Propfirm:</h3>
+          <h3 style="color: #1f2937;">What's New at FundedCobra:</h3>
           <ul style="color: #4b5563; font-size: 16px; line-height: 1.8;">
             <li>New account sizes available</li>
             <li>Improved trading conditions</li>

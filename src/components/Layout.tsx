@@ -100,7 +100,7 @@ export default function Layout() {
                   <BarChart2 className="w-5 h-5 text-white" />
                 </div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent hidden sm:block">
-                  Propfirm
+                  FundedCobra
                 </h1>
               </div>
             </div>

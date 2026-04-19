@@ -213,7 +213,7 @@ function get7DayEmailHTML(name: string): string {
       <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
         <h2 style="color: #1f2937; margin-top: 0;">Hi ${name},</h2>
         <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-          It's been a week since you joined Propfirm. We noticed you haven't selected your trading account yet.
+          It's been a week since you joined FundedCobra. We noticed you haven't selected your trading account yet.
         </p>
       </div>
 
@@ -232,7 +232,7 @@ function get7DayEmailHTML(name: string): string {
       </div>
 
       <div style="text-align: center; margin: 40px 0;">
-        <a href="https://account.propfirm.com/buy-account" 
+        <a href="https://account.fundedcobra.com/buy-account" 
            style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
           Start Trading Today
         </a>
@@ -262,7 +262,7 @@ function get14DayEmailHTML(name: string): string {
       </div>
 
       <div style="text-align: center; margin: 40px 0;">
-        <a href="https://account.propfirm.com/buy-account" 
+        <a href="https://account.fundedcobra.com/buy-account" 
            style="background: #7c3aed; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
           Claim Your Offer
         </a>
@@ -296,7 +296,7 @@ function getKYCReminderHTML(name: string): string {
       </div>
 
       <div style="text-align: center; margin: 40px 0;">
-        <a href="https://account.propfirm.com/kyc" 
+        <a href="https://account.fundedcobra.com/kyc" 
            style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
           Complete Verification
         </a>

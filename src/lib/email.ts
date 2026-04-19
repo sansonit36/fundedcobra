@@ -15,11 +15,11 @@ export async function sendTestEmail(to: string): Promise<{ success: boolean; err
     const { data, error } = await supabase.functions.invoke('send-test-email', {
       body: { 
         to,
-        subject: 'Propfirm SMTP Test',
+        subject: 'FundedCobra SMTP Test',
         html: `
           <h1>SMTP Test Successful</h1>
           <p>This email confirms that your SMTP configuration is working correctly.</p>
-          <p>You can now use email notifications in your Propfirm platform.</p>
+          <p>You can now use email notifications in your FundedCobra platform.</p>
         `
       }
     });

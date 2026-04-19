@@ -122,7 +122,7 @@ export default function Rejected() {
         {/* Footer Message */}
         <div className="mt-6 text-center">
           <p className="text-gray-500 text-sm">
-            Propfirm Community Protection
+            FundedCobra Community Protection
           </p>
         </div>
       </div>

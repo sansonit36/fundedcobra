@@ -343,7 +343,7 @@ export async function approveAccountRequest(
   requestId: string,
   mt5Login: string,
   mt5Password: string,
-  mt5Server: string = 'Propfirm-Live'
+  mt5Server: string = 'FundedCobra-Live'
 ): Promise<string> {
   const { data, error } = await supabase
     .rpc('approve_account_request', {

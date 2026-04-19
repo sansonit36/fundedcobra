@@ -4,7 +4,7 @@ import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 import { corsHeaders } from '../_shared/cors.ts';
 
 const SITE_URL = Deno.env.get('SITE_URL') ?? '';
-const PROJECT_NAME = Deno.env.get('PROJECT_NAME') ?? 'Propfirm';
+const PROJECT_NAME = Deno.env.get('PROJECT_NAME') ?? 'FundedCobra';
 
 
 serve(async (req) => {

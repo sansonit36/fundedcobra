@@ -30,7 +30,7 @@ export default function AccountApprovals() {
   const [mt5Credentials, setMT5Credentials] = useState({
     login: '',
     password: '',
-    server: 'Propfirm-Live'
+    server: 'FundedCobra-Live'
   });
   const [rejectionReason, setRejectionReason] = useState('');
   const [customRejectionReason, setCustomRejectionReason] = useState('');
@@ -172,7 +172,7 @@ const handleApprove = async () => {
     await loadRequests();
     setShowApprovalModal(false);
     setSelectedRequest(null);
-    setMT5Credentials({ login: "", password: "", server: "Propfirm-Live" });
+    setMT5Credentials({ login: "", password: "", server: "FundedCobra-Live" });
   } catch (err) {
     console.error("Error approving request:", err);
     setError(err instanceof Error ? err.message : "Failed to approve account request");
@@ -572,7 +572,7 @@ const handleApprove = async () => {
                     setMT5Credentials({
                       login: '',
                       password: '',
-                      server: 'Propfirm-Live'
+                      server: 'FundedCobra-Live'
                     });
                   }}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
