@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History } from 'lucide-react';
+import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History, Target } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getTradingAccounts, getPendingAccounts, TradingAccount, AccountRequest } from '../lib/database';
 import { supabase } from '../lib/supabase';
@@ -223,33 +223,78 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   </div>
                 </div>
 
-                {/* Drawdown Limits Section */}
-                <div className="mt-4">
-                  <h3 className="text-sm text-gray-400 mb-2">Drawdown Limits</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-400">Daily Drawdown Limit</p>
-                      <div className="relative h-4 bg-gray-700 rounded-full overflow-hidden">
+                {/* Enhanced Drawdown Limits Section */}
+                <div className="mt-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-gray-300 flex items-center">
+                      <Target className="w-4 h-4 mr-2 text-blue-400" />
+                      Loss Limits & Protection
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Daily Drawdown */}
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Daily Guard</p>
+                          <p className="text-lg font-bold text-white">
+                            ${(extended?.daily_drawdown_limit || 0).toLocaleString()} <span className="text-[10px] text-gray-500 font-normal">LIMIT</span>
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Safe Zone Space</p>
+                          <p className={`text-sm font-bold ${
+                            ((extended?.running_equity || 0) - (extended?.daily_drawdown_limit || 0)) > 500 ? 'text-green-400' : 'text-red-400'
+                          }`}>
+                            +${Math.max(0, (extended?.running_equity || 0) - (extended?.daily_drawdown_limit || 0)).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Clear Visual Progress Bar */}
+                      <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
                         <div 
-                          className="absolute top-0 left-0 h-full bg-yellow-500" 
-                          style={{ width: `${extended?.daily_drawdown_limit || 0}%` }}
+                          className={`absolute top-0 left-0 h-full transition-all duration-500 ${
+                            ((extended?.running_equity || 0) - (extended?.daily_drawdown_limit || 0)) > 500 ? 'bg-gradient-to-r from-green-500 to-emerald-400' : 'bg-gradient-to-r from-red-600 to-orange-500'
+                          }`}
+                          style={{ 
+                            width: `${Math.min(100, Math.max(0, (((extended?.running_equity || 0) - (extended?.daily_drawdown_limit || 0)) / ((extended?.running_balance || 1) * 0.05)) * 100))}%` 
+                          }}
                         ></div>
                       </div>
-                      <p className="text-xs text-gray-200 mt-1">
-                        {extended?.daily_drawdown_limit || 0}%
-                      </p>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-400">Overall Drawdown Limit</p>
-                      <div className="relative h-4 bg-gray-700 rounded-full overflow-hidden">
+
+                    {/* Overall Drawdown */}
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Max Safety</p>
+                          <p className="text-lg font-bold text-white">
+                            ${(extended?.overall_drawdown_limit || 0).toLocaleString()} <span className="text-[10px] text-gray-500 font-normal">LIMIT</span>
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Total Space</p>
+                          <p className={`text-sm font-bold ${
+                            ((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) > 1000 ? 'text-blue-400' : 'text-red-400'
+                          }`}>
+                            +${Math.max(0, (extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Interactive Progress Bar */}
+                      <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
                         <div 
-                          className="absolute top-0 left-0 h-full bg-red-500" 
-                          style={{ width: `${extended?.overall_drawdown_limit || 0}%` }}
+                          className={`absolute top-0 left-0 h-full transition-all duration-500 ${
+                            ((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) > 1000 ? 'bg-gradient-to-r from-blue-600 to-indigo-500' : 'bg-gradient-to-r from-red-600 to-orange-500'
+                          }`}
+                          style={{ 
+                            width: `${Math.min(100, Math.max(0, (((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) / ((extended?.running_balance || 1) * 0.12)) * 100))}%` 
+                          }}
                         ></div>
                       </div>
-                      <p className="text-xs text-gray-200 mt-1">
-                        {extended?.overall_drawdown_limit || 0}%
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -294,7 +339,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   
                   {showTrades[account.id] && (
                     <div className="mt-4">
-                      <TradeHistoryTable mt5Id={account.mt5_login} />
+                      <TradeHistoryTable mt5Id={account.mt5_login} breachReason={account.breach_reason} />
                     </div>
                   )}
                 </div>
@@ -322,7 +367,7 @@ interface Trade {
   close_time: string;
 }
 
-function TradeHistoryTable({ mt5Id }: { mt5Id: string }) {
+function TradeHistoryTable({ mt5Id, breachReason }: { mt5Id: string, breachReason?: string }) {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -362,6 +407,23 @@ function TradeHistoryTable({ mt5Id }: { mt5Id: string }) {
 
   return (
     <div className="overflow-x-auto rounded-xl border border-white/5">
+      {breachReason && (
+        <div className="bg-red-500/10 px-4 py-3 border-b border-white/5 flex items-start space-x-2">
+          <AlertOctagon className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="text-red-400 font-bold text-sm uppercase tracking-wider">Account Rule Violations</h4>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {breachReason.includes('|') ? (
+                breachReason.split('|').map((reason, idx) => (
+                  <span key={idx} className="bg-red-500/20 text-red-300 text-xs px-2 py-1 rounded max-w-full truncate">{reason.trim()}</span>
+                ))
+              ) : (
+                <span className="bg-red-500/20 text-red-300 text-xs px-2 py-1 rounded">{breachReason.replace('Audit: ', '')}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <table className="w-full text-left border-collapse">
         <thead className="bg-white/5">
           <tr>
@@ -411,7 +473,7 @@ function TradeHistoryTable({ mt5Id }: { mt5Id: string }) {
                       <p className="text-xs opacity-75">{new Date(trade.close_time).toLocaleTimeString()}</p>
                     </div>
                   </div>
-                  {isViolation && <p className="text-[10px] text-red-400 font-bold mt-1 uppercase">Rule Violation: Under 60s</p>}
+                  {isViolation && <p className="text-[10px] text-red-400 font-bold mt-1 uppercase">Scalping (&lt;60s)</p>}
                 </td>
               </tr>
             );

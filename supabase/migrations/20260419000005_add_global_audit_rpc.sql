@@ -22,7 +22,13 @@ BEGIN
     LOOP
         UPDATE trading_accounts 
         SET status = 'breached',
-            breach_reason = 'Audit: Rule Violation - Trade held under 60s (Ticket: ' || v_violation_record.ticket || ' | ' || v_violation_record.duration || 's)'
+            breach_reason = 
+              CASE 
+                WHEN breach_reason IS NULL OR breach_reason = '' THEN 'Audit: Rule Violation - Trade held under 60s (Ticket: ' || v_violation_record.ticket || ' | ' || v_violation_record.duration || 's)'
+                WHEN breach_reason NOT LIKE '%Ticket: ' || v_violation_record.ticket || '%' THEN breach_reason || ' | Rule Violation - Trade held under 60s (Ticket: ' || v_violation_record.ticket || ')'
+                ELSE breach_reason
+              END
+
         WHERE mt5_login = v_violation_record.mt5_id AND status = 'active';
         
         IF FOUND THEN
@@ -50,7 +56,12 @@ BEGIN
         ) THEN
             UPDATE trading_accounts 
             SET status = 'breached',
-                breach_reason = 'Audit: Rule Violation - Stacking pattern detected (System Audit)'
+                breach_reason = 
+                  CASE
+                    WHEN breach_reason IS NULL OR breach_reason = '' THEN 'Audit: Rule Violation - Stacking pattern detected (System Audit)'
+                    WHEN breach_reason NOT LIKE '%Stacking%' THEN breach_reason || ' | Rule Violation - Stacking pattern detected'
+                    ELSE breach_reason
+                  END
             WHERE mt5_login = v_account_record.mt5_login AND status = 'active';
             
             IF FOUND THEN
