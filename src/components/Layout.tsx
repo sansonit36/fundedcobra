@@ -96,12 +96,7 @@ export default function Layout() {
                 )}
               </button>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                  <BarChart2 className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent hidden sm:block">
-                  FundedCobra
-                </h1>
+                <img src="/logo.png" alt="FundedCobra Logo" className="h-8 object-contain" />
               </div>
             </div>
 
