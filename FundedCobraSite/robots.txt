@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://fundedcobra.com/sitemap.xml
+Disallow: /Files/img/legacy/

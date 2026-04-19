@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteBase /
+
+# Map /rules to /Files/pages/rules.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/Files/pages/$1.html -f
+RewriteRule ^([^/]+)/?$ Files/pages/$1.html [L]
+
+# Also handle root level if some files are there
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^([^/]+)/?$ $1.html [L]

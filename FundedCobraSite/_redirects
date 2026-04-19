@@ -1,0 +1,8 @@
+/rules /Files/pages/rules.html 200
+/accounts /Files/pages/accounts.html 200
+/reviews /Files/pages/reviews.html 200
+/about /Files/pages/about.html 200
+/faq /Files/pages/faq-page.html 200
+/privacy /Files/pages/privacy-policy.html 200
+/terms /Files/pages/terms-of-service.html 200
+/* /Files/pages/:splat.html 200
