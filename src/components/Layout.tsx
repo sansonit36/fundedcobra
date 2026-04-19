@@ -83,7 +83,7 @@ export default function Layout() {
       {/* Header */}
       <header className="fixed w-full z-50">
         <div className="glass-effect-dark border-b border-gray-700/50">
-          <div className="flex items-center justify-between px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-2">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -96,7 +96,7 @@ export default function Layout() {
                 )}
               </button>
               <div className="flex items-center space-x-3">
-                <img src="/logo.png" alt="FundedCobra Logo" className="h-10 object-contain" />
+                <img src="/logo.png" alt="FundedCobra Logo" className="h-[60px] object-contain" />
               </div>
             </div>
 
@@ -152,7 +152,7 @@ export default function Layout() {
         className={`fixed left-0 top-0 h-full w-full md:w-72 transition-transform duration-300 ease-out transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } ${isMobile ? 'z-40 bg-gray-900' : ''}`}
-        style={{ paddingTop: '73px' }}
+        style={{ paddingTop: '76px' }}
       >
         <div className="h-full glass-effect-dark border-r border-gray-700/50">
           <nav className="p-4 sm:p-6">
@@ -193,7 +193,7 @@ export default function Layout() {
       {/* Main Content */}
       <main 
         className={`transition-all duration-300 ease-out ${isSidebarOpen && !isMobile ? 'md:ml-72' : 'ml-0'}`}
-        style={{ paddingTop: '89px' }}
+        style={{ paddingTop: '76px' }}
       >
         <div className="p-4 sm:p-6">
           <Outlet />
