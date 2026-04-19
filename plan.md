@@ -1,4 +1,4 @@
-# Implementation Plan for Riverton Markets Platform
+# Implementation Plan for FundedCobra Platform
 
 ## 1. Database Setup & Configuration
 

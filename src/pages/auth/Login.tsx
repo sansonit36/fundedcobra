@@ -59,7 +59,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter your email"
                   required
                   disabled={loading}
@@ -74,7 +74,7 @@ export default function Login() {
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -85,7 +85,7 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter your password"
                   required
                   disabled={loading}
@@ -96,7 +96,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {loading ? (
                 <>
@@ -115,7 +115,7 @@ export default function Login() {
           <div className="mt-6 text-center">
             <p className="text-gray-400">
               Don't have an account?{' '}
-              <Link to="/signup" className="text-blue-400 hover:text-blue-300 transition-colors">
+              <Link to="/signup" className="text-primary-400 hover:text-primary-300 transition-colors">
                 Sign up
               </Link>
             </p>

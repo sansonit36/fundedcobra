@@ -188,7 +188,7 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
               <button
                 key={type}
                 onClick={() => setFilterType && setFilterType(type)}
-                className={`px-4 py-2 ${['all', 'active', 'breached'].includes(filterType) && filterType === type ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'} rounded-lg text-sm font-medium transition-colors capitalize flex-1 sm:flex-none text-center`}
+                className={`px-4 py-2 ${['all', 'active', 'breached'].includes(filterType) && filterType === type ? 'bg-primary-500 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'} rounded-lg text-sm font-medium transition-colors capitalize flex-1 sm:flex-none text-center`}
               >
                 {type}
               </button>
@@ -199,7 +199,7 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
           <select
             value={filterType}
             onChange={(e) => setFilterType && setFilterType(e.target.value)}
-            className="bg-[#0b0e14] border border-white/10 text-white text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-64 p-3 outline-none transition-colors hover:border-white/20"
+            className="bg-[#0b0e14] border border-white/10 text-white text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full sm:w-64 p-3 outline-none transition-colors hover:border-white/20"
           >
             <option value="all" disabled={['all', 'active', 'breached'].includes(filterType)}>-- Select Specific Account --</option>
             {allAccounts.some(a => a.status === 'active') && (
@@ -245,10 +245,10 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
         {/* Active Accounts */}
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+              <Users className="w-6 h-6 text-primary-400" />
             </div>
-            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">
+            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary-500/10 text-primary-400">
               Active
             </span>
           </div>
@@ -258,7 +258,7 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
             <span className="text-sm text-gray-400">accounts</span>
           </div>
           <div className="mt-4 flex items-center text-sm text-gray-400">
-            <Activity className="w-4 h-4 mr-1 text-blue-400" />
+            <Activity className="w-4 h-4 mr-1 text-primary-400" />
             <span>{stats.pendingAccounts} pending approval</span>
           </div>
         </div>

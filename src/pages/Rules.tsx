@@ -118,8 +118,8 @@ export default function Rules() {
 
             <div className="card-gradient rounded-2xl p-5 border border-white/5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                  <Activity className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center flex-shrink-0">
+                  <Activity className="w-5 h-5 text-primary-400" />
                 </div>
                 <h3 className="text-base font-bold text-white">Platform & Conditions</h3>
               </div>
@@ -227,7 +227,7 @@ export default function Rules() {
 
                         <div className="p-3 rounded-lg bg-white/5">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Shield className="w-3.5 h-3.5 text-blue-400" />
+                            <Shield className="w-3.5 h-3.5 text-primary-400" />
                             <span className="text-xs text-gray-400">Payout Schedule</span>
                           </div>
                           <div className="text-white font-bold">{payoutLabel(rule)}</div>
@@ -251,7 +251,7 @@ export default function Rules() {
 
                         <div className="p-3 rounded-lg bg-white/5">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <DollarSign className="w-3.5 h-3.5 text-blue-400" />
+                            <DollarSign className="w-3.5 h-3.5 text-primary-400" />
                             <span className="text-xs text-gray-400">Min. Withdrawal</span>
                           </div>
                           <div className="text-white font-bold">${rule.minimum_withdrawal_amount}</div>
@@ -274,7 +274,7 @@ export default function Rules() {
                 </div>
                 <button
                   onClick={() => setShowRulesModal(true)}
-                  className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-sm font-medium rounded-lg transition-colors border border-blue-500/20"
+                  className="px-4 py-2 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 text-sm font-medium rounded-lg transition-colors border border-primary-500/20"
                 >
                   Full Rules
                 </button>
@@ -395,14 +395,14 @@ export default function Rules() {
               </div>
 
               {/* Risk management */}
-              <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                <h4 className="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2">
+              <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
+                <h4 className="text-sm font-bold text-primary-400 mb-3 flex items-center gap-2">
                   <Shield className="w-4 h-4" /> Risk Management
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2"><span className="text-blue-400">•</span> Stop loss is recommended but not required</li>
-                  <li className="flex items-start gap-2"><span className="text-blue-400">•</span> Lot size must be proportional to account equity</li>
-                  <li className="flex items-start gap-2"><span className="text-blue-400">•</span> Risk per trade should not exceed 5% of account equity</li>
+                  <li className="flex items-start gap-2"><span className="text-primary-400">•</span> Stop loss is recommended but not required</li>
+                  <li className="flex items-start gap-2"><span className="text-primary-400">•</span> Lot size must be proportional to account equity</li>
+                  <li className="flex items-start gap-2"><span className="text-primary-400">•</span> Risk per trade should not exceed 5% of account equity</li>
                 </ul>
               </div>
 

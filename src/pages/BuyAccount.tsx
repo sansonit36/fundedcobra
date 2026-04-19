@@ -680,22 +680,22 @@ export default function BuyAccount() {
       {aiVerifying && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="max-w-lg w-full">
-            <div className="card-gradient rounded-2xl p-8 border-2 border-blue-500/30 shadow-2xl">
+            <div className="card-gradient rounded-2xl p-8 border-2 border-primary-500/30 shadow-2xl">
               {/* Animated Robot/AI Icon */}
               <div className="flex justify-center mb-6">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center animate-pulse">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center animate-pulse">
                     <Shield className="w-10 h-10 text-white" />
                   </div>
                   {/* Scanning rings */}
-                  <div className="absolute inset-0 rounded-full border-2 border-blue-400 animate-ping opacity-75"></div>
+                  <div className="absolute inset-0 rounded-full border-2 border-primary-400 animate-ping opacity-75"></div>
                   <div className="absolute inset-0 rounded-full border-2 border-purple-400 animate-ping opacity-50" style={{ animationDelay: '0.5s' }}></div>
                 </div>
               </div>
 
               {/* Title */}
               <h3 className="text-2xl font-bold text-center mb-2">
-                <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                   AI Verification in Progress
                 </span>
               </h3>
@@ -715,7 +715,7 @@ export default function BuyAccount() {
                     verificationStep > 0
                       ? 'bg-green-500 scale-100'
                       : verificationStep === 0
-                      ? 'bg-blue-500 animate-pulse scale-110'
+                      ? 'bg-primary-500 animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     {verificationStep > 0 ? (
@@ -738,7 +738,7 @@ export default function BuyAccount() {
                     verificationStep > 1
                       ? 'bg-green-500 scale-100'
                       : verificationStep === 1
-                      ? 'bg-blue-500 animate-pulse scale-110'
+                      ? 'bg-primary-500 animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     {verificationStep > 1 ? (
@@ -761,7 +761,7 @@ export default function BuyAccount() {
                     verificationStep > 2
                       ? 'bg-green-500 scale-100'
                       : verificationStep === 2
-                      ? 'bg-blue-500 animate-pulse scale-110'
+                      ? 'bg-primary-500 animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     {verificationStep > 2 ? (
@@ -782,7 +782,7 @@ export default function BuyAccount() {
                 }`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                     verificationStep === 3
-                      ? 'bg-blue-500 animate-pulse scale-110'
+                      ? 'bg-primary-500 animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     <Check className="w-4 h-4 text-white" />
@@ -795,8 +795,8 @@ export default function BuyAccount() {
               </div>
 
               {/* Fun Messages */}
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-center">
-                <p className="text-blue-300 text-sm font-medium">
+              <div className="bg-primary-500/10 border border-primary-500/30 rounded-xl p-4 text-center">
+                <p className="text-primary-300 text-sm font-medium">
                   {verificationStep === 0 && "📤 Hang tight! We're uploading your screenshot..."}
                   {verificationStep === 1 && "🤖 Our AI is examining every pixel of your screenshot..."}
                   {verificationStep === 2 && "🔍 Smart verification in action! Checking transaction details..."}
@@ -808,7 +808,7 @@ export default function BuyAccount() {
               <div className="mt-6">
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+                    className="h-full bg-gradient-to-r from-primary-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${(verificationStep + 1) * 25}%` }}
                   ></div>
                 </div>
@@ -819,9 +819,9 @@ export default function BuyAccount() {
 
               {/* Security Notice */}
               <div className="mt-6 flex items-start space-x-2 text-xs text-gray-400">
-                <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-400" />
+                <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary-400" />
                 <p>
-                  We use <span className="text-blue-400 font-semibold">GPT-4 Vision AI</span> to ensure all payment screenshots are genuine. 
+                  We use <span className="text-primary-400 font-semibold">GPT-4 Vision AI</span> to ensure all payment screenshots are genuine. 
                   This protects our community from fraud.
                 </p>
               </div>
@@ -833,7 +833,7 @@ export default function BuyAccount() {
       {/* Exit-Intent Modal */}
       {showExitIntent && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="max-w-md w-full card-gradient rounded-2xl p-8 border border-blue-500/30 shadow-2xl text-center">
+          <div className="max-w-md w-full card-gradient rounded-2xl p-8 border border-primary-500/30 shadow-2xl text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
               <span className="text-3xl">🚀</span>
             </div>
@@ -846,7 +846,7 @@ export default function BuyAccount() {
             <div className="space-y-3">
               <button
                 onClick={() => { setShowExitIntent(false); setShowPaymentModal(true); }}
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/30"
+                className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center space-x-2 shadow-lg shadow-primary-500/30"
               >
                 <Lock className="w-4 h-4" />
                 <span>Complete My Purchase</span>
@@ -876,7 +876,7 @@ export default function BuyAccount() {
               <p className="text-sm text-gray-300 transition-all duration-500">
                 💸 <span className="text-white font-semibold">{payoutTicker[tickerIndex].trader}</span> just withdrew{' '}
                 <span className="text-green-400 font-bold">{payoutTicker[tickerIndex].amount}</span> from their{' '}
-                <span className="text-blue-400">{payoutTicker[tickerIndex].pkg}</span>{' '}·{' '}
+                <span className="text-primary-400">{payoutTicker[tickerIndex].pkg}</span>{' '}·{' '}
                 <span className="text-gray-500 text-xs">{payoutTicker[tickerIndex].time}</span>
               </p>
             </div>
@@ -963,15 +963,15 @@ export default function BuyAccount() {
               {packages.filter(pkg => !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)).map((pkg) => (
                 <div key={pkg.id} className="relative">
                   {/* Viewing count badge */}
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-gray-800 border border-blue-500/30 flex items-center space-x-1 whitespace-nowrap">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                    <span className="text-blue-400 text-[10px] font-medium">{getViewingCount(pkg.name)} viewing now</span>
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-gray-800 border border-primary-500/30 flex items-center space-x-1 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse"></span>
+                    <span className="text-primary-400 text-[10px] font-medium">{getViewingCount(pkg.name)} viewing now</span>
                   </div>
                   <button
                     onClick={() => setSelectedPackage(pkg)}
                     className={`relative w-full p-4 rounded-xl border transition-all ${
                       selectedPackage?.id === pkg.id
-                        ? 'bg-blue-500/20 border-blue-500/50'
+                        ? 'bg-primary-500/20 border-primary-500/50'
                         : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   >
@@ -980,7 +980,7 @@ export default function BuyAccount() {
                       50% OFF
                     </div>
                     {selectedPackage?.id === pkg.id && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center z-10">
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center z-10">
                         <Check className="w-4 h-4 text-white" />
                       </div>
                     )}
@@ -995,12 +995,12 @@ export default function BuyAccount() {
                     <div className="text-xs text-green-400 font-medium mb-2">
                       Save ${(pkg.price * 0.5).toFixed(0)}!
                     </div>
-                    <div className="text-xs text-blue-400 mt-2">
+                    <div className="text-xs text-primary-400 mt-2">
                       Refundable after 5 payouts
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleBuyNow(pkg); }}
-                      className="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm transition-all flex items-center justify-center space-x-1.5 shadow-md shadow-blue-500/20"
+                      className="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700 text-white font-bold text-sm transition-all flex items-center justify-center space-x-1.5 shadow-md shadow-primary-500/20"
                     >
                       <Lock className="w-3.5 h-3.5" />
                       <span>Buy Now →</span>
@@ -1017,7 +1017,7 @@ export default function BuyAccount() {
                 <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-semibold text-white">Initial Split</h4>
-                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-blue-400">
+                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary-500/20 text-primary-400">
                       First 5 Payouts
                     </span>
                   </div>
@@ -1052,11 +1052,11 @@ export default function BuyAccount() {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <div className="mt-4 p-4 rounded-lg bg-primary-500/10 border border-primary-500/20">
                 <div className="flex items-start space-x-3">
-                  <Info className="w-5 h-5 text-blue-400 mt-0.5" />
+                  <Info className="w-5 h-5 text-primary-400 mt-0.5" />
                   <div>
-                    <p className="text-blue-400 font-medium">Fee Refund Policy</p>
+                    <p className="text-primary-400 font-medium">Fee Refund Policy</p>
                     <p className="text-gray-300 mt-1">
                       Your initial fee is fully refundable after completing 5 successful payouts. Once achieved, you'll receive 90% of future profits.
                     </p>
@@ -1074,7 +1074,7 @@ export default function BuyAccount() {
                 { icon: HelpCircle, text: "24/7 Support" }
               ].map((feature, index) => (
                 <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-white/5">
-                  <feature.icon className="w-5 h-5 text-blue-400" />
+                  <feature.icon className="w-5 h-5 text-primary-400" />
                   <span className="text-gray-200">{feature.text}</span>
                 </div>
               ))}
@@ -1087,7 +1087,7 @@ export default function BuyAccount() {
               <h3 className="text-xl font-bold text-white">Key Trading Rules</h3>
               <button
                 onClick={() => setShowRules(!showRules)}
-                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
               >
                 View full rules →
               </button>
@@ -1106,13 +1106,13 @@ export default function BuyAccount() {
                 </ul>
               </div>
               {/* Premium Accounts */}
-              <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                <h4 className="text-base font-semibold text-blue-400 mb-3 flex items-center gap-2">
+              <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
+                <h4 className="text-base font-semibold text-primary-400 mb-3 flex items-center gap-2">
                   <Star className="w-4 h-4" /> Premium Instant Accounts
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" /><span>Reach 5% profit → request weekly payout</span></li>
-                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" /><span>Trade at least 4 days per week</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-primary-400 mt-0.5 flex-shrink-0" /><span>Reach 5% profit → request weekly payout</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-primary-400 mt-0.5 flex-shrink-0" /><span>Trade at least 4 days per week</span></li>
                   <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 red-400 mt-0.5 flex-shrink-0" /><span>Max 8% daily loss / 12% total loss</span></li>
                 </ul>
               </div>
@@ -1141,23 +1141,23 @@ export default function BuyAccount() {
                 {/* Discount Banner - Only for Special Accounts */}
                 {showDiscountBanner && !discountExpired && timeRemaining === 0 && selectedPackage && 
                   ['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(selectedPackage.name) && (
-                  <div className="mb-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border border-blue-500/30 p-6">
+                  <div className="mb-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border border-primary-500/30 p-6">
                     {/* Background gradient effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-blue-600/10 opacity-50"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary-600/10 via-purple-600/10 to-primary-600/10 opacity-50"></div>
                     
                     <div className="relative z-10">
                       {/* Header */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                            <Tag className="w-5 h-5 text-blue-400" />
+                          <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
+                            <Tag className="w-5 h-5 text-primary-400" />
                           </div>
                           <div>
                             <h4 className="text-lg font-bold text-white">Welcome Offer</h4>
                             <p className="text-xs text-gray-400">Limited time exclusive discount</p>
                           </div>
                         </div>
-                        <div className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30">
+                        <div className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500/20 to-purple-500/20 border border-primary-400/30">
                           <span className="text-2xl font-bold text-white">10%</span>
                           <span className="text-sm text-gray-300 ml-1">OFF</span>
                         </div>
@@ -1171,7 +1171,7 @@ export default function BuyAccount() {
                       {/* Apply Button */}
                       <button
                         onClick={handleApplyDiscount}
-                        className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/30"
+                        className="w-full py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center space-x-2 shadow-lg shadow-primary-500/30"
                       >
                         <Tag className="w-5 h-5" />
                         <span>Apply WELCOME10 Code</span>
@@ -1265,7 +1265,7 @@ export default function BuyAccount() {
                 </div>
                 <button
                   onClick={handlePurchase}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 flex items-center justify-center space-x-2"
+                  className="w-full py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 flex items-center justify-center space-x-2"
                 >
                   <Lock className="w-4 h-4" />
                   <span>Secure Purchase</span>
@@ -1282,7 +1282,7 @@ export default function BuyAccount() {
                     <span className="text-gray-400 text-xs text-center leading-tight">Instant Access</span>
                   </div>
                   <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
-                    <Star className="w-4 h-4 text-blue-400" />
+                    <Star className="w-4 h-4 text-primary-400" />
                     <span className="text-gray-400 text-xs text-center leading-tight">Fee Refund</span>
                   </div>
                 </div>
@@ -1290,7 +1290,7 @@ export default function BuyAccount() {
                 {/* Social proof */}
                 <div className="mt-3 flex items-center justify-center space-x-1.5">
                   <div className="flex -space-x-1.5">
-                    {['bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500'].map((color, i) => (
+                    {['bg-primary-500', 'bg-primary-500', 'bg-purple-500', 'bg-pink-500'].map((color, i) => (
                       <div key={i} className={`w-5 h-5 rounded-full ${color} border border-gray-900 flex items-center justify-center`}>
                         <span className="text-white text-[7px] font-bold">T</span>
                       </div>
@@ -1364,16 +1364,16 @@ export default function BuyAccount() {
                     <li className="flex items-start gap-2"><span className="text-yellow-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
                   </ul>
                 </div>
-                <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                  <h4 className="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2">
+                <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
+                  <h4 className="text-sm font-bold text-primary-400 mb-3 flex items-center gap-2">
                     <Star className="w-4 h-4" /> Premium Instant Accounts
                     <span className="text-xs text-gray-500 font-normal">($7.5K – $200K)</span>
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-300">
-                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Withdrawal target:</strong> Make 5% profit → request a weekly payout</span></li>
-                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Payout schedule:</strong> Weekly only</span></li>
-                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Trading days:</strong> Must trade at least 4 days per week</span></li>
-                    <li className="flex items-start gap-2"><span className="text-blue-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Withdrawal target:</strong> Make 5% profit → request a weekly payout</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Payout schedule:</strong> Weekly only</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Trading days:</strong> Must trade at least 4 days per week</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
                   </ul>
                 </div>
               </div>
@@ -1444,7 +1444,7 @@ export default function BuyAccount() {
 
               {/* PKR amount row — only when PKR is selected */}
               {selectedPaymentMethod === 'pkr' && (
-                <div className="flex justify-between items-center p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-sm">
+                <div className="flex justify-between items-center p-3 rounded-lg bg-primary-500/10 border border-primary-500/20 text-sm">
                   <span className="text-gray-400">Amount in PKR</span>
                   <span className="text-white font-bold">PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}</span>
                 </div>
@@ -1498,16 +1498,16 @@ export default function BuyAccount() {
                             });
                           }
                         }}
-                        className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
+                        className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border-2 border-white/10 hover:border-primary-500/50 hover:bg-white/10 transition-all text-left"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
-                          <CreditCard className="w-5 h-5 text-blue-400" />
+                        <div className="w-10 h-10 rounded-lg bg-primary-500/15 flex items-center justify-center flex-shrink-0">
+                          <CreditCard className="w-5 h-5 text-primary-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-white font-semibold text-sm">Pakistani Methods</p>
                           <p className="text-xs text-gray-400">JazzCash, Nayapay, Bank</p>
                         </div>
-                        <span className="text-blue-400 font-bold text-sm flex-shrink-0">
+                        <span className="text-primary-400 font-bold text-sm flex-shrink-0">
                           PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}
                         </span>
                       </button>
@@ -1521,7 +1521,7 @@ export default function BuyAccount() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-white">USDT (TRC20) Details</p>
-                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-blue-400 hover:text-blue-300">
+                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-primary-400 hover:text-primary-300">
                       Change
                     </button>
                   </div>
@@ -1533,16 +1533,16 @@ export default function BuyAccount() {
                     <div>
                       <p className="text-xs text-gray-400 mb-1.5">Wallet Address</p>
                       <div className="flex items-center space-x-2 bg-black/30 p-3 rounded-lg">
-                        <code className="text-blue-400 text-xs flex-1 break-all leading-relaxed">
+                        <code className="text-primary-400 text-xs flex-1 break-all leading-relaxed">
                           TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5
                         </code>
                         <button
                           onClick={() => copyToClipboard('TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5', 'usdt')}
-                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 transition-colors"
+                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-primary-500/15 hover:bg-primary-500/25 transition-colors"
                         >
                           {copiedAccount === 'usdt'
                             ? <Check className="w-4 h-4 text-green-400" />
-                            : <><Copy className="w-3.5 h-3.5 text-blue-400 mr-1" /><span className="text-blue-400 text-xs">Copy</span></>}
+                            : <><Copy className="w-3.5 h-3.5 text-primary-400 mr-1" /><span className="text-primary-400 text-xs">Copy</span></>}
                         </button>
                       </div>
                     </div>
@@ -1555,7 +1555,7 @@ export default function BuyAccount() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-white">Choose PKR method</p>
-                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-blue-400 hover:text-blue-300">
+                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-primary-400 hover:text-primary-300">
                       Change
                     </button>
                   </div>
@@ -1567,10 +1567,10 @@ export default function BuyAccount() {
                         <button
                           key={method.id}
                           onClick={() => setSelectedPkrMethod(method)}
-                          className="w-full flex items-center space-x-3 p-3.5 rounded-xl bg-white/5 border-2 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all text-left"
+                          className="w-full flex items-center space-x-3 p-3.5 rounded-xl bg-white/5 border-2 border-white/10 hover:border-primary-500/50 hover:bg-white/10 transition-all text-left"
                         >
-                          <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
-                            <CreditCard className="w-4 h-4 text-blue-400" />
+                          <div className="w-9 h-9 rounded-lg bg-primary-500/15 flex items-center justify-center flex-shrink-0">
+                            <CreditCard className="w-4 h-4 text-primary-400" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold text-sm">{method.name}</p>
@@ -1589,7 +1589,7 @@ export default function BuyAccount() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-white">{selectedPkrMethod.name}</p>
-                    <button onClick={() => setSelectedPkrMethod(null)} className="text-xs text-blue-400 hover:text-blue-300">
+                    <button onClick={() => setSelectedPkrMethod(null)} className="text-xs text-primary-400 hover:text-primary-300">
                       Change
                     </button>
                   </div>
@@ -1601,14 +1601,14 @@ export default function BuyAccount() {
                     <div>
                       <p className="text-xs text-gray-400 mb-1.5">Account Number</p>
                       <div className="flex items-center space-x-2 bg-black/30 p-3 rounded-lg">
-                        <code className="text-blue-400 font-medium text-sm flex-1">{selectedPkrMethod.account_number}</code>
+                        <code className="text-primary-400 font-medium text-sm flex-1">{selectedPkrMethod.account_number}</code>
                         <button
                           onClick={() => copyToClipboard(selectedPkrMethod.account_number, selectedPkrMethod.id)}
-                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 transition-colors"
+                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-primary-500/15 hover:bg-primary-500/25 transition-colors"
                         >
                           {copiedAccount === selectedPkrMethod.id
                             ? <Check className="w-4 h-4 text-green-400" />
-                            : <><Copy className="w-3.5 h-3.5 text-blue-400 mr-1" /><span className="text-blue-400 text-xs">Copy</span></>}
+                            : <><Copy className="w-3.5 h-3.5 text-primary-400 mr-1" /><span className="text-primary-400 text-xs">Copy</span></>}
                         </button>
                       </div>
                     </div>
@@ -1639,7 +1639,7 @@ export default function BuyAccount() {
                     />
                     <label
                       htmlFor="screenshot"
-                      className="flex flex-col items-center justify-center w-full py-5 rounded-xl bg-white/5 border-2 border-dashed border-white/20 hover:border-blue-500/50 hover:bg-white/10 transition-all cursor-pointer text-center"
+                      className="flex flex-col items-center justify-center w-full py-5 rounded-xl bg-white/5 border-2 border-dashed border-white/20 hover:border-primary-500/50 hover:bg-white/10 transition-all cursor-pointer text-center"
                     >
                       <Upload className="w-6 h-6 text-gray-400 mb-1.5" />
                       <span className="text-sm text-white font-medium">
@@ -1652,7 +1652,7 @@ export default function BuyAccount() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-base"
+                    className="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-base"
                   >
                     <Lock className="w-4 h-4" />
                     <span>{submitting ? 'AI Verifying...' : 'Submit & Activate Account'}</span>
@@ -1701,7 +1701,7 @@ export default function BuyAccount() {
           </div>
           <button
             onClick={() => setShowPaymentModal(true)}
-            className="flex-shrink-0 flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-500/30"
+            className="flex-shrink-0 flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-600 text-white font-semibold rounded-xl text-sm shadow-lg shadow-primary-500/30"
           >
             <Lock className="w-3.5 h-3.5" />
             <span>Buy Now</span>

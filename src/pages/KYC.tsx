@@ -160,7 +160,7 @@ export default function KYC() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -257,8 +257,8 @@ export default function KYC() {
       {verification?.status !== 'approved' && (
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex-shrink-0 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex-shrink-0 flex items-center justify-center">
+              <Shield className="w-6 h-6 text-primary-400" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-white mb-2">KYC Instructions</h2>
@@ -269,11 +269,11 @@ export default function KYC() {
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start space-x-2">
-                    <FileText className="w-5 h-5 text-blue-400 mt-0.5" />
+                    <FileText className="w-5 h-5 text-primary-400 mt-0.5" />
                     <span>A valid government-issued ID card (front and back)</span>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <Camera className="w-5 h-5 text-blue-400 mt-0.5" />
+                    <Camera className="w-5 h-5 text-primary-400 mt-0.5" />
                     <span>A clear selfie photo of yourself</span>
                   </div>
                 </div>
@@ -452,7 +452,7 @@ export default function KYC() {
                   <button
                     onClick={handleSubmit}
                     disabled={uploading || !uploadedFiles.id_front || !uploadedFiles.id_back || !uploadedFiles.selfie}
-                    className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
                     {uploading ? (
                       <>

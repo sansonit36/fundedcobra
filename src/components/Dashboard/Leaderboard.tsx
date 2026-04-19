@@ -106,7 +106,7 @@ export default function Leaderboard() {
               <select
                 value={timeFrame}
                 onChange={(e) => setTimeFrame(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="day">Today</option>
                 <option value="week">This Week</option>
@@ -121,7 +121,7 @@ export default function Leaderboard() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortKey)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="total_profit">Profit</option>
                 <option value="win_rate">Win Rate</option>

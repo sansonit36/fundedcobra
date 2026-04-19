@@ -302,7 +302,7 @@ export default function TradingAccounts() {
               placeholder="Search accounts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
             />
           </div>
           
@@ -311,7 +311,7 @@ export default function TradingAccounts() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -338,7 +338,7 @@ export default function TradingAccounts() {
                 }
               }}
               disabled={processing}
-              className="flex items-center px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-medium rounded-lg transition-colors border border-blue-500/20 shadow-lg shadow-blue-500/5 group"
+              className="flex items-center px-4 py-2 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 font-medium rounded-lg transition-colors border border-primary-500/20 shadow-lg shadow-primary-500/5 group"
             >
               <Shield className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
               {processing ? 'Auditing...' : 'Global Audit'}
@@ -414,7 +414,7 @@ export default function TradingAccounts() {
                     </td>
                     <td className="py-4">
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">{account.mt5_login}</code>
+                        <code className="text-primary-400 font-medium">{account.mt5_login}</code>
                         <button
                           onClick={() => copyToClipboard(account.mt5_login)}
                           className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -425,7 +425,7 @@ export default function TradingAccounts() {
                     </td>
                     <td className="py-4">
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">
+                        <code className="text-primary-400 font-medium">
                           {showPasswords[account.id] ? account.mt5_password : '••••••••'}
                         </code>
                         <button
@@ -450,7 +450,7 @@ export default function TradingAccounts() {
                     </td>
                     <td className="py-4">
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">{account.mt5_server}</code>
+                        <code className="text-primary-400 font-medium">{account.mt5_server}</code>
                         <button
                           onClick={() => copyToClipboard(account.mt5_server)}
                           className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -517,7 +517,7 @@ export default function TradingAccounts() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => handleViewClick(account)}
-                          className="inline-flex items-center px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-sm font-medium"
+                          className="inline-flex items-center px-3 py-1 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors text-sm font-medium"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View
@@ -692,23 +692,23 @@ export default function TradingAccounts() {
                 <button
                   onClick={() => setActiveModalTab('overview')}
                   className={`pb-3 text-sm font-medium transition-colors relative ${
-                    activeModalTab === 'overview' ? 'text-blue-400' : 'text-gray-400 hover:text-white'
+                    activeModalTab === 'overview' ? 'text-primary-400' : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   Account Details
                   {activeModalTab === 'overview' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-400" />
                   )}
                 </button>
                 <button
                   onClick={() => setActiveModalTab('trades')}
                   className={`pb-3 text-sm font-medium transition-colors relative ${
-                    activeModalTab === 'trades' ? 'text-blue-400' : 'text-gray-400 hover:text-white'
+                    activeModalTab === 'trades' ? 'text-primary-400' : 'text-gray-400 hover:text-white'
                     }`}
                 >
                   Trade History
                   {activeModalTab === 'trades' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-400" />
                   )}
                 </button>
               </div>
@@ -759,7 +759,7 @@ export default function TradingAccounts() {
                     <div>
                       <p className="text-sm text-gray-400 mb-2">MT5 Login</p>
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">{selectedAccount.mt5_login}</code>
+                        <code className="text-primary-400 font-medium">{selectedAccount.mt5_login}</code>
                         <button
                           onClick={() => copyToClipboard(selectedAccount.mt5_login)}
                           className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -771,7 +771,7 @@ export default function TradingAccounts() {
                     <div>
                       <p className="text-sm text-gray-400 mb-2">MT5 Password</p>
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">
+                        <code className="text-primary-400 font-medium">
                           {showPasswords[selectedAccount.id] ? selectedAccount.mt5_password : '••••••••'}
                         </code>
                         <button
@@ -793,7 +793,7 @@ export default function TradingAccounts() {
                     <div>
                       <p className="text-sm text-gray-400 mb-2">MT5 Server</p>
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">{selectedAccount.mt5_server}</code>
+                        <code className="text-primary-400 font-medium">{selectedAccount.mt5_server}</code>
                         <button
                           onClick={() => copyToClipboard(selectedAccount.mt5_server)}
                           className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -806,9 +806,9 @@ export default function TradingAccounts() {
                 </div>
 
                 {/* Real-time Account Metrics */}
-                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20">
+                <div className="p-4 rounded-lg bg-gradient-to-r from-primary-500/10 to-purple-500/10 border border-primary-500/20">
                   <div className="flex items-center mb-4">
-                    <TrendingUp className="w-5 h-5 text-blue-400 mr-2" />
+                    <TrendingUp className="w-5 h-5 text-primary-400 mr-2" />
                     <h3 className="text-lg font-semibold text-white">Real-Time Metrics</h3>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -956,7 +956,7 @@ export default function TradingAccounts() {
             ) : (
               <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                  <History className="w-5 h-5 mr-2 text-blue-400" />
+                  <History className="w-5 h-5 mr-2 text-primary-400" />
                   Trade Audit Log
                 </h3>
                 <div className="mt-4">
@@ -972,7 +972,7 @@ export default function TradingAccounts() {
                     setShowViewModal(false);
                     setSelectedAccount(null);
                   }}
-                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+                  className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
                 >
                   Close
                 </button>
@@ -1013,7 +1013,7 @@ function TradeHistoryTable({ mt5Id }: { mt5Id: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
       </div>
     );
   }

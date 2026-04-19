@@ -1,4 +1,4 @@
-# Riverton Markets Trading Rules
+# FundedCobra Trading Rules
 
 ## Trading Platform & Conditions
 - Trading Platform: MetaTrader 5 (MT5)
@@ -160,6 +160,6 @@
 
 ## Disclaimer
 - Rules subject to change with notice
-- Final interpretation of rules rests with Riverton Markets
+- Final interpretation of rules rests with FundedCobra
 - Risk warning: Trading involves substantial risk of loss
 - Past performance is not indicative of future results 

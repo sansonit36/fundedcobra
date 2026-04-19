@@ -75,7 +75,7 @@ export default function RecentTrades({ filterType = 'all' }: { filterType?: stri
   if (loading) {
     return (
       <div className="card-gradient rounded-2xl p-6 border border-white/5 h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -88,12 +88,12 @@ export default function RecentTrades({ filterType = 'all' }: { filterType?: stri
     <div className="card-gradient rounded-2xl p-6 border border-white/5">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
-          <History className="w-5 h-5 text-blue-400" />
+          <History className="w-5 h-5 text-primary-400" />
           <h3 className="text-lg font-bold text-white">Recent Trading Activity</h3>
         </div>
         <button 
           onClick={() => navigate('/trading-accounts')}
-          className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors flex items-center"
+          className="text-sm font-medium text-primary-400 hover:text-primary-300 transition-colors flex items-center"
         >
           View All Accounts
           <ArrowRight className="w-4 h-4 ml-1" />

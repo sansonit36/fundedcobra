@@ -1,4 +1,4 @@
-# MT5 Integration Analysis - Riverton Markets
+# MT5 Integration Analysis - FundedCobra
 
 ## Overview
 This folder contains all files related to the MT5 (MetaTrader 5) live account data integration with Supabase and MySQL databases.
@@ -83,8 +83,8 @@ This folder contains all files related to the MT5 (MetaTrader 5) live account da
   2. `trading_accounts` - Stores trading account status & breach info
 
 ### MySQL Database
-- **Host**: `u427305155_rivertonm` (Hostinger)
-- **Database**: `u427305155_rivertonm`
+- **Host**: `u427305155_fundedcobram` (Hostinger)
+- **Database**: `u427305155_fundedcobram`
 - **Table**: `account_data_extended`
 - **Operation**: Upsert on duplicate `mt5_id`
 

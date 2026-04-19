@@ -42,7 +42,7 @@ const statusStyles = {
   breached: 'bg-red-500/10 text-red-400 border-red-400/20',
   rejected: 'bg-gray-500/10 text-gray-400 border-gray-400/20',
   pending_payment: 'bg-yellow-500/10 text-yellow-400 border-yellow-400/20',
-  payment_submitted: 'bg-blue-500/10 text-blue-400 border-blue-400/20',
+  payment_submitted: 'bg-primary-500/10 text-primary-400 border-primary-400/20',
   suspicious: 'bg-orange-500/10 text-orange-400 border-orange-400/20'
 };
 
@@ -52,7 +52,7 @@ const statusIcons = {
   breached: <XCircle className="w-5 h-5 text-red-400" />,
   rejected: <XCircle className="w-5 h-5 text-gray-400" />,
   pending_payment: <AlertTriangle className="w-5 h-5 text-yellow-400" />,
-  payment_submitted: <AlertTriangle className="w-5 h-5 text-blue-400" />,
+  payment_submitted: <AlertTriangle className="w-5 h-5 text-primary-400" />,
   suspicious: <Clock className="w-5 h-5 text-orange-400" />
 };
 
@@ -142,7 +142,7 @@ export default function TradingAccounts() {
     return (
       <div className="card-gradient rounded-2xl p-6 border border-white/5">
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
         </div>
       </div>
     );
@@ -159,7 +159,7 @@ export default function TradingAccounts() {
             placeholder="Search accounts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full sm:w-64 pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+            className="w-full sm:w-64 pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
           />
         </div>
         
@@ -167,7 +167,7 @@ export default function TradingAccounts() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full sm:w-auto appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+            className="w-full sm:w-auto appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -226,7 +226,7 @@ export default function TradingAccounts() {
                     {account.type === 'account' && (
                       <button
                         onClick={() => setExpandedRow(expandedRow === account.id ? null : account.id)}
-                        className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
+                        className="inline-flex items-center px-4 py-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors"
                       >
                         Details
                       </button>

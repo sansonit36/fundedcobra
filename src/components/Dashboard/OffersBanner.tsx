@@ -208,7 +208,7 @@ export default function OffersBanner() {
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 border border-white/10">
-              <Zap className="w-5 h-5 text-blue-400" />
+              <Zap className="w-5 h-5 text-primary-400" />
               <div>
                 <div className="text-white font-bold">Instant Activation</div>
                 <div className="text-xs text-gray-400">Start trading immediately</div>

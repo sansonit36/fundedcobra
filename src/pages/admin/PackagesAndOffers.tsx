@@ -278,7 +278,7 @@ export default function PackagesAndOffers() {
       <div className="card-gradient rounded-2xl p-6 border border-white/5">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white flex items-center">
-            <Package className="w-5 h-5 mr-2 text-blue-400" />
+            <Package className="w-5 h-5 mr-2 text-primary-400" />
             Account Packages
           </h2>
           <button
@@ -287,7 +287,7 @@ export default function PackagesAndOffers() {
               resetPackageForm();
               setShowPackageModal(true);
             }}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span>Add Package</span>
@@ -323,7 +323,7 @@ export default function PackagesAndOffers() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => openEditPackage(pkg)}
-                        className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-colors"
+                        className="p-2 rounded-lg hover:bg-primary-500/10 text-primary-400 transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -369,7 +369,7 @@ export default function PackagesAndOffers() {
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-bold text-white">{offer.title}</h3>
-                    <span className="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 text-white font-bold">
+                    <span className="px-3 py-1 rounded-lg bg-gradient-to-r from-primary-500/20 to-purple-500/20 border border-primary-400/30 text-white font-bold">
                       {offer.discount_percent}% OFF
                     </span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${offer.is_active
@@ -382,8 +382,8 @@ export default function PackagesAndOffers() {
                   <p className="text-gray-400 text-sm mb-3">{offer.description}</p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <div className="flex items-center space-x-2">
-                      <Tag className="w-4 h-4 text-blue-400" />
-                      <code className="text-blue-400 font-mono font-bold">{offer.discount_code}</code>
+                      <Tag className="w-4 h-4 text-primary-400" />
+                      <code className="text-primary-400 font-mono font-bold">{offer.discount_code}</code>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4 text-yellow-400" />
@@ -403,7 +403,7 @@ export default function PackagesAndOffers() {
                 <div className="flex space-x-2 ml-4">
                   <button
                     onClick={() => openEditOffer(offer)}
-                    className="p-2 rounded-lg hover:bg-blue-500/10 text-blue-400 transition-colors"
+                    className="p-2 rounded-lg hover:bg-primary-500/10 text-primary-400 transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
@@ -436,7 +436,7 @@ export default function PackagesAndOffers() {
                   type="text"
                   value={packageForm.name}
                   onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="e.g., $10,000 Account"
                   required
                 />
@@ -449,7 +449,7 @@ export default function PackagesAndOffers() {
                   type="number"
                   value={packageForm.balance}
                   onChange={(e) => setPackageForm({ ...packageForm, balance: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="10000"
                   required
                 />
@@ -463,7 +463,7 @@ export default function PackagesAndOffers() {
                   step="0.01"
                   value={packageForm.price}
                   onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="299"
                   required
                 />
@@ -494,7 +494,7 @@ export default function PackagesAndOffers() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+                  className="flex-1 py-2 px-4 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
                 >
                   {editingPackage ? 'Update' : 'Create'}
                 </button>
@@ -520,7 +520,7 @@ export default function PackagesAndOffers() {
                   type="text"
                   value={offerForm.title}
                   onChange={(e) => setOfferForm({ ...offerForm, title: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="We’re Growing Sale"
                   required
                 />
@@ -532,7 +532,7 @@ export default function PackagesAndOffers() {
                 <textarea
                   value={offerForm.description}
                   onChange={(e) => setOfferForm({ ...offerForm, description: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="Massive discount on all standard accounts!"
                   rows={3}
                   required
@@ -547,7 +547,7 @@ export default function PackagesAndOffers() {
                     type="text"
                     value={offerForm.discount_code}
                     onChange={(e) => setOfferForm({ ...offerForm, discount_code: e.target.value.toUpperCase() })}
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 font-mono"
+                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50 font-mono"
                     placeholder="GROWING50"
                     required
                   />
@@ -560,7 +560,7 @@ export default function PackagesAndOffers() {
                     type="number"
                     value={offerForm.discount_percent}
                     onChange={(e) => setOfferForm({ ...offerForm, discount_percent: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                     placeholder="50"
                     min="0"
                     max="100"
@@ -576,7 +576,7 @@ export default function PackagesAndOffers() {
                   type="date"
                   value={offerForm.expires_at}
                   onChange={(e) => setOfferForm({ ...offerForm, expires_at: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   required
                 />
               </div>

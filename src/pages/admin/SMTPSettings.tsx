@@ -149,7 +149,7 @@ export default function SMTPSettings() {
                 type="text"
                 value={config.host}
                 onChange={(e) => setConfig(prev => ({ ...prev, host: e.target.value }))}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 placeholder="smtp.example.com"
                 required
               />
@@ -163,7 +163,7 @@ export default function SMTPSettings() {
                 type="number"
                 value={config.port}
                 onChange={(e) => setConfig(prev => ({ ...prev, port: parseInt(e.target.value) }))}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 placeholder="587"
                 required
               />
@@ -177,7 +177,7 @@ export default function SMTPSettings() {
                 type="text"
                 value={config.username}
                 onChange={(e) => setConfig(prev => ({ ...prev, username: e.target.value }))}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 placeholder="username@example.com"
                 required
               />
@@ -191,7 +191,7 @@ export default function SMTPSettings() {
                 type="password"
                 value={config.password}
                 onChange={(e) => setConfig(prev => ({ ...prev, password: e.target.value }))}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 placeholder="••••••••"
                 required
               />
@@ -205,7 +205,7 @@ export default function SMTPSettings() {
                 type="email"
                 value={config.from_email}
                 onChange={(e) => setConfig(prev => ({ ...prev, from_email: e.target.value }))}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 placeholder="noreply@example.com"
                 required
               />
@@ -217,7 +217,7 @@ export default function SMTPSettings() {
                 id="secure"
                 checked={config.secure}
                 onChange={(e) => setConfig(prev => ({ ...prev, secure: e.target.checked }))}
-                className="rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
               />
               <label htmlFor="secure" className="text-sm font-medium text-gray-400">
                 Use SSL/TLS
@@ -229,7 +229,7 @@ export default function SMTPSettings() {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center"
+              className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center"
             >
               <Save className="w-4 h-4 mr-2" />
               {saving ? 'Saving...' : 'Save Settings'}
@@ -252,7 +252,7 @@ export default function SMTPSettings() {
                 type="email"
                 value={testEmail}
                 onChange={(e) => setTestEmail(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 placeholder="Enter email address for testing"
               />
             </div>

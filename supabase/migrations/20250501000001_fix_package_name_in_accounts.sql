@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION approve_account_request(
   request_id uuid,
   mt5_login text,
   mt5_password text,
-  mt5_server text DEFAULT 'Propfirm-Live'
+  mt5_server text DEFAULT 'FundedCobra-Live'
 )
 RETURNS uuid
 LANGUAGE plpgsql

@@ -25,7 +25,7 @@ Your affiliate system is now **100% functional** with all components integrated 
 ## 🔄 COMPLETE USER FLOW
 
 ### **1. SIGNUP WITH REFERRAL**
-**URL**: `https://account.rivertonmarkets.com/signup?ref=ABC12345`
+**URL**: `https://account.fundedcobra.com/signup?ref=ABC12345`
 
 **What Happens:**
 1. User clicks referral link
@@ -99,7 +99,7 @@ Commission Credited: $200
    - Current tier
    - Progress to next tier
 2. Auto-generates referral code if doesn't exist
-3. Displays affiliate link: `https://rivertonmarkets.com?ref=CODE`
+3. Displays affiliate link: `https://fundedcobra.com?ref=CODE`
 
 **Files Involved:**
 - `/src/pages/Affiliate.tsx` (lines 100-165)
@@ -273,7 +273,7 @@ Available for Withdrawal = Pending - SUM(pending withdrawals)
 3. Admin rejects → `rejected` + `rejection_reason` saved
 
 ### ✅ **Referral Link Tracking**
-- Format: `https://rivertonmarkets.com?ref=ABC12345`
+- Format: `https://fundedcobra.com?ref=ABC12345`
 - Tracked via `useAffiliateTracking` hook
 - Stored in sessionStorage and cookies
 - Linked on signup via `notifyAffiliateRegistration()`
@@ -358,7 +358,7 @@ processed_at      timestamp
 
 ## 🚀 DEPLOYMENT STATUS
 
-**Live URL**: `https://account.rivertonmarkets.com`
+**Live URL**: `https://account.fundedcobra.com`
 
 **Deployed Components:**
 ✅ User affiliate dashboard

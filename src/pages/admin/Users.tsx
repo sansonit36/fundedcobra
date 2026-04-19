@@ -409,7 +409,7 @@ export default function Users() {
                   onClick={() => setUserStatusFilter(filter.value)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2 ${
                     userStatusFilter === filter.value
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-white/5 text-gray-400 hover:bg-white/10'
                   }`}
                 >
@@ -456,11 +456,11 @@ export default function Users() {
                 placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
               />
             </div>
-            <div className="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-              <span className="text-blue-400 font-medium">
+            <div className="px-4 py-2 rounded-lg bg-primary-500/10 border border-primary-500/20">
+              <span className="text-primary-400 font-medium">
                 Showing {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} filtered ({totalCount} total)
               </span>
             </div>
@@ -471,7 +471,7 @@ export default function Users() {
             <select
               value={itemsPerPage}
               onChange={(e) => setItemsPerPage(Number(e.target.value))}
-              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
             >
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -486,7 +486,7 @@ export default function Users() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -551,8 +551,8 @@ export default function Users() {
                       </td>
                       <td className="py-4">
                         <div className="flex items-center space-x-1">
-                          {user.role === 'admin' && <Shield className="w-4 h-4 text-blue-400" />}
-                          <span className={`capitalize ${user.role === 'admin' ? 'text-blue-400' : 'text-gray-300'}`}>
+                          {user.role === 'admin' && <Shield className="w-4 h-4 text-primary-400" />}
+                          <span className={`capitalize ${user.role === 'admin' ? 'text-primary-400' : 'text-gray-300'}`}>
                             {user.role}
                           </span>
                         </div>
@@ -569,7 +569,7 @@ export default function Users() {
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}
-                            className="p-2 rounded-lg hover:bg-white/10 transition-colors text-blue-400"
+                            className="p-2 rounded-lg hover:bg-white/10 transition-colors text-primary-400"
                             title="View MT5 Accounts"
                           >
                             <Wallet className="w-5 h-5" />
@@ -629,7 +629,7 @@ export default function Users() {
                                       <div>
                                         <p className="text-sm text-gray-400 mb-1">Login ID</p>
                                         <div className="flex items-center space-x-2">
-                                          <code className="text-blue-400 font-medium">{account.mt5_login}</code>
+                                          <code className="text-primary-400 font-medium">{account.mt5_login}</code>
                                           <button
                                             onClick={() => copyToClipboard(account.mt5_login)}
                                             className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -642,7 +642,7 @@ export default function Users() {
                                       <div>
                                         <p className="text-sm text-gray-400 mb-1">Password</p>
                                         <div className="flex items-center space-x-2">
-                                          <code className="text-blue-400 font-medium">
+                                          <code className="text-primary-400 font-medium">
                                             {showPasswords[account.id] ? account.mt5_password : '••••••••'}
                                           </code>
                                           <button
@@ -669,7 +669,7 @@ export default function Users() {
                                       <div>
                                         <p className="text-sm text-gray-400 mb-1">Server</p>
                                         <div className="flex items-center space-x-2">
-                                          <code className="text-blue-400 font-medium">{account.mt5_server}</code>
+                                          <code className="text-primary-400 font-medium">{account.mt5_server}</code>
                                           <button
                                             onClick={() => copyToClipboard(account.mt5_server)}
                                             className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -774,7 +774,7 @@ export default function Users() {
                       onClick={() => setCurrentPage(pageNum)}
                       className={`px-3 py-2 rounded-lg transition-colors ${
                         currentPage === pageNum
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-primary-500 text-white'
                           : 'bg-white/5 hover:bg-white/10 text-white'
                       }`}
                     >

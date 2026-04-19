@@ -84,8 +84,8 @@ export default function AdminSettings() {
         {/* System Settings */}
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-              <Globe className="w-5 h-5 text-blue-400" />
+            <div className="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+              <Globe className="w-5 h-5 text-primary-400" />
             </div>
             <h2 className="text-xl font-bold text-white">System</h2>
           </div>
@@ -95,7 +95,7 @@ export default function AdminSettings() {
               <label className="block text-sm font-medium text-gray-400 mb-1">
                 Default Trading Platform
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50">
+              <select className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50">
                 <option value="mt5">MetaTrader 5</option>
                 <option value="mt4">MetaTrader 4</option>
               </select>
@@ -105,7 +105,7 @@ export default function AdminSettings() {
               <label className="block text-sm font-medium text-gray-400 mb-1">
                 Default Leverage
               </label>
-              <select className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50">
+              <select className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50">
                 <option value="100">1:100</option>
                 <option value="200">1:200</option>
                 <option value="500">1:500</option>

@@ -144,7 +144,7 @@ export default function PaymentMethods() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -155,7 +155,7 @@ export default function PaymentMethods() {
         <h1 className="text-2xl font-bold text-white">Payment Methods</h1>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+          className="flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Method
@@ -172,7 +172,7 @@ export default function PaymentMethods() {
               type="number"
               value={usdToPkr}
               onChange={(e) => setUsdToPkr(Number(e.target.value))}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
             />
           </div>
           <button
@@ -205,21 +205,21 @@ export default function PaymentMethods() {
                       type="text"
                       defaultValue={method.name}
                       onChange={(e) => method.name = e.target.value}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                       placeholder="Method Name"
                     />
                     <input
                       type="text"
                       defaultValue={method.account_name}
                       onChange={(e) => method.account_name = e.target.value}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                       placeholder="Account Name"
                     />
                     <input
                       type="text"
                       defaultValue={method.account_number}
                       onChange={(e) => method.account_number = e.target.value}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                       placeholder="Account Number"
                     />
                     <div className="flex space-x-2">
@@ -242,8 +242,8 @@ export default function PaymentMethods() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                        <CreditCard className="w-6 h-6 text-blue-400" />
+                      <div className="w-12 h-12 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                        <CreditCard className="w-6 h-6 text-primary-400" />
                       </div>
                       <div>
                         <h4 className="text-white font-semibold">{method.name}</h4>
@@ -264,7 +264,7 @@ export default function PaymentMethods() {
                       </button>
                       <button
                         onClick={() => setEditingId(method.id)}
-                        className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                        className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -295,7 +295,7 @@ export default function PaymentMethods() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="e.g., JazzCash, Nayapay"
                 />
               </div>
@@ -305,7 +305,7 @@ export default function PaymentMethods() {
                   type="text"
                   value={formData.account_name}
                   onChange={(e) => setFormData({ ...formData, account_name: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="Account holder name"
                 />
               </div>
@@ -315,7 +315,7 @@ export default function PaymentMethods() {
                   type="text"
                   value={formData.account_number}
                   onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="Account number"
                 />
               </div>
@@ -323,7 +323,7 @@ export default function PaymentMethods() {
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={handleAdd}
-                className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
               >
                 Add Method
               </button>

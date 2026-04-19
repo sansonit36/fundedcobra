@@ -441,7 +441,7 @@ export default function EmailManagement() {
           onClick={() => setActiveTab('templates')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'templates'
-              ? 'text-blue-400 border-b-2 border-blue-400'
+              ? 'text-primary-400 border-b-2 border-primary-400'
               : 'text-gray-400 hover:text-white'
           }`}
         >
@@ -452,7 +452,7 @@ export default function EmailManagement() {
           onClick={() => setActiveTab('logs')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'logs'
-              ? 'text-blue-400 border-b-2 border-blue-400'
+              ? 'text-primary-400 border-b-2 border-primary-400'
               : 'text-gray-400 hover:text-white'
           }`}
         >
@@ -463,7 +463,7 @@ export default function EmailManagement() {
           onClick={() => setActiveTab('send')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'send'
-              ? 'text-blue-400 border-b-2 border-blue-400'
+              ? 'text-primary-400 border-b-2 border-primary-400'
               : 'text-gray-400 hover:text-white'
           }`}
         >
@@ -494,7 +494,7 @@ export default function EmailManagement() {
                   </button>
                   <button
                     onClick={() => handleEditTemplate(key as EmailTemplate)}
-                    className="px-4 py-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors flex items-center"
+                    className="px-4 py-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors flex items-center"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
@@ -517,7 +517,7 @@ export default function EmailManagement() {
                   <p className="text-gray-400 text-sm mb-1">Total Sent</p>
                   <p className="text-2xl font-bold text-white">{emailLogs.length}</p>
                 </div>
-                <Mail className="w-10 h-10 text-blue-400" />
+                <Mail className="w-10 h-10 text-primary-400" />
               </div>
             </div>
 
@@ -553,7 +553,7 @@ export default function EmailManagement() {
                 placeholder="Search by email, name, or template..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50"
+                className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-primary-500/50"
               />
             </div>
           </div>
@@ -580,7 +580,7 @@ export default function EmailManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm">
+                        <span className="px-3 py-1 rounded-full bg-primary-500/10 text-primary-400 text-sm">
                           {log.template.replace(/_/g, ' ')}
                         </span>
                       </td>
@@ -633,7 +633,7 @@ export default function EmailManagement() {
                   onClick={() => setSelectedSegment(value as SegmentType)}
                   className={`w-full px-4 py-3 rounded-lg text-left transition-colors flex items-center justify-between ${
                     selectedSegment === value
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                      ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
                       : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5'
                   }`}
                 >
@@ -659,7 +659,7 @@ export default function EmailManagement() {
                     loadSegmentUsers();
                   }}
                   rows={6}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 text-sm"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50 text-sm"
                   placeholder="Enter emails separated by commas or new lines:\nuser1@example.com\nuser2@example.com, user3@example.com"
                 />
                 <p className="text-xs text-gray-500 mt-2">
@@ -707,7 +707,7 @@ export default function EmailManagement() {
                   type="text"
                   value={customSubject}
                   onChange={(e) => setCustomSubject(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter email subject..."
                 />
               </div>
@@ -720,7 +720,7 @@ export default function EmailManagement() {
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   rows={12}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter your message..."
                 />
               </div>
@@ -728,7 +728,7 @@ export default function EmailManagement() {
               <button
                 onClick={handleSendCustomEmail}
                 disabled={sending || !customSubject || !customMessage}
-                className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {sending ? (
                   <>Processing...</>
@@ -779,7 +779,7 @@ export default function EmailManagement() {
                   type="text"
                   value={editedSubject}
                   onChange={(e) => setEditedSubject(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter subject line..."
                 />
               </div>
@@ -792,13 +792,13 @@ export default function EmailManagement() {
                   value={editedHtml}
                   onChange={(e) => setEditedHtml(e.target.value)}
                   rows={16}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 font-mono text-sm"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50 font-mono text-sm"
                   placeholder="Enter HTML content...Use placeholders like: {{name}}, {{accountBalance}}, etc."
                 />
               </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <p className="text-blue-400 text-sm">
+              <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg p-4">
+                <p className="text-primary-400 text-sm">
                   <strong>Available Placeholders:</strong> {'{{'} name {'}}'},  {'{{'} accountBalance {'}}'},  {'{{'} mt5Login {'}}'},  {'{{'} mt5Server {'}}'},  {'{{'} breachReason {'}}'},  {'{{'} reason {'}}'}
                 </p>
               </div>
@@ -807,7 +807,7 @@ export default function EmailManagement() {
                 <button
                   onClick={handleSaveTemplate}
                   disabled={!editedSubject || !editedHtml}
-                  className="flex-1 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+                  className="flex-1 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center"
                 >
                   <Save className="w-5 h-5 mr-2" />
                   Save Changes
@@ -879,7 +879,7 @@ export default function EmailManagement() {
                     setViewingTemplate(null);
                     handleEditTemplate(viewingTemplate);
                   }}
-                  className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors flex items-center"
+                  className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors flex items-center"
                 >
                   <Edit className="w-5 h-5 mr-2" />
                   Edit Template

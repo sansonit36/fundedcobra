@@ -84,19 +84,19 @@ export default function ThankYou() {
             <h2 className="text-xl font-semibold text-white mb-4">Next Steps:</h2>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <ArrowRight className="w-5 h-5 text-blue-400 mt-1 shrink-0" />
+                <ArrowRight className="w-5 h-5 text-primary-400 mt-1 shrink-0" />
                 <span className="ml-2 text-gray-300">
                   We will verify your payment and process your account request within 24 hours.
                 </span>
               </li>
               <li className="flex items-start">
-                <ArrowRight className="w-5 h-5 text-blue-400 mt-1 shrink-0" />
+                <ArrowRight className="w-5 h-5 text-primary-400 mt-1 shrink-0" />
                 <span className="ml-2 text-gray-300">
                   Once approved, you'll receive your MT5 login credentials via email.
                 </span>
               </li>
               <li className="flex items-start">
-                <ArrowRight className="w-5 h-5 text-blue-400 mt-1 shrink-0" />
+                <ArrowRight className="w-5 h-5 text-primary-400 mt-1 shrink-0" />
                 <span className="ml-2 text-gray-300">
                   You can track your account status in the Trading Accounts section.
                 </span>
@@ -107,7 +107,7 @@ export default function ThankYou() {
           <div className="flex justify-center space-x-4">
             <button
               onClick={() => navigate('/trading-accounts')}
-              className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+              className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
             >
               View Trading Accounts
             </button>

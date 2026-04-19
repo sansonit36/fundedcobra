@@ -26,7 +26,7 @@ SELECT
   false,
   'your-email@gmail.com',
   'your-app-specific-password',
-  'noreply@propfirm.com'
+  'noreply@fundedcobra.com'
 WHERE NOT EXISTS (
   SELECT 1 FROM smtp_config
 );
@@ -39,7 +39,7 @@ SET
   secure = false,
   username = 'your-email@gmail.com',
   password = 'your-app-specific-password',
-  from_email = 'noreply@propfirm.com',
+  from_email = 'noreply@fundedcobra.com',
   updated_at = now()
 WHERE id = (
   SELECT id FROM smtp_config LIMIT 1

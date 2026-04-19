@@ -65,7 +65,7 @@ const affiliateTiers: AffiliateTier[] = [
       'Exclusive workshops',
       'Co-branded opportunities'
     ],
-    color: 'from-blue-400 to-blue-500'
+    color: 'from-primary-400 to-primary-500'
   }
 ];
 
@@ -189,7 +189,7 @@ export default function Affiliate() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function Affiliate() {
           </button>
           <button
             onClick={copyToClipboard}
-            className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+            className="flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
           >
             {showCopied ? (
               'Copied!'
@@ -233,8 +233,8 @@ export default function Affiliate() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+              <Users className="w-6 h-6 text-primary-400" />
             </div>
           </div>
           <p className="text-sm font-medium text-gray-400 mb-1">Total Referrals</p>
@@ -275,7 +275,7 @@ export default function Affiliate() {
         <div className="relative pt-1">
           <div className="flex mb-2 items-center justify-between">
             <div>
-              <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-blue-500/20 text-blue-400">
+              <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-primary-500/20 text-primary-400">
                 {stats.activeReferrals} / {stats.activeReferrals + stats.referralsToNextTier} Active Traders (Purchased)
               </span>
             </div>
@@ -288,7 +288,7 @@ export default function Affiliate() {
           <div className="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-white/5">
             <div
               style={{ width: `${stats.referralsToNextTier > 0 ? (stats.activeReferrals / (stats.activeReferrals + stats.referralsToNextTier)) * 100 : 100}%` }}
-              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
+              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500"
             ></div>
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function Affiliate() {
               <div className="mb-4">
                 <div className="text-sm text-gray-400 mb-2">Requirements:</div>
                 <div className="flex items-center text-white">
-                  <Users className="w-4 h-4 mr-2 text-blue-400" />
+                  <Users className="w-4 h-4 mr-2 text-primary-400" />
                   {tier.requiredReferrals}+ referrals
                 </div>
               </div>
@@ -324,7 +324,7 @@ export default function Affiliate() {
                 <div className="text-sm text-gray-400 mb-2">Benefits:</div>
                 {tier.benefits.map((benefit, index) => (
                   <div key={index} className="flex items-start text-gray-300">
-                    <ChevronRight className="w-4 h-4 mr-1 mt-1 text-blue-400 shrink-0" />
+                    <ChevronRight className="w-4 h-4 mr-1 mt-1 text-primary-400 shrink-0" />
                     <span className="text-sm">{benefit}</span>
                   </div>
                 ))}
@@ -332,7 +332,7 @@ export default function Affiliate() {
 
               {stats.currentTier === tier.name && (
                 <div className="absolute top-4 right-4">
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
+                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-primary-500/20 text-primary-400">
                     Current Tier
                   </div>
                 </div>
@@ -347,7 +347,7 @@ export default function Affiliate() {
         <h3 className="text-xl font-bold text-white mb-6">How It Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex items-start space-x-4">
-            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
               1
             </div>
             <div>
@@ -356,7 +356,7 @@ export default function Affiliate() {
             </div>
           </div>
           <div className="flex items-start space-x-4">
-            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
               2
             </div>
             <div>
@@ -365,7 +365,7 @@ export default function Affiliate() {
             </div>
           </div>
           <div className="flex items-start space-x-4">
-            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
               3
             </div>
             <div>
@@ -382,7 +382,7 @@ export default function Affiliate() {
           <h3 className="text-xl font-bold text-white">Marketing Resources</h3>
           <a
             href="#"
-            className="flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+            className="flex items-center text-primary-400 hover:text-primary-300 transition-colors"
           >
             View all resources
             <ExternalLink className="w-4 h-4 ml-1" />

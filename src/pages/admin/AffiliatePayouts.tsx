@@ -343,7 +343,7 @@ export default function AffiliatePayouts() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -358,8 +358,8 @@ export default function AffiliatePayouts() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-primary-400" />
             </div>
           </div>
           <p className="text-sm font-medium text-gray-400 mb-1">Pending Payouts</p>
@@ -403,7 +403,7 @@ export default function AffiliatePayouts() {
               placeholder="Search payouts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
             />
           </div>
           
@@ -412,7 +412,7 @@ export default function AffiliatePayouts() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
@@ -430,7 +430,7 @@ export default function AffiliatePayouts() {
             onClick={() => setActiveTab('requests')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'requests'
-                ? 'bg-blue-500 text-white'
+                ? 'bg-primary-500 text-white'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }`}
           >
@@ -440,7 +440,7 @@ export default function AffiliatePayouts() {
             onClick={() => setActiveTab('affiliates')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'affiliates'
-                ? 'bg-blue-500 text-white'
+                ? 'bg-primary-500 text-white'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }`}
           >
@@ -450,7 +450,7 @@ export default function AffiliatePayouts() {
             onClick={() => setActiveTab('commissions')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'commissions'
-                ? 'bg-blue-500 text-white'
+                ? 'bg-primary-500 text-white'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }`}
           >
@@ -538,7 +538,7 @@ export default function AffiliatePayouts() {
                           )}
                           <button
                             onClick={() => setSelectedPayout(selectedPayout?.id === payout.id ? null : payout)}
-                            className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
+                            className="p-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors"
                             title="View Details"
                           >
                             <Eye className="w-5 h-5" />
@@ -636,7 +636,7 @@ export default function AffiliatePayouts() {
                         </div>
                       </td>
                       <td className="py-4">
-                        <div className="font-mono text-blue-400">{affiliate.referralCode}</div>
+                        <div className="font-mono text-primary-400">{affiliate.referralCode}</div>
                       </td>
                       <td className="py-4">
                         <div className="font-medium text-white">{affiliate.totalReferrals}</div>

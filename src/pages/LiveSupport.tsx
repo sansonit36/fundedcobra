@@ -61,7 +61,7 @@ export default function LiveSupport() {
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
             <MessageCircle className="w-8 h-8 text-white" />
           </div>
         </div>
@@ -79,10 +79,10 @@ export default function LiveSupport() {
         {supportInfo.map((item, i) => (
           <div
             key={i}
-            className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 flex flex-col items-center text-center space-y-3 hover:border-blue-500/40 transition-colors duration-300"
+            className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 flex flex-col items-center text-center space-y-3 hover:border-primary-500/40 transition-colors duration-300"
           >
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center">
-              <item.icon className="w-5 h-5 text-blue-400" />
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500/20 to-primary-500/20 flex items-center justify-center">
+              <item.icon className="w-5 h-5 text-primary-400" />
             </div>
             <div>
               <p className="text-white font-semibold text-sm">{item.title}</p>
@@ -93,7 +93,7 @@ export default function LiveSupport() {
       </div>
 
       {/* Chat box placeholder / notice */}
-      <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 backdrop-blur-sm p-8 text-center space-y-4">
+      <div className="rounded-2xl border border-primary-500/20 bg-gradient-to-br from-primary-500/5 to-primary-500/5 backdrop-blur-sm p-8 text-center space-y-4">
         <div className="flex items-center justify-center space-x-2">
           <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse"></span>
           <span className="text-green-400 text-sm font-medium">Support agents are online</span>
@@ -102,10 +102,10 @@ export default function LiveSupport() {
           The live chat widget is loading in the bottom-right corner of your screen.
           Click it to start a conversation with our team.
         </p>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
         <p className="text-gray-500 text-xs">
           Powered by{' '}
-          <span className="text-blue-400 font-medium">Tawk.to</span> — your
+          <span className="text-primary-400 font-medium">Tawk.to</span> — your
           messages are private and secure.
         </p>
       </div>

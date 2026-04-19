@@ -151,7 +151,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     <div>
                       <p className="text-sm text-gray-400 mb-1">MT5 Login</p>
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">{account.mt5_login}</code>
+                        <code className="text-primary-400 font-medium">{account.mt5_login}</code>
                         <button
                           onClick={() => copyToClipboard(account.mt5_login)}
                           className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -164,7 +164,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     <div>
                       <p className="text-sm text-gray-400 mb-1">MT5 Password</p>
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">
+                        <code className="text-primary-400 font-medium">
                           {showPasswords[account.id] ? account.mt5_password : '••••••••'}
                         </code>
                         <button
@@ -191,7 +191,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     <div>
                       <p className="text-sm text-gray-400 mb-1">MT5 Server</p>
                       <div className="flex items-center space-x-2">
-                        <code className="text-blue-400 font-medium">{account.mt5_server}</code>
+                        <code className="text-primary-400 font-medium">{account.mt5_server}</code>
                         <button
                           onClick={() => copyToClipboard(account.mt5_server)}
                           className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
@@ -227,7 +227,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                 <div className="mt-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-gray-300 flex items-center">
-                      <Target className="w-4 h-4 mr-2 text-blue-400" />
+                      <Target className="w-4 h-4 mr-2 text-primary-400" />
                       Loss Limits & Protection
                     </h3>
                   </div>
@@ -277,7 +277,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                         <div className="text-right">
                           <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Total Space</p>
                           <p className={`text-sm font-bold ${
-                            ((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) > 1000 ? 'text-blue-400' : 'text-red-400'
+                            ((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) > 1000 ? 'text-primary-400' : 'text-red-400'
                           }`}>
                             +${Math.max(0, (extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)).toLocaleString()}
                           </p>
@@ -288,7 +288,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                       <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className={`absolute top-0 left-0 h-full transition-all duration-500 ${
-                            ((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) > 1000 ? 'bg-gradient-to-r from-blue-600 to-indigo-500' : 'bg-gradient-to-r from-red-600 to-orange-500'
+                            ((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) > 1000 ? 'bg-gradient-to-r from-primary-600 to-primary-500' : 'bg-gradient-to-r from-red-600 to-orange-500'
                           }`}
                           style={{ 
                             width: `${Math.min(100, Math.max(0, (((extended?.running_equity || 0) - (extended?.overall_drawdown_limit || 0)) / ((extended?.running_balance || 1) * 0.12)) * 100))}%` 
@@ -317,7 +317,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                       </a>
                       <a
                         href="/buy-account"
-                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors text-sm font-medium"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white transition-colors text-sm font-medium"
                       >
                         Get New Account
                       </a>
@@ -330,7 +330,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                 <div className="mt-4 pt-4 border-t border-white/5">
                   <button
                     onClick={() => toggleTradesVisibility(account.id)}
-                    className="flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                    className="flex items-center text-sm font-medium text-primary-400 hover:text-primary-300 transition-colors"
                   >
                     <History className="w-4 h-4 mr-2" />
                     {showTrades[account.id] ? 'Hide Recent Trades' : 'View Recent Trades'}
@@ -396,7 +396,7 @@ function TradeHistoryTable({ mt5Id, breachReason }: { mt5Id: string, breachReaso
   if (loading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <div className="w-6 h-6 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <div className="w-6 h-6 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -555,13 +555,13 @@ export default function TradingAccounts() {
             placeholder="Search accounts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+            className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
           />
         </div>
         
         <button
           onClick={() => navigate('/buy-account')}
-          className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+          className="flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Buy Account

@@ -165,14 +165,14 @@ export default function Layout() {
                     onClick={() => handleNavigation(item.path)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-white'
+                        ? 'bg-gradient-to-r from-primary-500/20 to-primary-500/20 text-white'
                         : 'text-gray-400 hover:bg-white/5 hover:text-gray-100'
                     }`}
                   >
-                    <item.icon className={`w-5 h-5 ${isActive ? 'text-blue-400' : ''}`} />
+                    <item.icon className={`w-5 h-5 ${isActive ? 'text-primary-400' : ''}`} />
                     <span className="font-medium">{item.text}</span>
                     {isActive && (
-                      <div className="ml-auto w-2 h-2 rounded-full bg-blue-400"></div>
+                      <div className="ml-auto w-2 h-2 rounded-full bg-primary-400"></div>
                     )}
                   </button>
                 );

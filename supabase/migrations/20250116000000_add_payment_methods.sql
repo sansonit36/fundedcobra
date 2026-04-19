@@ -63,7 +63,7 @@ ON CONFLICT (key) DO NOTHING;
 
 -- Insert default payment methods
 INSERT INTO payment_methods (name, account_name, account_number, enabled) VALUES
-('JazzCash', 'Propfirm', '03001234567', true),
-('Nayapay', 'Propfirm', '03001234567', true),
-('Bank Transfer', 'Propfirm', 'PK12ABCD1234567890123456', true)
+('JazzCash', 'FundedCobra', '03001234567', true),
+('Nayapay', 'FundedCobra', '03001234567', true),
+('Bank Transfer', 'FundedCobra', 'PK12ABCD1234567890123456', true)
 ON CONFLICT DO NOTHING;

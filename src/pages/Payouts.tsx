@@ -314,10 +314,10 @@ export default function Payouts() {
         {/* Available for Payout */}
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-              <Wallet className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+              <Wallet className="w-6 h-6 text-primary-400" />
             </div>
-            <div className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">
+            <div className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary-500/10 text-primary-400">
               50% of Profits
             </div>
           </div>
@@ -329,7 +329,7 @@ export default function Payouts() {
             <span className="text-sm text-gray-400">.00</span>
           </div>
           <div className="mt-4 flex items-center text-sm text-gray-400">
-            <Calculator className="w-4 h-4 mr-1 text-blue-400" />
+            <Calculator className="w-4 h-4 mr-1 text-primary-400" />
             <span>Across all active accounts</span>
           </div>
         </div>
@@ -412,7 +412,7 @@ export default function Payouts() {
               const payoutInfo = getNextPayoutInfo();
               
               return (
-                <div key={account.id} className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-colors">
+                <div key={account.id} className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary-500/30 transition-colors">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold text-white">MT5 #{account.mt5_login}</h3>
                     <span className="text-xs text-gray-400">
@@ -433,7 +433,7 @@ export default function Payouts() {
                     
                     <div className="pt-2 mt-2 border-t border-white/10">
                       <div className="flex items-center space-x-2">
-                        <Clock className="w-3 h-3 text-blue-400" />
+                        <Clock className="w-3 h-3 text-primary-400" />
                         <span className={`text-xs font-medium ${payoutInfo.color}`}>{payoutInfo.text}</span>
                       </div>
                       {payoutInfo.detail && (
@@ -454,7 +454,7 @@ export default function Payouts() {
           <h2 className="text-xl font-bold text-white">Payout History</h2>
           <button
             onClick={() => setShowRequestForm(true)}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
           >
             Request Payout
           </button>
@@ -523,7 +523,7 @@ export default function Payouts() {
                       <td className="py-4">
                         {(request.wallet_address || request.walletAddress) && (
                           <div className="flex items-center space-x-2">
-                            <code className="font-medium text-blue-400">
+                            <code className="font-medium text-primary-400">
                               {formatWalletAddress(request.wallet_address || request.walletAddress)}
                             </code>
                             <button
@@ -578,7 +578,7 @@ export default function Payouts() {
                 <select
                   value={selectedAccount}
                   onChange={(e) => setSelectedAccount(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                 >
                   <option value="">Select Account</option>
                   {activeAccounts.map((account) => {
@@ -635,11 +635,11 @@ export default function Payouts() {
                 }
                 
                 return (
-                  <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <div className="p-4 rounded-lg bg-primary-500/10 border border-primary-500/20">
                     <div className="flex items-start space-x-3">
-                      <Calculator className="w-5 h-5 text-blue-400 mt-0.5" />
+                      <Calculator className="w-5 h-5 text-primary-400 mt-0.5" />
                       <div className="w-full">
-                        <p className="text-blue-400 font-medium">Account Details</p>
+                        <p className="text-primary-400 font-medium">Account Details</p>
                         <div className="mt-2 space-y-1 text-sm">
                           <p className="text-gray-300">
                             Account Package: <span className="text-white font-medium">{packageName}</span>
@@ -727,7 +727,7 @@ export default function Payouts() {
                   value={walletAddress}
                   onChange={(e) => setWalletAddress(e.target.value)}
                   placeholder="Enter your USDT-TRC20 wallet address"
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                 />
                 <p className="mt-1 text-xs text-gray-400">
                   Must be a valid USDT-TRC20 wallet address starting with 'T'
@@ -737,7 +737,7 @@ export default function Payouts() {
               <button
                 type="submit"
                 disabled={submitting || !selectedAccount || !amount || !walletAddress}
-                className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Submitting...' : 'Submit Request'}
               </button>

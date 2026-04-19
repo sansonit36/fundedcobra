@@ -318,7 +318,7 @@ export default function Affiliates() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -333,8 +333,8 @@ export default function Affiliates() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+              <Users className="w-6 h-6 text-primary-400" />
             </div>
           </div>
           <p className="text-sm font-medium text-gray-400 mb-1">Total Affiliates</p>
@@ -390,7 +390,7 @@ export default function Affiliates() {
               placeholder="Search affiliates..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
             />
           </div>
           
@@ -400,7 +400,7 @@ export default function Affiliates() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -414,7 +414,7 @@ export default function Affiliates() {
               <select
                 value={tierFilter}
                 onChange={(e) => setTierFilter(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="all">All Tiers</option>
                 <option value="Bronze">Bronze</option>
@@ -430,7 +430,7 @@ export default function Affiliates() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'referrals' | 'earnings' | 'recent')}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="referrals">Sort by Referrals</option>
                 <option value="earnings">Sort by Earnings</option>
@@ -503,7 +503,7 @@ export default function Affiliates() {
                         <div>
                           <div className="font-medium text-white">{affiliate.name}</div>
                           <div className="text-sm text-gray-400">{affiliate.email}</div>
-                          <div className="text-xs text-blue-400 font-mono">{affiliate.referralCode}</div>
+                          <div className="text-xs text-primary-400 font-mono">{affiliate.referralCode}</div>
                         </div>
                       </div>
                     </td>
@@ -531,7 +531,7 @@ export default function Affiliates() {
                         {/* View Details Button */}
                         <button
                           onClick={() => openViewModal(affiliate)}
-                          className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
+                          className="p-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors"
                           title="View Details"
                         >
                           <Eye className="w-5 h-5" />
@@ -591,7 +591,7 @@ export default function Affiliates() {
               </div>
               <div className="bg-white/5 rounded-xl p-4">
                 <p className="text-gray-400 text-sm mb-1">Referral Code</p>
-                <p className="text-blue-400 font-mono font-medium">{viewModalAffiliate.referralCode}</p>
+                <p className="text-primary-400 font-mono font-medium">{viewModalAffiliate.referralCode}</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
                 <p className="text-gray-400 text-sm mb-1">Joined</p>
@@ -601,8 +601,8 @@ export default function Affiliates() {
 
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
-                <p className="text-blue-400 text-sm mb-1">Total Referrals</p>
+              <div className="bg-primary-500/10 rounded-xl p-4 border border-primary-500/20">
+                <p className="text-primary-400 text-sm mb-1">Total Referrals</p>
                 <p className="text-2xl font-bold text-white">{viewModalAffiliate.stats.totalReferrals}</p>
               </div>
               <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/20">
@@ -622,13 +622,13 @@ export default function Affiliates() {
             {/* Referrals List */}
             <div>
               <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                <Users className="w-5 h-5 mr-2 text-blue-400" />
+                <Users className="w-5 h-5 mr-2 text-primary-400" />
                 Referrals ({affiliateReferrals.length})
               </h4>
 
               {loadingReferrals ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                 </div>
               ) : affiliateReferrals.length === 0 ? (
                 <div className="text-center py-8 bg-white/5 rounded-xl">

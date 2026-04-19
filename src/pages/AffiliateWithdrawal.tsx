@@ -128,7 +128,7 @@ export default function AffiliateWithdrawal() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function AffiliateWithdrawal() {
               max={availableBalance}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
               placeholder="0.00"
               required
             />
@@ -199,7 +199,7 @@ export default function AffiliateWithdrawal() {
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
               placeholder="Enter your USDT (TRC-20) contract address here. Only USDT-TRC20 is supported."
               required
             />
@@ -208,7 +208,7 @@ export default function AffiliateWithdrawal() {
           <button
             type="submit"
             disabled={submitting || availableBalance <= 0}
-            className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'Submitting...' : 'Submit Withdrawal Request'}
           </button>

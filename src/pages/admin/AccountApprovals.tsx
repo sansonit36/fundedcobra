@@ -353,7 +353,7 @@ const handleApprove = async () => {
                   onClick={() => setStatusFilter(tab.value)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     statusFilter === tab.value
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-white/5 text-gray-400 hover:bg-white/10'
                   }`}
                 >
@@ -399,7 +399,7 @@ const handleApprove = async () => {
               placeholder="Search requests..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
             />
           </div>
         </div>
@@ -441,7 +441,7 @@ const handleApprove = async () => {
                           <div className="font-medium text-white">{request.user_name}</div>
                           <div className="text-sm text-gray-400">{request.user_email}</div>
                           {request.referrer_name && (
-                            <div className="flex items-center space-x-1 text-[10px] text-blue-400 font-bold uppercase mt-0.5">
+                            <div className="flex items-center space-x-1 text-[10px] text-primary-400 font-bold uppercase mt-0.5">
                               <Users className="w-3 h-3" />
                               <span>Ref: {request.referrer_name}</span>
                             </div>
@@ -494,7 +494,7 @@ const handleApprove = async () => {
                           href={request.payment_screenshot_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-400 hover:text-blue-300"
+                          className="text-sm text-primary-400 hover:text-primary-300"
                         >
                           View Payment Proof
                         </a>
@@ -518,7 +518,7 @@ const handleApprove = async () => {
                               setSelectedRequest(request);
                               setShowDetailsModal(true);
                             }}
-                            className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
+                            className="p-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors"
                             title="View Details"
                           >
                             <Eye className="w-5 h-5" />
@@ -594,8 +594,8 @@ const handleApprove = async () => {
                       <p className="text-white font-medium">{selectedRequest.package_name}</p>
                     </div>
                     {selectedRequest.referrer_name && (
-                      <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 col-span-2">
-                        <p className="text-sm text-blue-400">Referred By (Affiliate)</p>
+                      <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20 col-span-2">
+                        <p className="text-sm text-primary-400">Referred By (Affiliate)</p>
                         <p className="text-white font-medium">{selectedRequest.referrer_name}</p>
                       </div>
                     )}
@@ -774,10 +774,10 @@ const handleApprove = async () => {
                 </div>
 
                 {/* AI Verification Section */}
-                <div className="p-5 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-4">
+                <div className="p-5 rounded-xl bg-primary-500/5 border border-primary-500/10 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
+                      <div className="p-2 rounded-lg bg-primary-500/20 text-primary-400">
                         <AlertTriangle className="w-5 h-5" />
                       </div>
                       <h4 className="font-bold text-white uppercase tracking-wider text-sm">AI Analysis Report</h4>
@@ -793,7 +793,7 @@ const handleApprove = async () => {
 
                   <div className="space-y-3">
                     <div>
-                      <p className="text-xs text-blue-400 mb-1 font-bold uppercase">AI Conclusion</p>
+                      <p className="text-xs text-primary-400 mb-1 font-bold uppercase">AI Conclusion</p>
                       <p className="text-white text-sm bg-black/20 p-3 rounded-lg border border-white/5 italic">
                         "{selectedRequest.ai_reason || 'No specific reasoning provided by AI.'}"
                       </p>

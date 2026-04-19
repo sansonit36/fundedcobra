@@ -159,7 +159,7 @@ export default function Settings() {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={updating}
-                    className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-medium rounded-lg transition-colors flex items-center space-x-2"
+                    className="px-4 py-2 bg-primary-500/20 hover:bg-primary-500/30 text-primary-400 font-medium rounded-lg transition-colors flex items-center space-x-2"
                   >
                     <Upload className="w-4 h-4" />
                     <span>Upload Image</span>
@@ -202,7 +202,7 @@ export default function Settings() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter your name"
                 />
               </div>
@@ -235,7 +235,7 @@ export default function Settings() {
                   type="text"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
                   placeholder="Enter your country"
                 />
               </div>
@@ -244,7 +244,7 @@ export default function Settings() {
             <button
               type="submit"
               disabled={updating}
-              className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {updating ? 'Updating...' : 'Update Profile'}
             </button>

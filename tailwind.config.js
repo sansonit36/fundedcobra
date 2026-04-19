@@ -3,6 +3,21 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      colors: {
+        primary: {
+          50: '#fcf6fe',
+          100: '#f8eafd',
+          200: '#f2d5fb',
+          300: '#e9b5f7',
+          400: '#db8bf1',
+          500: '#bd4dd6',
+          600: '#a63aba',
+          700: '#893099',
+          800: '#722a7f',
+          900: '#5e2669',
+          950: '#3d1146',
+        },
+      },
       screens: {
         'xs': '320px',
         'sm': '640px',

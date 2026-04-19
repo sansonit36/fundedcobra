@@ -100,7 +100,7 @@ export default function AccountRules() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-blue-400 animate-spin" />
+        <RefreshCw className="w-8 h-8 text-primary-400 animate-spin" />
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function AccountRules() {
         </div>
         <button
           onClick={loadRules}
-          className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-medium rounded-lg transition-colors flex items-center"
+          className="px-4 py-2 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 font-medium rounded-lg transition-colors flex items-center"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
@@ -200,7 +200,7 @@ export default function AccountRules() {
       {/* Premium Instant Accounts Section */}
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
-          <Settings className="w-5 h-5 text-blue-400" />
+          <Settings className="w-5 h-5 text-primary-400" />
           <h2 className="text-xl font-bold text-white">Premium Instant Accounts</h2>
         </div>
 
@@ -259,7 +259,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
         {!isEditing && !isLegacy ? (
           <button
             onClick={() => onEdit(rule)}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
           >
             Edit Rules
           </button>
@@ -295,7 +295,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
               type="number"
               value={localRule.withdrawal_target_percent}
               onChange={(e) => setLocalRule({ ...localRule, withdrawal_target_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
               step="0.1"
             />
           ) : (
@@ -313,7 +313,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
               type="number"
               value={localRule.minimum_withdrawal_amount}
               onChange={(e) => setLocalRule({ ...localRule, minimum_withdrawal_amount: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
             />
           ) : (
             <div className="text-lg font-bold text-white">${rule.minimum_withdrawal_amount}</div>
@@ -330,7 +330,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
               type="number"
               value={localRule.single_trade_limit_percent}
               onChange={(e) => setLocalRule({ ...localRule, single_trade_limit_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
             />
           ) : (
             <div className="text-lg font-bold text-white">{rule.single_trade_limit_percent}%</div>
@@ -347,7 +347,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
               type="number"
               value={localRule.daily_drawdown_percent}
               onChange={(e) => setLocalRule({ ...localRule, daily_drawdown_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
             />
           ) : (
             <div className="text-lg font-bold text-white">{rule.daily_drawdown_percent}%</div>
@@ -364,7 +364,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
               type="number"
               value={localRule.overall_drawdown_percent}
               onChange={(e) => setLocalRule({ ...localRule, overall_drawdown_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
             />
           ) : (
             <div className="text-lg font-bold text-white">{rule.overall_drawdown_percent}%</div>
@@ -383,7 +383,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                   type="checkbox"
                   checked={localRule.has_minimum_trading_days}
                   onChange={(e) => setLocalRule({ ...localRule, has_minimum_trading_days: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                 />
                 <span className="text-sm text-gray-400">Required</span>
               </div>
@@ -392,7 +392,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                   type="number"
                   value={localRule.minimum_trading_days}
                   onChange={(e) => setLocalRule({ ...localRule, minimum_trading_days: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
                 />
               )}
             </div>
@@ -415,7 +415,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                   type="checkbox"
                   checked={localRule.daily_payout_enabled}
                   onChange={(e) => setLocalRule({ ...localRule, daily_payout_enabled: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                 />
                 <span className="text-white">Daily Payouts</span>
               </label>
@@ -424,7 +424,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                   type="checkbox"
                   checked={localRule.weekly_payout_enabled}
                   onChange={(e) => setLocalRule({ ...localRule, weekly_payout_enabled: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                  className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                 />
                 <span className="text-white">Weekly Payouts</span>
               </label>
@@ -437,7 +437,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                 </span>
               )}
               {rule.weekly_payout_enabled && (
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400">
+                <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary-500/10 text-primary-400">
                   Weekly Payouts
                 </span>
               )}
@@ -455,7 +455,7 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
           <textarea
             value={localRule.rule_description}
             onChange={(e) => setLocalRule({ ...localRule, rule_description: e.target.value })}
-            className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+            className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
             rows={3}
           />
         ) : (

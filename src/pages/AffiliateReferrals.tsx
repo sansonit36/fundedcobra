@@ -128,7 +128,7 @@ export default function AffiliateReferrals() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -141,8 +141,8 @@ export default function AffiliateReferrals() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
+              <Users className="w-6 h-6 text-primary-400" />
             </div>
           </div>
           <p className="text-sm font-medium text-gray-400 mb-1">Total Referrals</p>

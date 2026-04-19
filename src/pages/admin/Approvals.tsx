@@ -90,7 +90,7 @@ export default function Approvals() {
               placeholder="Search requests..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
+              className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
             />
           </div>
           
@@ -99,7 +99,7 @@ export default function Approvals() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-blue-500/50"
+                className="appearance-none pl-4 pr-8 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-200 focus:outline-none focus:border-primary-500/50"
               >
                 <option value="all">All Types</option>
                 <option value="account">Account</option>
@@ -138,7 +138,7 @@ export default function Approvals() {
                   </td>
                   <td className="py-4">
                     <div className={`inline-flex items-center px-3 py-1 rounded-full border ${
-                      request.type === 'account' ? 'bg-blue-500/10 text-blue-400 border-blue-400/20' :
+                      request.type === 'account' ? 'bg-primary-500/10 text-primary-400 border-primary-400/20' :
                       request.type === 'payout' ? 'bg-green-500/10 text-green-400 border-green-400/20' :
                       'bg-purple-500/10 text-purple-400 border-purple-400/20'
                     }`}>
@@ -169,7 +169,7 @@ export default function Approvals() {
                       </button>
                       <button
                         onClick={() => setSelectedRequest(selectedRequest?.id === request.id ? null : request)}
-                        className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
+                        className="p-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors"
                       >
                         <AlertTriangle className="w-5 h-5" />
                       </button>
@@ -208,7 +208,7 @@ export default function Approvals() {
                 <div>
                   <p className="text-gray-400 mb-1">Type</p>
                   <div className={`inline-flex items-center px-3 py-1 rounded-full border ${
-                    selectedRequest.type === 'account' ? 'bg-blue-500/10 text-blue-400 border-blue-400/20' :
+                    selectedRequest.type === 'account' ? 'bg-primary-500/10 text-primary-400 border-primary-400/20' :
                     selectedRequest.type === 'payout' ? 'bg-green-500/10 text-green-400 border-green-400/20' :
                     'bg-purple-500/10 text-purple-400 border-purple-400/20'
                   }`}>

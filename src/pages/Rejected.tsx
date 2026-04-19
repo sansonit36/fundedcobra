@@ -104,7 +104,7 @@ export default function Rejected() {
             </p>
             <p className="text-gray-400 text-xs">
               Contact support at{' '}
-              <a href={`mailto:${import.meta.env.VITE_SUPPORT_EMAIL}`} className="text-blue-400 hover:text-blue-300 underline">
+              <a href={`mailto:${import.meta.env.VITE_SUPPORT_EMAIL}`} className="text-primary-400 hover:text-primary-300 underline">
                 {import.meta.env.VITE_SUPPORT_EMAIL}
               </a>
               {' '}with your account details and evidence of legitimate payment.
