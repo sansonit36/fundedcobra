@@ -15,7 +15,7 @@ interface Trade {
   mt5_id: string;
 }
 
-export default function RecentTrades() {
+export default function RecentTrades({ filterType = 'all' }: { filterType?: string }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [trades, setTrades] = useState<Trade[]>([]);
@@ -24,22 +24,36 @@ export default function RecentTrades() {
   useEffect(() => {
     if (!user) return;
     loadRecentTrades();
-  }, [user]);
+  }, [user, filterType]);
 
   const loadRecentTrades = async () => {
     try {
       // Get user's MT5 IDs first
       const { data: accounts } = await supabase
         .from('trading_accounts')
-        .select('mt5_login')
+        .select('mt5_login, status')
         .eq('user_id', user!.id);
 
       if (!accounts || accounts.length === 0) {
         setLoading(false);
+        setTrades([]);
         return;
       }
 
-      const mt5Ids = accounts.map(a => a.mt5_login);
+      let mt5Ids: string[] = [];
+      if (filterType === 'all') {
+        mt5Ids = accounts.map(a => a.mt5_login).filter(Boolean);
+      } else if (filterType === 'active' || filterType === 'breached') {
+        mt5Ids = accounts.filter(a => a.status === filterType).map(a => a.mt5_login).filter(Boolean);
+      } else {
+        mt5Ids = [filterType]; // specific mt5_login
+      }
+
+      if (mt5Ids.length === 0) {
+        setTrades([]);
+        setLoading(false);
+        return;
+      }
 
       // Fetch trades for those IDs
       const { data, error } = await supabase
