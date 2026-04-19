@@ -21,11 +21,12 @@ export default function Overview() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<'all' | 'active' | 'breached'>('all');
 
   useEffect(() => {
     if (!user) return;
     loadStats();
-  }, [user]);
+  }, [user, filterType]);
 
   const loadStats = async () => {
     try {
@@ -36,6 +37,7 @@ export default function Overview() {
         .from('trading_accounts')
         .select(`
           id,
+          mt5_login,
           balance,
           equity,
           status,
@@ -54,43 +56,50 @@ export default function Overview() {
 
       if (requestsError) throw requestsError;
 
-      // Get trading stats
-      const { data: tradingStats, error: statsError } = await supabase
-        .from('trading_stats')
-        .select(`
-          account_id,
-          total_trades,
-          current_profit,
-          updated_at
-        `)
-        .in('account_id', accounts?.map(acc => acc.id) || []);
+      // Filter accounts
+      const filteredAccounts = filterType === 'all' 
+        ? (accounts || []) 
+        : (accounts?.filter(acc => acc.status === filterType) || []);
 
-      if (statsError) throw statsError;
-
-      // Calculate stats
-      const activeAccounts = accounts?.filter(acc => acc.status === 'active') || [];
-      const totalBalance = activeAccounts.reduce((sum, acc) => sum + acc.balance, 0);
-      const totalEquity = activeAccounts.reduce((sum, acc) => sum + acc.equity, 0);
+      const totalBalance = filteredAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+      const totalEquity = filteredAccounts.reduce((sum, acc) => sum + acc.equity, 0);
       const totalProfits = totalEquity - totalBalance;
-      const totalTrades = tradingStats?.reduce((sum, stat) => sum + stat.total_trades, 0) || 0;
+
+      // Get trades for filtered accounts
+      const mt5Logins = filteredAccounts.map(acc => acc.mt5_login).filter(Boolean);
+      let totalTrades = 0;
+      let dailyPL = 0;
+      const today = new Date();
+
+      if (mt5Logins.length > 0) {
+        const { data: trades, error: tradesError } = await supabase
+          .from('trade_history')
+          .select('profit, close_time')
+          .in('mt5_id', mt5Logins);
+
+        if (!tradesError && trades) {
+          totalTrades = trades.length;
+          
+          const todayTrades = trades.filter(t => {
+            const d = new Date(t.close_time);
+            return d.toDateString() === today.toDateString();
+          });
+          dailyPL = todayTrades.reduce((sum, t) => sum + t.profit, 0);
+        }
+      }
+
+      const activeAccounts = accounts?.filter(acc => acc.status === 'active') || [];
+      const pendingAccounts = requestsError ? 0 : pendingRequests?.length || 0;
 
       // Calculate monthly change
       const monthlyChange = totalBalance > 0 ? ((totalEquity - totalBalance) / totalBalance) * 100 : 0;
-
-      // Calculate daily P&L
-      const today = new Date();
-      const todayStats = tradingStats?.filter(stat => {
-        const statDate = new Date(stat.updated_at);
-        return statDate.toDateString() === today.toDateString();
-      });
-      const dailyPL = todayStats?.reduce((sum, stat) => sum + stat.current_profit, 0) || 0;
       const dailyChangePercent = totalBalance > 0 ? (dailyPL / totalBalance) * 100 : 0;
 
       setStats({
         totalBalance,
         monthlyChange,
         activeAccounts: activeAccounts.length,
-        pendingAccounts: pendingRequests?.length || 0,
+        pendingAccounts,
         dailyPL,
         dailyChangePercent,
         monthlyPL: totalProfits,
@@ -136,6 +145,23 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
+      {/* Filters */}
+      <div className="flex space-x-2">
+        {(['all', 'active', 'breached'] as const).map((type) => (
+          <button
+            key={type}
+            onClick={() => setFilterType(type)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
+              filterType === type 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/10'
+            }`}
+          >
+            {type} Accounts
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Balance */}
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
