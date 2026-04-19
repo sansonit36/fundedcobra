@@ -1,0 +1,20 @@
+{
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:42:15",
+      "close_time": "2026-04-19 21:42:15"
+    }
+  ]
+}

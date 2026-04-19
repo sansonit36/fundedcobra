@@ -12,12 +12,15 @@ interface Referral {
   hasPurchased: boolean;
   totalSpent: number;
   commissionEarned: number;
+  purchasesList: any[];
+  earningsList: any[];
 }
 
 export default function AffiliateReferrals() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalReferrals: 0,
     activeReferrals: 0,
@@ -54,20 +57,24 @@ export default function AffiliateReferrals() {
           const profile = ref.profiles;
 
           // Get total spent by this referral
-          const { data: purchases } = await supabase
+          const { data: purchases, error: pErr } = await supabase
             .from('account_requests')
-            .select('amount, status')
+            .select('id, amount, status, created_at, package:account_packages(name)')
             .eq('user_id', ref.referred_id)
-            .eq('status', 'approved');
+            .eq('status', 'approved')
+            .order('created_at', { ascending: false });
+
+          if (pErr) console.error("Error fetching purchases for referral:", pErr);
 
           const totalSpent = purchases?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
 
           // Get commissions earned from this referral
           const { data: earnings } = await supabase
             .from('affiliate_earnings')
-            .select('amount')
+            .select('id, amount, created_at, source_transaction')
             .eq('affiliate_id', user?.id)
-            .eq('referral_id', ref.referred_id);
+            .eq('referral_id', ref.referred_id)
+            .order('created_at', { ascending: false });
 
           const commissionEarned = earnings?.reduce((sum, e) => sum + Number(e.amount), 0) || 0;
 
@@ -79,15 +86,17 @@ export default function AffiliateReferrals() {
             status: ref.status,
             hasPurchased: (purchases?.length || 0) > 0,
             totalSpent,
-            commissionEarned
+            commissionEarned,
+            purchasesList: purchases || [],
+            earningsList: earnings || []
           };
         })
       );
 
       setReferrals(referralsWithStats);
 
-      // Calculate stats
-      const activeCount = referralsWithStats.filter(r => r.status === 'active').length;
+      // Calculate stats (Active means they actually purchased an account)
+      const activeCount = referralsWithStats.filter(r => r.hasPurchased).length;
       const totalComm = referralsWithStats.reduce((sum, r) => sum + r.commissionEarned, 0);
 
       // Get this month's commissions
@@ -195,37 +204,83 @@ export default function AffiliateReferrals() {
               </thead>
               <tbody>
                 {referrals.map((referral) => (
-                  <tr key={referral.id} className="border-b border-gray-700/50 hover:bg-white/5">
-                    <td className="py-4">
-                      <div>
-                        <p className="text-white font-medium">{referral.name}</p>
-                        <p className="text-sm text-gray-400">{referral.email}</p>
-                      </div>
-                    </td>
-                    <td className="py-4 text-gray-300">
-                      {new Date(referral.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="py-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm ${
-                          referral.status === 'active'
-                            ? 'bg-green-500/10 text-green-400'
-                            : 'bg-gray-500/10 text-gray-400'
-                        }`}
-                      >
-                        {referral.status}
-                      </span>
-                    </td>
-                    <td className="py-4 text-white font-semibold">
-                      ${referral.totalSpent.toFixed(2)}
-                      {referral.hasPurchased && (
-                        <span className="ml-2 text-xs text-green-400">✓ Purchased</span>
-                      )}
-                    </td>
-                    <td className="py-4 text-purple-400 font-bold">
-                      ${referral.commissionEarned.toFixed(2)}
-                    </td>
-                  </tr>
+                  <React.Fragment key={referral.id}>
+                    <tr 
+                      onClick={() => setExpandedId(expandedId === referral.id ? null : referral.id)} 
+                      className="border-b border-gray-700/50 hover:bg-white/5 cursor-pointer transition-colors"
+                    >
+                      <td className="py-4 pl-2">
+                        <div>
+                          <p className="text-white font-medium">{referral.name}</p>
+                          <p className="text-sm text-gray-400">{referral.email}</p>
+                        </div>
+                      </td>
+                      <td className="py-4 text-gray-300">
+                        {new Date(referral.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="py-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            referral.hasPurchased
+                              ? 'bg-green-500/10 text-green-400'
+                              : 'bg-gray-500/10 text-gray-400'
+                          }`}
+                        >
+                          {referral.hasPurchased ? 'Active Trader' : 'Signed Up'}
+                        </span>
+                      </td>
+                      <td className="py-4 text-white font-semibold">
+                        {referral.totalSpent > 0 ? `$${referral.totalSpent.toFixed(2)}` : '-'}
+                      </td>
+                      <td className="py-4 text-purple-400 font-bold">
+                        ${referral.commissionEarned.toFixed(2)}
+                      </td>
+                    </tr>
+                    
+                    {expandedId === referral.id && (
+                      <tr className="bg-black/20 border-b border-gray-700/50">
+                        <td colSpan={5} className="p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Purchases Column */}
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-white mb-2 pb-2 border-b border-white/10 uppercase tracking-wider">Trading Accounts Purchased</h4>
+                              {referral.purchasesList.length > 0 ? (
+                                referral.purchasesList.map(purchase => (
+                                  <div key={purchase.id} className="flex justify-between items-center bg-white/5 rounded-lg p-3">
+                                    <div>
+                                      <p className="text-white font-medium">{purchase.package?.name || 'Trading Account'}</p>
+                                      <p className="text-xs text-gray-400">{new Date(purchase.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                    <span className="text-green-400 font-semibold">${Number(purchase.amount).toFixed(2)}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-sm text-gray-500 italic p-3 text-center">No purchases yet</p>
+                              )}
+                            </div>
+                            
+                            {/* Commissions Column */}
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-white mb-2 pb-2 border-b border-white/10 uppercase tracking-wider">Commissions Earnt</h4>
+                              {referral.earningsList.length > 0 ? (
+                                referral.earningsList.map(earning => (
+                                  <div key={earning.id} className="flex justify-between items-center bg-purple-500/10 rounded-lg p-3 border border-purple-500/20">
+                                    <div>
+                                      <p className="text-purple-300 font-medium">Commission Credit</p>
+                                      <p className="text-xs text-gray-400">{new Date(earning.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                    <span className="text-purple-400 font-bold">+${Number(earning.amount).toFixed(2)}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-sm text-gray-500 italic p-3 text-center">No commissions yet</p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

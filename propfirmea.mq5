@@ -1,17 +1,18 @@
 //+------------------------------------------------------------------+
-//|                                               RivertonMarkets.mq5 |
-//|                                          Copyright 2024, Riverton |
+//|                                                   rivertonea.mq5   |
+//|                                          Copyright 2024, Propfirm   |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2024, Riverton"
-#property link      "https://rivertonmarkets.com"
+#property copyright "Copyright 2024, Propfirm"
+#property link      "https://propfirm.com"
 #property version   "1.00"
 #property strict
-#property description "Riverton Markets MT5 Expert Advisor"
+#property description "Propfirm MT5 Expert Advisor"
 
 // Include required libraries
 #include <Trade\Trade.mqh>
 #include <Trade\PositionInfo.mqh>
 #include <Trade\OrderInfo.mqh>
+#include <JAson.mqh>
 
 // Constants
 #define MIN_TRADE_TIME 60    // 1 minute minimum trade duration
@@ -28,11 +29,20 @@
 CTrade trade;
 CPositionInfo position;
 COrderInfo order;
+CJAVal json;
 string accountId;
 double dailyHighEquity;
 double startingBalance;
 datetime lastUpdateTime;
 datetime dailyResetTime;
+bool isBreached;
+
+// Trade tracking map
+struct TradeTime {
+   datetime openTime;
+   double openPrice;
+};
+TradeTime tradeMap[];
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                     |
@@ -46,6 +56,9 @@ int OnInit() {
    startingBalance = AccountInfoDouble(ACCOUNT_BALANCE);
    dailyResetTime = TimeTradeServer() + PeriodSeconds(PERIOD_D1);
    
+   // Reset breach status
+   isBreached = false;
+   
    // Send initial account state
    SendAccountUpdate();
    
@@ -56,14 +69,16 @@ int OnInit() {
 //| Expert deinitialization function                                   |
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
-   // Clean up any global variables
-   GlobalVariablesDeleteAll();
+   ArrayFree(tradeMap);
 }
 
 //+------------------------------------------------------------------+
 //| Expert tick function                                              |
 //+------------------------------------------------------------------+
 void OnTick() {
+   // Skip if account is breached
+   if(isBreached) return;
+
    // Check if it's time to reset daily high equity
    if(TimeTradeServer() >= dailyResetTime) {
       dailyHighEquity = AccountInfoDouble(ACCOUNT_EQUITY);
@@ -81,8 +96,17 @@ void OnTick() {
    double overallDrawdown = ((startingBalance - currentEquity) / startingBalance) * 100;
    
    if(dailyDrawdown >= DAILY_DRAWDOWN || overallDrawdown >= OVERALL_DRAWDOWN) {
-      // Close all positions if drawdown limits are breached
+      isBreached = true;
+      string reason = dailyDrawdown >= DAILY_DRAWDOWN ? 
+         "Daily drawdown limit exceeded" : 
+         "Overall drawdown limit exceeded";
+      
+      // Close all positions
       CloseAllPositions();
+      
+      // Send breach notification
+      NotifyBreach(reason);
+      return;
    }
    
    // Send periodic updates
@@ -98,45 +122,49 @@ void OnTick() {
 void OnTradeTransaction(const MqlTradeTransaction& trans,
                        const MqlTradeRequest& request,
                        const MqlTradeResult& result) {
-   // Store trade open time for new positions
+   // Handle new positions
    if(trans.type == TRADE_TRANSACTION_DEAL_ADD) {
       if(trans.deal_type == DEAL_TYPE_BUY || trans.deal_type == DEAL_TYPE_SELL) {
-         GlobalVariableSet("trade_" + IntegerToString(trans.position), TimeTradeServer());
+         int idx = ArraySize(tradeMap);
+         ArrayResize(tradeMap, idx + 1);
+         tradeMap[idx].openTime = TimeTradeServer();
+         tradeMap[idx].openPrice = trans.price;
       }
    }
    
-   // Check rules for closed positions
+   // Handle closed positions
    if(trans.type == TRADE_TRANSACTION_DEAL_ADD && trans.deal_type == DEAL_TYPE_BALANCE) {
-      ulong posTicket = trans.position;
-      datetime openTime = (datetime)GlobalVariableGet("trade_" + IntegerToString(posTicket));
-      
-      if(openTime > 0) {
+      for(int i = ArraySize(tradeMap) - 1; i >= 0; i--) {
          // Check minimum trade duration
-         if(TimeTradeServer() - openTime < MIN_TRADE_TIME) {
-            Print("Warning: Trade #", posTicket, " closed too quickly - minimum duration is 1 minute");
+         if(TimeTradeServer() - tradeMap[i].openTime < MIN_TRADE_TIME) {
+            Print("Warning: Trade closed too quickly - minimum duration is 1 minute");
          }
          
          // Get position details for profit calculation
-         if(HistorySelectByPosition(posTicket)) {
+         if(HistorySelectByPosition(trans.position)) {
             ulong dealTicket = HistoryDealGetTicket(0); // Get first deal (open)
             if(dealTicket > 0) {
                double openPrice = HistoryDealGetDouble(dealTicket, DEAL_PRICE);
                dealTicket = HistoryDealGetTicket(1); // Get second deal (close)
                if(dealTicket > 0) {
                   double closePrice = HistoryDealGetDouble(dealTicket, DEAL_PRICE);
-                  double profit = HistoryDealGetDouble(dealTicket, DEAL_PROFIT);
+                  double dealProfit = HistoryDealGetDouble(dealTicket, DEAL_PROFIT);
                   
-                  // Check maximum profit
-                  double profitPercent = (MathAbs(profit) / AccountInfoDouble(ACCOUNT_BALANCE)) * 100;
+                  // Calculate profit percentage
+                  double profitPercent = (MathAbs(dealProfit) / AccountInfoDouble(ACCOUNT_BALANCE)) * 100;
+                  
                   if(profitPercent > MAX_PROFIT_TARGET) {
-                     Print("Warning: Trade #", posTicket, " profit exceeds maximum allowed - capping at 25%");
+                     Print("Warning: Trade profit exceeds maximum allowed - capping at 25%");
                   }
                }
             }
          }
          
-         // Clean up trade tracking
-         GlobalVariableDel("trade_" + IntegerToString(posTicket));
+         // Remove trade from tracking
+         if(i < ArraySize(tradeMap) - 1)
+            ArrayCopy(tradeMap, tradeMap, i, i + 1, ArraySize(tradeMap) - i - 1);
+         ArrayResize(tradeMap, ArraySize(tradeMap) - 1);
+         break;
       }
    }
    
@@ -160,51 +188,78 @@ void CloseAllPositions() {
 //| Send account update to backend                                    |
 //+------------------------------------------------------------------+
 void SendAccountUpdate() {
-   // Prepare account data
-   string json = "{";
-   json += "\"accountId\":\"" + accountId + "\",";
-   json += "\"balance\":" + DoubleToString(AccountInfoDouble(ACCOUNT_BALANCE), 2) + ",";
-   json += "\"equity\":" + DoubleToString(AccountInfoDouble(ACCOUNT_EQUITY), 2) + ",";
-   json += "\"margin\":" + DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN), 2) + ",";
-   json += "\"freeMargin\":" + DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN_FREE), 2) + ",";
-   json += "\"marginLevel\":" + DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN_LEVEL), 2) + ",";
-   json += "\"dailyHighEquity\":" + DoubleToString(dailyHighEquity, 2) + ",";
+   // Clear previous JSON
+   json.Clear();
+   
+   // Add account data
+   json["accountId"] = accountId;
+   json["balance"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_BALANCE), 2);
+   json["equity"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_EQUITY), 2);
+   json["margin"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_MARGIN), 2);
+   json["freeMargin"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_MARGIN_FREE), 2);
+   json["marginLevel"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_MARGIN_LEVEL), 2);
+   json["dailyHighEquity"] = NormalizeDouble(dailyHighEquity, 2);
    
    // Add open positions
-   json += "\"trades\":[";
+   CJAVal trades;
    int total = PositionsTotal();
    for(int i = 0; i < total; i++) {
       ulong ticket = PositionGetTicket(i);
       if(ticket > 0) {
-         if(i > 0) json += ",";
-         json += "{";
-         json += "\"ticket\":" + IntegerToString(ticket) + ",";
-         json += "\"symbol\":\"" + PositionGetString(POSITION_SYMBOL) + "\",";
-         json += "\"type\":\"" + (PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY ? "buy" : "sell") + "\",";
-         json += "\"volume\":" + DoubleToString(PositionGetDouble(POSITION_VOLUME), 2) + ",";
-         json += "\"openPrice\":" + DoubleToString(PositionGetDouble(POSITION_PRICE_OPEN), 5) + ",";
-         json += "\"openTime\":\"" + TimeToString((datetime)PositionGetInteger(POSITION_TIME), TIME_DATE|TIME_SECONDS) + "\",";
-         json += "\"stopLoss\":" + DoubleToString(PositionGetDouble(POSITION_SL), 5) + ",";
-         json += "\"takeProfit\":" + DoubleToString(PositionGetDouble(POSITION_TP), 5) + ",";
-         json += "\"profit\":" + DoubleToString(PositionGetDouble(POSITION_PROFIT), 2);
-         json += "}";
+         CJAVal trade;
+         trade["ticket"] = (long)ticket;
+         trade["symbol"] = PositionGetString(POSITION_SYMBOL);
+         trade["type"] = (PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY ? "buy" : "sell");
+         trade["volume"] = NormalizeDouble(PositionGetDouble(POSITION_VOLUME), 2);
+         trade["openPrice"] = NormalizeDouble(PositionGetDouble(POSITION_PRICE_OPEN), 5);
+         trade["openTime"] = TimeToString((datetime)PositionGetInteger(POSITION_TIME), TIME_DATE|TIME_SECONDS);
+         trade["stopLoss"] = NormalizeDouble(PositionGetDouble(POSITION_SL), 5);
+         trade["takeProfit"] = NormalizeDouble(PositionGetDouble(POSITION_TP), 5);
+         trade["profit"] = NormalizeDouble(PositionGetDouble(POSITION_PROFIT), 2);
+         trades.Add(trade);
       }
    }
-   json += "]";
-   json += "}";
+   json["trades"].Set(trades);
    
-   // Prepare headers with authentication
+   // Send update to Supabase
+   string jsonStr = json.Serialize();
+   Print("Sending account update: ", jsonStr);
+   SendRequest("POST", "/rest/v1/mt5_updates", jsonStr);
+}
+
+//+------------------------------------------------------------------+
+//| Send breach notification                                          |
+//+------------------------------------------------------------------+
+void NotifyBreach(const string reason) {
+   // Clear previous JSON
+   json.Clear();
+   
+   // Add breach data
+   json["accountId"] = accountId;
+   json["reason"] = reason;
+   json["equity"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_EQUITY), 2);
+   json["balance"] = NormalizeDouble(AccountInfoDouble(ACCOUNT_BALANCE), 2);
+   
+   // Send breach notification to Supabase
+   string jsonStr = json.Serialize();
+   SendRequest("POST", "/rest/v1/mt5_breaches", jsonStr);
+}
+
+//+------------------------------------------------------------------+
+//| Send HTTP request to Supabase                                     |
+//+------------------------------------------------------------------+
+void SendRequest(const string method, const string endpoint, const string data) {
    string headers = "Content-Type: application/json\r\n" +
                    "apikey: " + SUPABASE_ANON_KEY + "\r\n" +
                    "Authorization: Bearer " + SUPABASE_ANON_KEY + "\r\n" +
                    "Prefer: return=minimal\r\n";
    
    char post[], result[];
-   StringToCharArray(json, post);
+   StringToCharArray(data, post);
    
    int res = WebRequest(
-      "POST",
-      SUPABASE_URL + "/rest/v1/mt5_updates",
+      method,
+      SUPABASE_URL + endpoint,
       headers,
       5000,
       post,
@@ -214,6 +269,14 @@ void SendAccountUpdate() {
    
    if(res == -1) {
       int error = GetLastError();
-      Print("Error sending update: ", error);
+      Print("Error sending request: ", error);
       
       // Handle common errors
+      if(error == 4014)
+         Print("No internet connection");
+      else if(error == 4015)
+         Print("Request timeout");
+      else
+         Print("HTTP error: ", error);
+   }
+}

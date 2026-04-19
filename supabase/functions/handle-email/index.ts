@@ -1,13 +1,19 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 import { corsHeaders } from '../_shared/cors.ts';
 
-const SITE_URL = 'https://account.rivertonmarkets.com';
+const SITE_URL = Deno.env.get('SITE_URL') ?? '';
+const PROJECT_NAME = Deno.env.get('PROJECT_NAME') ?? 'Propfirm';
+
 
 serve(async (req) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { 
+      status: 204,
+      headers: corsHeaders 
+    });
   }
 
   try {
@@ -44,7 +50,7 @@ serve(async (req) => {
 
     switch (type) {
       case 'signup':
-        subject = 'Welcome to Riverton Markets';
+        subject = `Welcome to ${PROJECT_NAME}`;
         html = template.replace(/http:\/\/localhost:3000/g, SITE_URL);
         break;
       case 'magiclink':

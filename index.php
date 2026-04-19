@@ -48,7 +48,7 @@ fbq('track', 'PageView');
 src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
-    <title>Riverton Markets - The Trader's Private Bank</title>
+    <title>Propfirm - The Trader's Private Bank</title>
     <link rel="stylesheet" href="styles/main.css?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +79,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
             <p class="hero-subheading">You've already proven yourself in the trenches. We don't waste your time with phases. We hand you $100K on day one and say: 'Go make us both rich.'</p>
             
             <div class="hero-cta-container">
-                <a href="https://account.rivertonmarkets.com/" class="btn btn-primary hero-tilted">Get Funded in 47 Seconds</a>
+                <a href="https://account.propfirm.com/" class="btn btn-primary hero-tilted">Get Funded in 47 Seconds</a>
                 <a href="payouts.html" class="btn btn-secondary">Watch Payout Proof</a>
             </div>
             
@@ -280,7 +280,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                             </div>
                             <div class="video-info">
                                 <h3>Why I Left My Day Job</h3>
-                                <p>Clyde's decision to go full-time with Riverton funding</p>
+                                <p>Clyde's decision to go full-time with Propfirm funding</p>
                                 <div class="video-meta">
                                     <span class="video-date">3 weeks ago</span>
                                     <span class="video-views">15.2K views</span>
@@ -380,7 +380,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                             </p>
                         </div>
                         
-                        <a href="https://account.rivertonmarkets.com/buy-account" style="display: inline-block; background: white; color: #059669; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); transition: transform 0.2s, box-shadow 0.2s; font-size: 1rem;">
+                        <a href="https://account.propfirm.com/buy-account" style="display: inline-block; background: white; color: #059669; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 700; text-decoration: none; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); transition: transform 0.2s, box-shadow 0.2s; font-size: 1rem;">
                             <svg style="width: 20px; height: 20px; display: inline-block; margin-right: 0.5rem; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
                             </svg>
@@ -492,7 +492,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                             </div>
                         </div>
                         
-                        <a href="https://account.rivertonmarkets.com/" class="btn btn-primary btn-full-width">
+                        <a href="https://account.propfirm.com/" class="btn btn-primary btn-full-width">
                             Select Plan
                         </a>
                     </div>
@@ -589,7 +589,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                             </div>
                         </div>
                         
-                        <a href="https://account.rivertonmarkets.com/" class="btn btn-primary btn-full-width">
+                        <a href="https://account.propfirm.com/" class="btn btn-primary btn-full-width">
                             Select Plan
                         </a>
                     </div>
@@ -649,7 +649,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
         <div class="container">
             <div class="section-header">
                 <h2>Powered by MetaTrader 5</h2>
-                <p class="section-subheading">The world's most advanced trading platform, exclusively for Riverton traders</p>
+                <p class="section-subheading">The world's most advanced trading platform, exclusively for Propfirm traders</p>
             </div>
             
             <div class="mt5-content">
@@ -725,8 +725,8 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                         
                         <div class="platform-cta">
                             <h3>Ready to Trade with MT5?</h3>
-                            <p>Get instant access to the world's most advanced trading platform with your Riverton account.</p>
-                            <a href="https://account.rivertonmarkets.com/" class="btn btn-primary">Get Funded Now</a>
+                            <p>Get instant access to the world's most advanced trading platform with your Propfirm account.</p>
+                            <a href="https://account.propfirm.com/" class="btn btn-primary">Get Funded Now</a>
                         </div>
                     </div>
                 </div>
@@ -738,7 +738,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
     <section id="features">
         <div class="container">
             <div class="section-header">
-                <h2>Why Elite Traders Choose Riverton</h2>
+                <h2>Why Elite Traders Choose Propfirm</h2>
                 <p class="section-subheading">We've redefined what it means to be a prop firm. Here's how we stand apart:</p>
             </div>
             
@@ -887,7 +887,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
         <div class="container">
             <div class="section-header">
                 <h2>Trader Success Stories</h2>
-                <p class="section-subheading">Hear from traders who've transformed their lives with Riverton Markets</p>
+                <p class="section-subheading">Hear from traders who've transformed their lives with Propfirm</p>
             </div>
             
             <div class="testimonials-grid">
@@ -900,7 +900,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                         </div>
                     </div>
                     <div class="testimonial-content">
-                        <p>"Riverton Markets changed my life. I went from struggling to make ends meet to receiving a $28K payout in just 3 months. The platform is intuitive, the support team is responsive, and the profit split is unmatched in the industry."</p>
+                        <p>"Propfirm changed my life. I went from struggling to make ends meet to receiving a $28K payout in just 3 months. The platform is intuitive, the support team is responsive, and the profit split is unmatched in the industry."</p>
                     </div>
                     <div class="testimonial-stats">
                         <div>
@@ -923,7 +923,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                         </div>
                     </div>
                     <div class="testimonial-content">
-                        <p>"I've tried several prop firms, but none compare to Riverton. The instant funding, simple rules, and lightning-fast payouts make this the only prop firm I recommend to other traders. I've made over $50K in payouts so far!"</p>
+                        <p>"I've tried several prop firms, but none compare to Propfirm. The instant funding, simple rules, and lightning-fast payouts make this the only prop firm I recommend to other traders. I've made over $50K in payouts so far!"</p>
                     </div>
                     <div class="testimonial-stats">
                         <div>
@@ -946,7 +946,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
                         </div>
                     </div>
                     <div class="testimonial-content">
-                        <p>"The freedom Riverton gives you is unparalleled. No restrictive rules, no hidden fees, just pure trading freedom with real capital. I've been able to quit my day job and trade full-time thanks to the consistent payouts."</p>
+                        <p>"The freedom Propfirm gives you is unparalleled. No restrictive rules, no hidden fees, just pure trading freedom with real capital. I've been able to quit my day job and trade full-time thanks to the consistent payouts."</p>
                     </div>
                     <div class="testimonial-stats">
                         <div>
@@ -969,7 +969,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
             <h2 class="cta-heading">Your Trading Journey Starts Here</h2>
             <p class="cta-subheading">Join thousands of successful traders who've made us both rich.</p>
             <div class="cta-buttons">
-                <a href="https://account.rivertonmarkets.com/" class="btn btn-gold">Claim My Account →</a>
+                <a href="https://account.propfirm.com/" class="btn btn-gold">Claim My Account →</a>
                 <a href="reviews.html" class="btn btn-secondary">Read Success Stories</a>
             </div>
         </div>
@@ -1007,7 +1007,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
             <div class="footer-links">
                 <h4>Products</h4>
                 <ul>
-                    <li><a href="https://account.rivertonmarkets.com/">Account Tiers</a></li>
+                    <li><a href="https://account.propfirm.com/">Account Tiers</a></li>
                     <li><a href="payouts.html">Payout Process</a></li>
                     <li><a href="rules.html">Trading Rules</a></li>
                     <li><a href="faq.html">FAQ</a></li>
@@ -1027,7 +1027,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
             <div class="footer-links">
                 <h4>Contact Us</h4>
                 <ul>
-                    <li><a href="mailto:Support@rivertonmarkets.com">Support@rivertonmarkets.com</a></li>
+                    <li><a href="mailto:Support@propfirm.com">Support@propfirm.com</a></li>
                     <li><a href="tel:+447414236273">+44 7414 236273</a></li>
                     <li>Unit A1, 17 Heron Road</li>
                 </ul>
@@ -1045,7 +1045,7 @@ src="https://www.facebook.com/tr?id=1765985323943547&ev=PageView&noscript=1"
         </div>
         
         <div class="footer-bottom">
-            <p>&copy; 2025 Riverton Markets. The Trader's Private Bank. All rights reserved.</p>
+            <p>&copy; 2025 Propfirm. The Trader's Private Bank. All rights reserved.</p>
         </div>
     </div>
 </footer>

@@ -1,6 +1,7 @@
 // src/affiliateApi.ts
 
-const AFF_BASE = 'https://rivertonmarkets.com/affiliate/api';
+const AFF_BASE = import.meta.env.VITE_API_URL || '';
+
 const DEFAULT_TIMEOUT_MS = 8000;
 
 function withTimeout<T>(p: Promise<T>, ms = DEFAULT_TIMEOUT_MS) {
@@ -78,7 +79,8 @@ export async function notifyAffiliateRegistration(params: {
   if (sessionStorage.getItem(key)) return;
   sessionStorage.setItem(key, '1');
 
-  const ref = new URL(window.location.href).searchParams.get('ref') ?? '';
+  const ref = new URL(window.location.href).searchParams.get('ref') ?? 
+              localStorage.getItem('affiliate_ref') ?? '';
 
   try {
     await postForm(`${AFF_BASE}/register.php`, {

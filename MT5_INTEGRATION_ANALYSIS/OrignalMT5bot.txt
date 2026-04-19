@@ -1,0 +1,1439 @@
+//+------------------------------------------------------------------+
+
+
+
+//|                                             FundedCobraEA.mq5|
+
+
+
+//|   Combines drawdown checks, email/alerts, position closures, and   |
+
+
+
+//|   sends account data & trading account status updates to PHP endpoints|
+
+
+
+//|                        Copyright 2024, FundedCobra          |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+#include <Trade/Trade.mqh>
+
+
+
+CTrade trade;
+
+
+
+
+
+
+
+//--- Global variables
+
+
+
+double initialEquity;
+
+
+
+double maxEquity;
+
+
+
+double drawdownLimit;
+
+
+
+double maxDrawdownLimit; // Overall drawdown limit (12% of initial equity)
+
+
+
+bool tradingStopped = false;
+
+
+
+bool emailSent = false;
+
+
+
+bool drawdownBreached = false;       // Tracks if drawdown is breached
+
+
+
+bool dailyDrawdownEmailSent = false; // Flag to track if daily drawdown email was sent
+
+
+
+string clientName = AccountInfoString(ACCOUNT_NAME); // Dynamically fetched
+
+
+
+
+
+
+
+//--- Timer interval (in seconds)
+
+
+
+#define UPDATE_INTERVAL 1
+
+
+
+
+
+
+
+//--- PHP Endpoints
+#define BRIDGE_DOMAIN "https://fundedcobra.com/MT5%20Sync"
+#define PROJECT_NAME "FundedCobra"
+
+// Endpoint for updating account_data_extended table (account data)
+#define PHP_ENDPOINT BRIDGE_DOMAIN + "/insert_data.php"
+
+// Endpoint for updating trading_accounts table (status & breach_reason)
+#define TRADING_ACCOUNT_ENDPOINT BRIDGE_DOMAIN + "/update_trading_account.php"
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Expert initialization function                                   |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+input double InitialEquityInput = 0.0; // If >0, overrides account equity at startup
+
+
+
+int OnInit()
+
+{
+
+   // Capture initial equity exactly once
+
+   if(InitialEquityInput > 0.0)
+
+      initialEquity = InitialEquityInput;
+
+   else
+
+      initialEquity = AccountInfoDouble(ACCOUNT_EQUITY);
+
+
+
+   maxEquity        = initialEquity;
+
+   drawdownLimit    = initialEquity * 0.92;   // 8% daily drawdown limit
+
+   maxDrawdownLimit = initialEquity * 0.88;   // 12% overall drawdown limit
+
+
+
+   Print("EA applied. Initial equity: ", DoubleToString(initialEquity,2));
+
+   Print("Daily drawdown limit set to: ", DoubleToString(drawdownLimit,2));
+
+   Print("Max drawdown limit set to: ", DoubleToString(maxDrawdownLimit,2));
+
+
+
+   if(!drawdownBreached)
+
+   {
+
+      SendInitialEquityEmail();
+
+      SendDrawdownLimitNotification();
+
+   }
+
+
+
+   // Schedule OnTimer every UPDATE_INTERVAL seconds
+
+   EventSetTimer(UPDATE_INTERVAL);
+
+
+
+   // Send the very first account update
+
+   SendAccountUpdate();
+
+
+
+   return(INIT_SUCCEEDED);
+
+}
+
+
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Expert deinitialization function                                 |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void OnDeinit(const int reason)
+
+
+
+{
+
+
+
+   Print("EA Deinitialized - Removing timer...");
+
+
+
+   EventKillTimer();
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Timer function: reset daily values and email flags               |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void OnTimer()
+
+
+
+{
+
+
+
+   datetime now = TimeCurrent();
+
+
+
+   MqlDateTime currentTimeStruct;
+
+
+
+   TimeToStruct(now, currentTimeStruct);
+
+
+
+
+
+
+
+   // Reset daily drawdown limit at market close (example: 21:05) if not breached
+
+
+
+   if(currentTimeStruct.hour == 21 && currentTimeStruct.min == 5 && !dailyDrawdownEmailSent && !drawdownBreached)
+
+
+
+   {
+
+
+
+      SetDailyDrawdownLimit();
+
+
+
+      dailyDrawdownEmailSent = true;
+
+
+
+   }
+
+
+
+
+
+
+
+   // Reset email flag after midnight (example: 00:10)
+
+
+
+   if(currentTimeStruct.hour == 0 && currentTimeStruct.min == 10)
+
+
+
+      dailyDrawdownEmailSent = false;
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Expert tick function                                             |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void OnTick()
+
+{
+
+   double currentEquity = AccountInfoDouble(ACCOUNT_EQUITY);
+
+
+
+   // Update maximum equity if current equity is higher
+
+   if(currentEquity > maxEquity)
+
+   {
+
+      maxEquity = currentEquity;
+
+
+
+      // Only print the first new daily high once per day
+
+      static int lastHighPrintDate = 0;
+
+      MqlDateTime dt; TimeToStruct(TimeCurrent(), dt);
+
+      int today = dt.year * 10000 + dt.mon * 100 + dt.day;
+
+
+
+      if(today != lastHighPrintDate)
+
+      {
+
+         Print("New daily high equity: ", DoubleToString(maxEquity,2));
+
+         lastHighPrintDate = today;
+
+      }
+
+   }
+
+
+
+
+
+   // Check drawdown conditions
+
+
+
+   if(!tradingStopped && currentEquity <= drawdownLimit)
+
+
+
+   {
+
+
+
+      Print("Daily drawdown limit breached! Current Equity: ", DoubleToString(currentEquity,2));
+
+
+
+      Alert("Daily drawdown limit breached! Current Equity: " + DoubleToString(currentEquity,2));
+
+
+
+      NotifyDrawdownBreach();  // Sends emails/notifications and updates trading_accounts
+
+
+
+      CloseAllPositions();
+
+
+
+      tradingStopped = true;
+
+
+
+      drawdownBreached = true;
+
+
+
+   }
+
+
+
+   if(!tradingStopped && currentEquity <= maxDrawdownLimit)
+
+
+
+   {
+
+
+
+      Print("Max drawdown limit breached! Current Equity: ", DoubleToString(currentEquity,2));
+
+
+
+      Alert("Max drawdown limit breached! Current Equity: " + DoubleToString(currentEquity,2));
+
+
+
+      NotifyMaxDrawdownBreach();  // Sends emails/notifications and updates trading_accounts
+
+
+
+      CloseAllPositions();
+
+
+
+      tradingStopped = true;
+
+
+
+      drawdownBreached = true;
+
+
+
+   }
+
+
+
+
+
+
+
+   // Continuously close any new positions if trading is stopped
+
+
+
+   if(tradingStopped)
+
+
+
+      CloseAllNewPositions();
+
+
+
+
+
+
+
+   // Send periodic account update every UPDATE_INTERVAL seconds
+
+
+
+   static datetime lastUpdateTime = 0;
+
+
+
+   if(TimeTradeServer() - lastUpdateTime >= UPDATE_INTERVAL)
+
+
+
+   {
+
+
+
+      SendAccountUpdate();
+
+
+
+      lastUpdateTime = TimeTradeServer();
+
+
+
+   }
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Reset daily drawdown limit and send notifications                |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void SetDailyDrawdownLimit()
+
+
+
+{
+
+
+
+   initialEquity = AccountInfoDouble(ACCOUNT_EQUITY); // Update initial equity at market close
+
+
+
+   maxEquity = initialEquity;
+
+
+
+   drawdownLimit = initialEquity * 0.92; // Reset daily drawdown limit
+
+
+
+
+
+
+
+   Print("Daily Drawdown Limit Updated. New initial equity: ", DoubleToString(initialEquity,2));
+
+
+
+   Print("New Daily Drawdown Limit: ", DoubleToString(drawdownLimit,2));
+
+
+
+
+
+
+
+   if(!drawdownBreached)
+
+
+
+   {
+
+
+
+      SendDailyDrawdownLimitEmail();
+
+
+
+      Alert("Daily drawdown limit updated. Initial equity: " + DoubleToString(initialEquity,2) +
+
+
+
+            ", Drawdown Limit: " + DoubleToString(drawdownLimit,2));
+
+
+
+   }
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Send daily drawdown limit email                                  |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void SendDailyDrawdownLimitEmail()
+
+
+
+{
+
+
+
+   string subject = "Daily Drawdown Limit Set - FundedCobra";
+
+
+
+   string accId = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+
+
+   string message = "Daily drawdown limit has been updated based on market closing.\n\n" +
+
+
+
+                    "Your initial equity for the day is: " + DoubleToString(initialEquity,2) + ".\n" +
+
+
+
+                    "Your daily drawdown limit is set to: " + DoubleToString(drawdownLimit,2) + ".\n\n" +
+
+
+
+                    "Your MT5 Account ID: " + accId + "\n" +
+
+
+
+                    "Thank you for trading with FundedCobra!";
+
+
+
+   SendMail(subject, message);
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Notify drawdown breach and update trading_accounts table         |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void NotifyDrawdownBreach()
+
+
+
+{
+
+
+
+   if(!emailSent)
+
+
+
+   {
+
+
+
+      string accId = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+
+
+      string message = "Your account has breached the daily drawdown limit. Trading has been disabled.\n" +
+
+
+
+                       "Current equity: " + DoubleToString(AccountInfoDouble(ACCOUNT_EQUITY),2) + "\n" +
+
+
+
+                       "Client Name: " + clientName + "\n" +
+
+
+
+                       "Your MT5 Account ID: " + accId;
+
+
+
+      Alert(message);
+
+
+
+      SendNotification(message);
+
+
+
+      string subject = "Daily Drawdown Limit Breached - FundedCobra";
+
+
+
+      SendMail(subject, message);
+
+
+
+      
+
+
+
+      // Update trading_accounts table with status "breached" and breach reason "daily limit hit"
+
+
+
+      UpdateTradingAccountStatus("daily limit hit");
+
+
+
+
+
+
+
+      emailSent = true;
+
+
+
+   }
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Notify max drawdown breach and update trading_accounts table     |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void NotifyMaxDrawdownBreach()
+
+
+
+{
+
+
+
+   if(!emailSent)
+
+
+
+   {
+
+
+
+      string accId = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+
+
+      string message = "Your account has breached the max drawdown limit (12% of initial equity). Trading has been disabled.\n" +
+
+
+
+                       "Current equity: " + DoubleToString(AccountInfoDouble(ACCOUNT_EQUITY),2) + "\n" +
+
+
+
+                       "Client Name: " + clientName + "\n" +
+
+
+
+                       "Your MT5 Account ID: " + accId;
+
+
+
+      Alert(message);
+
+
+
+      SendNotification(message);
+
+
+
+      string subject = "Max Drawdown Limit Breached - FundedCobra";
+
+
+
+      SendMail(subject, message);
+
+
+
+
+
+
+
+      // Update trading_accounts table with status "breached" and breach reason "overall limit hit"
+
+
+
+      UpdateTradingAccountStatus("overall limit hit");
+
+
+
+
+
+
+
+      emailSent = true;
+
+
+
+   }
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Send initial equity email                                          |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void SendInitialEquityEmail()
+
+
+
+{
+
+
+
+   string subject = "Initial Equity Applied - FundedCobra";
+
+
+
+   string accId = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+
+
+   string message = "Welcome to FundedCobra!\n\n" +
+
+
+
+                    "Your initial equity has been applied: " + DoubleToString(initialEquity,2) + ".\n" +
+
+
+
+                    "Your drawdown limit is set to: " + DoubleToString(drawdownLimit,2) +
+
+
+
+                    ". If your account equity reaches this amount, your account is breached.\n\n" +
+
+
+
+                    "Your MT5 Account ID: " + accId + "\n" +
+
+
+
+                    "Thank you for choosing FundedCobra!";
+
+
+
+   SendMail(subject, message);
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Send drawdown limit notification                                 |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void SendDrawdownLimitNotification()
+
+
+
+{
+
+
+
+   string accId = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+
+
+   string message = "Your drawdown limit is set to: " + DoubleToString(drawdownLimit,2) +
+
+
+
+                    ". If your account equity reaches this amount, your account is breached.\n" +
+
+
+
+                    "Your MT5 Account ID: " + accId;
+
+
+
+   Alert(message);
+
+
+
+   SendNotification(message);
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Close all open positions                                           |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void CloseAllPositions()
+
+
+
+{
+
+
+
+   int totalPositions = PositionsTotal();
+
+
+
+   Print("Closing all positions. Total positions: ", IntegerToString(totalPositions));
+
+
+
+   Alert("Closing all positions. Total positions: " + IntegerToString(totalPositions));
+
+
+
+   for(int i = totalPositions - 1; i >= 0; i--)
+
+
+
+   {
+
+
+
+      if(PositionSelect(PositionGetSymbol(i)))
+
+
+
+      {
+
+
+
+         ulong ticket = PositionGetInteger(POSITION_TICKET);
+
+
+
+         bool result = trade.PositionClose(ticket);
+
+
+
+         if(result)
+
+
+
+         {
+
+
+
+            Print("Position closed successfully. Ticket: ", ticket);
+
+
+
+            Alert("Position closed successfully. Ticket: " + IntegerToString(ticket));
+
+
+
+         }
+
+
+
+         else
+
+
+
+         {
+
+
+
+            Print("Failed to close position. Error: ", GetLastError());
+
+
+
+            Alert("Failed to close position. Error: " + IntegerToString(GetLastError()));
+
+
+
+         }
+
+
+
+      }
+
+
+
+   }
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Continuously close new positions after trading is stopped        |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void CloseAllNewPositions()
+
+
+
+{
+
+
+
+   int totalPositions = PositionsTotal();
+
+
+
+   for(int i = totalPositions - 1; i >= 0; i--)
+
+
+
+   {
+
+
+
+      if(PositionSelect(PositionGetSymbol(i)))
+
+
+
+      {
+
+
+
+         ulong ticket = PositionGetInteger(POSITION_TICKET);
+
+
+
+         bool result = trade.PositionClose(ticket);
+
+
+
+         if(result)
+
+
+
+         {
+
+
+
+            Print("New position closed successfully. Ticket: ", ticket);
+
+
+
+            Alert("New position closed successfully. Ticket: " + IntegerToString(ticket));
+
+
+
+            string message = "Trading disabled for " + clientName +
+
+
+
+                             ". New trade closed. Ticket ID: " + IntegerToString(ticket) + ".";
+
+
+
+            Alert(message);
+
+
+
+            SendNotification(message);
+
+
+
+         }
+
+
+
+         else
+
+
+
+         {
+
+
+
+            Print("Failed to close new position. Error: ", GetLastError());
+
+
+
+            Alert("Failed to close new position. Error: " + IntegerToString(GetLastError()));
+
+
+
+         }
+
+
+
+      }
+
+
+
+   }
+
+
+
+}
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Send account update to PHP endpoint (for account_data_extended)    |
+
+
+
+//+------------------------------------------------------------------+
+
+void SendAccountUpdate()
+
+{
+
+   static bool initialSent = false;
+
+   static int  lastPrintDate = 0;
+
+
+
+   string mt5_id        = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+   string client_name   = AccountInfoString(ACCOUNT_NAME);
+
+   double currentEquity = AccountInfoDouble(ACCOUNT_EQUITY);
+
+
+
+   // Build JSON payload
+
+   string json = "{";
+
+   json += "\"mt5_id\":\"" + mt5_id + "\",";
+
+   json += "\"client_name\":\"" + client_name + "\",";
+
+
+
+   if(!initialSent)
+
+   {
+
+      json += "\"initial_equity\":" + DoubleToString(initialEquity,2) + ",";
+
+      initialSent = true;
+
+   }
+
+
+
+   json += "\"daily_drawdown_limit\":8,";
+
+   json += "\"overall_drawdown_limit\":12,";
+
+   json += "\"weekly_profit_target\":10,";
+
+   json += "\"running_balance\":" + DoubleToString(currentEquity,2) + ",";
+
+   json += "\"running_equity\":" + DoubleToString(currentEquity,2) + ",";
+
+   json += "\"largest_single_trade_profit_week\":0,";
+
+   json += "\"trades_under_60s_week\":0}";
+
+   
+
+   // Determine if today’s prints should fire
+
+   MqlDateTime dt; TimeToStruct(TimeCurrent(), dt);
+
+   int today = dt.year*10000 + dt.mon*100 + dt.day;
+
+   bool firstPrintToday = (today != lastPrintDate);
+
+
+
+   if(firstPrintToday)
+
+      Print("Sending account update: ", json);
+
+
+
+   // POST to PHP endpoint
+
+   char postData[];
+
+   int data_len = StringLen(json);
+
+   ArrayResize(postData, data_len);
+
+   StringToCharArray(json, postData, 0, data_len, CP_UTF8);
+
+
+
+   string headers = "Content-Type: application/json\r\n";
+
+   char result[];
+
+   int res = WebRequest("POST", PHP_ENDPOINT, headers, 5000, postData, result, headers);
+
+
+
+   if(res == -1)
+
+      Print("Error sending data to PHP endpoint. Error code: ", GetLastError());
+
+   else if(firstPrintToday)
+
+   {
+
+      Print("Data sent successfully to PHP endpoint.");
+
+      lastPrintDate = today;
+
+   }
+
+}
+
+
+
+
+
+
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+//| Update trading_accounts table (status & breach_reason)           |
+
+
+
+//+------------------------------------------------------------------+
+
+
+
+void UpdateTradingAccountStatus(string breachReason)
+
+
+
+{
+
+
+
+   string mt5_login = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+
+
+
+   string json = "{";
+
+
+
+   json += "\"mt5_login\":\"" + mt5_login + "\",";
+
+
+
+   json += "\"status\":\"breached\",";
+
+
+
+   json += "\"breach_reason\":\"" + breachReason + "\"";
+
+
+
+   json += "}";
+
+
+
+   Print("Updating trading account status: ", json);
+
+
+
+
+
+
+
+   char postData[];
+
+
+
+   int data_len = StringLen(json);
+
+
+
+   ArrayResize(postData, data_len);
+
+
+
+   StringToCharArray(json, postData, 0, data_len, CP_UTF8);
+
+
+
+
+
+
+
+   string headers = "Content-Type: application/json\r\n";
+
+
+
+   char result[];
+
+
+
+   int res = WebRequest("POST", TRADING_ACCOUNT_ENDPOINT, headers, 5000, postData, result, headers);
+
+
+
+   if(res == -1)
+
+
+
+   {
+
+
+
+      int error = GetLastError();
+
+
+
+      Print("Error updating trading account. Error code: ", error);
+
+
+
+   }
+
+
+
+   else
+
+
+
+   {
+
+
+
+      Print("Trading account updated successfully.");
+
+
+
+      // Uncomment to print server response:
+
+
+
+      // Print("Response: ", CharArrayToString(result));
+
+
+
+   }
+
+
+
+}
+
+
+
+//+------------------------------------------------------------------+

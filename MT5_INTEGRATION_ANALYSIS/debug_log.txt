@@ -1,0 +1,361 @@
+[2026-04-19 16:35:50] === Script Execution Started ===
+[2026-04-19 16:35:50] Raw data (before trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:35:50",
+      "close_time": "2026-04-19 21:35:50"
+    }
+  ]
+}
+[2026-04-19 16:35:50] Raw data (after trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:35:50",
+      "close_time": "2026-04-19 21:35:50"
+    }
+  ]
+}
+[2026-04-19 16:35:50] Data successfully saved to: /Users/macbookairm2/Documents/Propfirm CRM/MT5_INTEGRATION_ANALYSIS/received_data.json
+[2026-04-19 16:35:50] Decoded data: Array
+(
+    [mt5_id] => LOCAL_TEST_888
+    [client_name] => Antigravity Test
+    [initial_equity] => 50000
+    [running_balance] => 51200
+    [running_equity] => 51150
+    [trades] => Array
+        (
+            [0] => Array
+                (
+                    [ticket] => test_tkt_101
+                    [symbol] => XAUUSD
+                    [type] => buy
+                    [volume] => 0.5
+                    [open_price] => 2030.5
+                    [close_price] => 2035
+                    [profit] => 450
+                    [open_time] => 2026-04-19 21:35:50
+                    [close_time] => 2026-04-19 21:35:50
+                )
+
+        )
+
+)
+
+[2026-04-19 16:35:52] Account Data Upsert - Status: 201
+[2026-04-19 16:35:52] Processing 1 trades...
+[2026-04-19 16:35:53] Trade History Upsert - Status: 401
+[2026-04-19 16:35:53] === Script Execution Ended ===
+[2026-04-19 16:37:30] === Script Execution Started ===
+[2026-04-19 16:37:30] Raw data (before trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:37:30",
+      "close_time": "2026-04-19 21:37:30"
+    }
+  ]
+}
+[2026-04-19 16:37:30] Raw data (after trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:37:30",
+      "close_time": "2026-04-19 21:37:30"
+    }
+  ]
+}
+[2026-04-19 16:37:30] Data successfully saved to: /Users/macbookairm2/Documents/Propfirm CRM/MT5_INTEGRATION_ANALYSIS/received_data.json
+[2026-04-19 16:37:30] Decoded data: Array
+(
+    [mt5_id] => LOCAL_TEST_888
+    [client_name] => Antigravity Test
+    [initial_equity] => 50000
+    [running_balance] => 51200
+    [running_equity] => 51150
+    [trades] => Array
+        (
+            [0] => Array
+                (
+                    [ticket] => test_tkt_101
+                    [symbol] => XAUUSD
+                    [type] => buy
+                    [volume] => 0.5
+                    [open_price] => 2030.5
+                    [close_price] => 2035
+                    [profit] => 450
+                    [open_time] => 2026-04-19 21:37:30
+                    [close_time] => 2026-04-19 21:37:30
+                )
+
+        )
+
+)
+
+[2026-04-19 16:37:31] Account Data Upsert - Status: 200
+[2026-04-19 16:37:31] Processing 1 trades...
+[2026-04-19 16:37:32] Trade History Upsert - Status: 401
+[2026-04-19 16:37:32] === Script Execution Ended ===
+[2026-04-19 16:39:14] === Script Execution Started ===
+[2026-04-19 16:39:14] Raw data (before trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:39:14",
+      "close_time": "2026-04-19 21:39:14"
+    }
+  ]
+}
+[2026-04-19 16:39:14] Raw data (after trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:39:14",
+      "close_time": "2026-04-19 21:39:14"
+    }
+  ]
+}
+[2026-04-19 16:39:14] Data successfully saved to: /Users/macbookairm2/Documents/Propfirm CRM/MT5_INTEGRATION_ANALYSIS/received_data.json
+[2026-04-19 16:39:14] Decoded data: Array
+(
+    [mt5_id] => LOCAL_TEST_888
+    [client_name] => Antigravity Test
+    [initial_equity] => 50000
+    [running_balance] => 51200
+    [running_equity] => 51150
+    [trades] => Array
+        (
+            [0] => Array
+                (
+                    [ticket] => test_tkt_101
+                    [symbol] => XAUUSD
+                    [type] => buy
+                    [volume] => 0.5
+                    [open_price] => 2030.5
+                    [close_price] => 2035
+                    [profit] => 450
+                    [open_time] => 2026-04-19 21:39:14
+                    [close_time] => 2026-04-19 21:39:14
+                )
+
+        )
+
+)
+
+[2026-04-19 16:39:15] Account Data Upsert - Status: 200
+[2026-04-19 16:39:15] Processing 1 trades...
+[2026-04-19 16:39:16] Trade History Upsert - Status: 401
+[2026-04-19 16:39:16] === Script Execution Ended ===
+[2026-04-19 16:41:06] === Script Execution Started ===
+[2026-04-19 16:41:06] Raw data (before trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:41:06",
+      "close_time": "2026-04-19 21:41:06"
+    }
+  ]
+}
+[2026-04-19 16:41:06] Raw data (after trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:41:06",
+      "close_time": "2026-04-19 21:41:06"
+    }
+  ]
+}
+[2026-04-19 16:41:06] Data successfully saved to: /Users/macbookairm2/Documents/Propfirm CRM/MT5_INTEGRATION_ANALYSIS/received_data.json
+[2026-04-19 16:41:06] Decoded data: Array
+(
+    [mt5_id] => LOCAL_TEST_888
+    [client_name] => Antigravity Test
+    [initial_equity] => 50000
+    [running_balance] => 51200
+    [running_equity] => 51150
+    [trades] => Array
+        (
+            [0] => Array
+                (
+                    [ticket] => test_tkt_101
+                    [symbol] => XAUUSD
+                    [type] => buy
+                    [volume] => 0.5
+                    [open_price] => 2030.5
+                    [close_price] => 2035
+                    [profit] => 450
+                    [open_time] => 2026-04-19 21:41:06
+                    [close_time] => 2026-04-19 21:41:06
+                )
+
+        )
+
+)
+
+[2026-04-19 16:41:07] Account Data Upsert - Status: 200
+[2026-04-19 16:41:07] Processing 1 trades...
+[2026-04-19 16:41:08] Trade History Upsert - Status: 401
+[2026-04-19 16:41:08] Trade History Error Response: {"code":"42501","details":null,"hint":null,"message":"new row violates row-level security policy for table \"trade_history\""}
+[2026-04-19 16:41:08] === Script Execution Ended ===
+[2026-04-19 16:42:15] === Script Execution Started ===
+[2026-04-19 16:42:15] Raw data (before trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:42:15",
+      "close_time": "2026-04-19 21:42:15"
+    }
+  ]
+}
+[2026-04-19 16:42:15] Raw data (after trim): {
+  "mt5_id": "LOCAL_TEST_888",
+  "client_name": "Antigravity Test",
+  "initial_equity": 50000.00,
+  "running_balance": 51200.00,
+  "running_equity": 51150.00,
+  "trades": [
+    {
+      "ticket": "test_tkt_101",
+      "symbol": "XAUUSD",
+      "type": "buy",
+      "volume": 0.5,
+      "open_price": 2030.50,
+      "close_price": 2035.00,
+      "profit": 450.00,
+      "open_time": "2026-04-19 21:42:15",
+      "close_time": "2026-04-19 21:42:15"
+    }
+  ]
+}
+[2026-04-19 16:42:15] Data successfully saved to: /Users/macbookairm2/Documents/Propfirm CRM/MT5_INTEGRATION_ANALYSIS/received_data.json
+[2026-04-19 16:42:15] Decoded data: Array
+(
+    [mt5_id] => LOCAL_TEST_888
+    [client_name] => Antigravity Test
+    [initial_equity] => 50000
+    [running_balance] => 51200
+    [running_equity] => 51150
+    [trades] => Array
+        (
+            [0] => Array
+                (
+                    [ticket] => test_tkt_101
+                    [symbol] => XAUUSD
+                    [type] => buy
+                    [volume] => 0.5
+                    [open_price] => 2030.5
+                    [close_price] => 2035
+                    [profit] => 450
+                    [open_time] => 2026-04-19 21:42:15
+                    [close_time] => 2026-04-19 21:42:15
+                )
+
+        )
+
+)
+
+[2026-04-19 16:42:17] Account Data Upsert - Status: 200
+[2026-04-19 16:42:17] Processing 1 trades...
+[2026-04-19 16:42:18] Trade History Upsert - Status: 201
+[2026-04-19 16:42:18] === Script Execution Ended ===

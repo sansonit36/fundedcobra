@@ -50,10 +50,10 @@ CREATE POLICY "Admins can insert email templates"
 
 -- Insert default templates
 INSERT INTO email_templates (template_key, subject, html_body) VALUES
-('welcome', 'Welcome to Riverton Markets - Start Your Trading Journey', '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
-  <h1 style="color: #1e3a8a; text-align: center;">Welcome to Riverton Markets</h1>
+('welcome', 'Welcome to Propfirm - Start Your Trading Journey', '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
+  <h1 style="color: #1e3a8a; text-align: center;">Welcome to Propfirm</h1>
   <p>Hi {{name}},</p>
-  <p>Thank you for joining Riverton Markets! We''re excited to help you achieve your trading goals.</p>
+  <p>Thank you for joining Propfirm! We''re excited to help you achieve your trading goals.</p>
   <h3>Next Steps to Get Started:</h3>
   <ol>
     <li>Complete Your KYC Verification</li>
@@ -61,7 +61,7 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
     <li>Start Trading</li>
   </ol>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/dashboard" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Go to Dashboard</a>
+    <a href="https://account.propfirm.com/dashboard" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Go to Dashboard</a>
   </div>
 </div>'),
 
@@ -73,7 +73,7 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
   <p><strong>MT5 Login:</strong> {{mt5Login}}</p>
   <p><strong>Server:</strong> {{mt5Server}}</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/trading-accounts" style="background: #059669; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">View Account Details</a>
+    <a href="https://account.propfirm.com/trading-accounts" style="background: #059669; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">View Account Details</a>
   </div>
 </div>'),
 
@@ -101,18 +101,18 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
 ('kyc_reminder', 'Complete Your KYC Verification', '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
   <h1 style="color: #1e3a8a; text-align: center;">Complete Your Verification</h1>
   <p>Hi {{name}},</p>
-  <p>You''re almost there! Complete your KYC verification to start trading with Riverton Markets.</p>
+  <p>You''re almost there! Complete your KYC verification to start trading with Propfirm.</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/kyc" style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Complete KYC Now</a>
+    <a href="https://account.propfirm.com/kyc" style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Complete KYC Now</a>
   </div>
 </div>'),
 
 ('account_purchase_reminder', 'Ready to Start Trading?', '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
   <h1 style="color: #1e3a8a; text-align: center;">Choose Your Trading Account</h1>
   <p>Hi {{name}},</p>
-  <p>You''re registered with Riverton Markets, but haven''t chosen your trading account yet.</p>
+  <p>You''re registered with Propfirm, but haven''t chosen your trading account yet.</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/buy-account" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">View All Accounts</a>
+    <a href="https://account.propfirm.com/buy-account" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">View All Accounts</a>
   </div>
 </div>'),
 
@@ -136,12 +136,12 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
   <p>Please contact support if you have questions.</p>
 </div>'),
 
-('inactive_user', 'We Miss You at Riverton Markets', '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
+('inactive_user', 'We Miss You at Propfirm', '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
   <h1 style="color: #1e3a8a; text-align: center;">Come Back to Trading</h1>
   <p>Hi {{name}},</p>
   <p>We noticed you haven''t been active lately. Your trading account is waiting for you!</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/dashboard" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Back to Dashboard</a>
+    <a href="https://account.propfirm.com/dashboard" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Back to Dashboard</a>
   </div>
 </div>'),
 
@@ -150,7 +150,7 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
   <p>Hi {{name}},</p>
   <p>It''s been a week since you joined. Don''t let this opportunity pass by!</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/buy-account" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Start Trading Today</a>
+    <a href="https://account.propfirm.com/buy-account" style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Start Trading Today</a>
   </div>
 </div>'),
 
@@ -159,7 +159,7 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
   <p>Hi {{name}},</p>
   <p>Get 10% OFF on your first trading account!</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/buy-account" style="background: #7c3aed; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Claim Your Offer</a>
+    <a href="https://account.propfirm.com/buy-account" style="background: #7c3aed; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Claim Your Offer</a>
   </div>
 </div>'),
 
@@ -168,7 +168,7 @@ INSERT INTO email_templates (template_key, subject, html_body) VALUES
   <p>Hi {{name}},</p>
   <p>You''re so close! Complete your KYC verification to unlock full access.</p>
   <div style="text-align: center; margin: 40px 0;">
-    <a href="https://account.rivertonmarkets.com/kyc" style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Complete Verification</a>
+    <a href="https://account.propfirm.com/kyc" style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">Complete Verification</a>
   </div>
 </div>')
 

@@ -90,8 +90,10 @@ export default function KYC() {
       setUploading(true);
       setError(null);
 
-      // Create verification if not exists
-      if (!verification) {
+      // Get or create verification
+      let currentVerification = verification;
+      
+      if (!currentVerification) {
         const { data: newVerification, error: verificationError } = await supabase
           .from('kyc_verifications')
           .insert([{ user_id: user!.id }])
@@ -99,39 +101,54 @@ export default function KYC() {
           .single();
 
         if (verificationError) throw verificationError;
+        currentVerification = newVerification;
         setVerification(newVerification);
-
-        // Upload all files
-        for (const [type, file] of Object.entries(uploadedFiles)) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${user!.id}/${newVerification.id}/${type}.${fileExt}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from('kyc-documents')
-            .upload(fileName, file);
-
-          if (uploadError) throw uploadError;
-
-          // Get public URL
-          const { data: { publicUrl } } = supabase.storage
-            .from('kyc-documents')
-            .getPublicUrl(fileName);
-
-          // Save document reference
-          const { error: documentError } = await supabase
-            .from('kyc_documents')
-            .insert([{
-              verification_id: newVerification.id,
-              type,
-              file_url: publicUrl
-            }]);
-
-          if (documentError) throw documentError;
-        }
-
-        // Reload documents
-        await loadKYCStatus();
+      } else if (currentVerification.status === 'rejected') {
+        // Reset status to pending if re-submitting
+        const { data: updatedVerification, error: updateError } = await supabase
+          .from('kyc_verifications')
+          .update({ status: 'pending', rejection_reason: null })
+          .eq('id', currentVerification.id)
+          .select()
+          .single();
+          
+        if (updateError) throw updateError;
+        currentVerification = updatedVerification;
+        setVerification(updatedVerification);
       }
+
+      // Upload all files
+      for (const [type, file] of Object.entries(uploadedFiles)) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user!.id}/${currentVerification.id}/${type}.${fileExt}`;
+
+        // Upload with upsert to replace old files if they exist
+        const { error: uploadError } = await supabase.storage
+          .from('kyc-documents')
+          .upload(fileName, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('kyc-documents')
+          .getPublicUrl(fileName);
+
+        // Save or update document reference
+        const { error: documentError } = await supabase
+          .from('kyc_documents')
+          .upsert({
+            verification_id: currentVerification.id,
+            type,
+            file_url: publicUrl
+          }, { onConflict: 'verification_id,type' });
+
+        if (documentError) throw documentError;
+      }
+
+      // Reload documents and status
+      await loadKYCStatus();
+      setSuccess('Documents submitted successfully! We will review them shortly.');
     } catch (err) {
       console.error('Error uploading documents:', err);
       setError('Failed to upload documents');

@@ -32,6 +32,8 @@ interface AdminUserData {
   has_approved_purchase?: boolean;
   has_rejected_purchase?: boolean;
   has_active_account?: boolean;
+  referrer_name?: string | null;
+  referred_by?: string | null;
 }
 
 type TimeFilter = 'today' | 'week' | 'month' | 'all';
@@ -137,7 +139,10 @@ export default function Users() {
         return acc;
       }, {});
 
+      const userMap = allUsers.reduce((acc, u) => ({ ...acc, [u.id]: u.name }), {} as Record<string, string>);
+
       const transformedUsers = (allUsers || []).map(user => {
+        const referrerName = user.referred_by ? userMap[user.referred_by] : null;
         const userKycStatuses = kycMap[user.id] || [];
         const userRequestStatuses = requestsMap[user.id] || [];
         
@@ -154,7 +159,8 @@ export default function Users() {
           has_purchased: hasPurchased,
           has_approved_purchase: hasApprovedPurchase,
           has_rejected_purchase: hasRejectedPurchase,
-          has_active_account: hasActiveAccount
+          has_active_account: hasActiveAccount,
+          referrer_name: referrerName
         };
       });
 
@@ -496,6 +502,7 @@ export default function Users() {
             <thead>
               <tr className="border-b border-gray-700/50">
                 <th className="pb-3 text-left text-gray-400 font-medium">User</th>
+                <th className="pb-3 text-left text-gray-400 font-medium whitespace-nowrap">Referred By</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Status</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Role</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Joined</th>
@@ -524,6 +531,18 @@ export default function Users() {
                             <div className="text-sm text-gray-400">{user.email}</div>
                           </div>
                         </div>
+                      </td>
+                      <td className="py-4">
+                        {user.referred_by ? (
+                          <div className="flex flex-col">
+                            <span className="text-white font-medium text-sm">
+                              {/* Using the mapping we created earlier in loadUsers */}
+                              {(user as any).referrer_name || 'Affiliate User'}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 text-sm">-</span>
+                        )}
                       </td>
                       <td className="py-4">
                         <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles[user.status]}`}>

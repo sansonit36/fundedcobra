@@ -6,9 +6,12 @@ export function useAffiliateTracking() {
     const url = new URL(window.location.href);
     let ref = url.searchParams.get('ref');
 
-    // Fallback: check what index.html stored earlier
-    if (!ref) {
-      ref = sessionStorage.getItem('pending_aff_ref');
+    // If found in URL, save it persistently
+    if (ref) {
+      localStorage.setItem('affiliate_ref', ref);
+    } else {
+      // Fallback: check localStorage
+      ref = localStorage.getItem('affiliate_ref');
     }
 
     if (!ref) return;
@@ -17,8 +20,8 @@ export function useAffiliateTracking() {
     const KEY = `affTracked:${ref}`;
     if (sessionStorage.getItem(KEY)) return;
 
-    // call your PHP tracker to set cookie on .rivertonmarkets.com
-    fetch('https://rivertonmarkets.com/affiliate/api/track.php', {
+    // call your PHP tracker to set cookie
+    fetch(`${import.meta.env.VITE_API_URL}/track.php`, {
       method: 'POST',
       credentials: 'include', // allow Set-Cookie from apex → subdomain
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

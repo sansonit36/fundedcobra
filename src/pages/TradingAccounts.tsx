@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon } from 'lucide-react';
+import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getTradingAccounts, getPendingAccounts, TradingAccount, AccountRequest } from '../lib/database';
 import { supabase } from '../lib/supabase';
@@ -26,18 +26,21 @@ const statusStyles = {
   active: 'bg-green-500/10 text-green-400 border-green-400/20',
   pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-400/20',
   breached: 'bg-red-500/10 text-red-400 border-red-400/20',
-  suspended: 'bg-orange-500/10 text-orange-400 border-orange-400/20'
+  suspended: 'bg-orange-500/10 text-orange-400 border-orange-400/20',
+  suspicious: 'bg-orange-500/10 text-orange-400 border-orange-400/20'
 };
 
 const statusIcons = {
   active: <CheckCircle className="w-5 h-5 text-green-400" />,
   pending: <Clock className="w-5 h-5 text-yellow-400" />,
   breached: <AlertOctagon className="w-5 h-5 text-red-400" />,
-  suspended: <AlertOctagon className="w-5 h-5 text-orange-400" />
+  suspended: <AlertOctagon className="w-5 h-5 text-orange-400" />,
+  suspicious: <Clock className="w-5 h-5 text-orange-400" />
 };
 
 function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+  const [showTrades, setShowTrades] = useState<Record<string, boolean>>({});
   const [extendedData, setExtendedData] = useState<Record<string, ExtendedAccountData>>({});
   const [loading, setLoading] = useState(true);
 
@@ -87,6 +90,13 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
 
   const togglePasswordVisibility = (accountId: string) => {
     setShowPasswords(prev => ({
+      ...prev,
+      [accountId]: !prev[accountId]
+    }));
+  };
+
+  const toggleTradesVisibility = (accountId: string) => {
+    setShowTrades(prev => ({
       ...prev,
       [accountId]: !prev[accountId]
     }));
@@ -271,11 +281,143 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                 )}
                 {/* End Breach Reason Section */}
                 
+                {/* Trade History Toggle */}
+                <div className="mt-4 pt-4 border-t border-white/5">
+                  <button
+                    onClick={() => toggleTradesVisibility(account.id)}
+                    className="flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    <History className="w-4 h-4 mr-2" />
+                    {showTrades[account.id] ? 'Hide Recent Trades' : 'View Recent Trades'}
+                    {showTrades[account.id] ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+                  </button>
+                  
+                  {showTrades[account.id] && (
+                    <div className="mt-4">
+                      <TradeHistoryTable mt5Id={account.mt5_login} />
+                    </div>
+                  )}
+                </div>
+                {/* End Trade History Toggle */}
+                
               </div>
             </div>
           </div>
         );
       })}
+    </div>
+  );
+}
+
+interface Trade {
+  id: string;
+  ticket: string;
+  symbol: string;
+  type: string;
+  volume: number;
+  open_price: number;
+  close_price: number;
+  profit: number;
+  open_time: string;
+  close_time: string;
+}
+
+function TradeHistoryTable({ mt5Id }: { mt5Id: string }) {
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTrades();
+  }, [mt5Id]);
+
+  const loadTrades = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('trade_history')
+        .select('*')
+        .eq('mt5_id', mt5Id)
+        .order('close_time', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setTrades(data || []);
+    } catch (err) {
+      console.error('Error loading trades:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <div className="w-6 h-6 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (trades.length === 0) {
+    return <p className="text-sm text-gray-500 italic py-2 text-center">No recent trades found for this account.</p>;
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-xl border border-white/5">
+      <table className="w-full text-left border-collapse">
+        <thead className="bg-white/5">
+          <tr>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Symbol</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Type</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Volume</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Profit</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Open Time</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Close Time</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/5">
+          {trades.map((trade) => {
+            const duration = Math.abs(new Date(trade.close_time).getTime() - new Date(trade.open_time).getTime()) / 1000;
+            const isViolation = duration < 60;
+            
+            return (
+              <tr key={trade.id} className={`hover:bg-white/5 transition-colors ${isViolation ? 'bg-red-500/5' : ''}`}>
+                <td className="px-4 py-3">
+                  <span className={`text-sm font-bold uppercase ${isViolation ? 'text-red-400' : 'text-white'}`}>{trade.symbol}</span>
+                  <p className="text-[10px] text-gray-500">#{trade.ticket}</p>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    trade.type.toLowerCase() === 'buy' 
+                      ? 'bg-green-500/10 text-green-400' 
+                      : 'bg-red-500/10 text-red-400'
+                  }`}>
+                    {trade.type}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300 font-medium text-center">{trade.volume.toFixed(2)}</td>
+                <td className="px-4 py-3 text-sm text-gray-300 font-mono text-center">{trade.close_price.toFixed(5)}</td>
+                <td className={`px-4 py-3 text-sm font-bold text-center ${trade.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {trade.profit >= 0 ? '+' : ''}${trade.profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </td>
+                <td className={`px-4 py-3 text-sm text-gray-300 ${isViolation ? 'text-red-400 font-bold' : ''}`}>
+                  {new Date(trade.open_time).toLocaleDateString()}
+                  <p className="text-xs opacity-75">{new Date(trade.open_time).toLocaleTimeString()}</p>
+                </td>
+                <td className={`px-4 py-3 text-sm text-gray-300 border-l border-white/5 ${isViolation ? 'text-red-400 font-bold' : ''}`}>
+                  <div className="flex items-center space-x-2">
+                    {isViolation && <AlertOctagon className="w-4 h-4 text-red-400" />}
+                    <div>
+                      {new Date(trade.close_time).toLocaleDateString()}
+                      <p className="text-xs opacity-75">{new Date(trade.close_time).toLocaleTimeString()}</p>
+                    </div>
+                  </div>
+                  {isViolation && <p className="text-[10px] text-red-400 font-bold mt-1 uppercase">Rule Violation: Under 60s</p>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -412,10 +554,15 @@ export default function TradingAccounts() {
             {pendingAccounts.map((request) => (
               <div key={request.id} className="p-6 rounded-lg bg-white/5 border border-white/10">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles.pending}`}>
-                    {statusIcons.pending}
+                  <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles[request.status as keyof typeof statusStyles] || statusStyles.pending}`}>
+                    {statusIcons[request.status as keyof typeof statusIcons] || statusIcons.pending}
                     <span className="ml-2 text-sm font-medium capitalize">{request.status.replace('_', ' ')}</span>
                   </div>
+                  {request.status === 'suspicious' && (
+                    <div className="flex items-center text-orange-400 text-xs mt-1 italic">
+                      <span>Under security review: {request.ai_reason || 'Manual verification required'}</span>
+                    </div>
+                  )}
                   <div className="text-sm text-gray-400">
                     Created: {new Date(request.created_at).toLocaleDateString()}
                   </div>

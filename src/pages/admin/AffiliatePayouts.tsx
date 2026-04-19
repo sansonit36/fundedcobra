@@ -33,6 +33,17 @@ interface AffiliateWithEarnings {
   totalReferrals: number;
 }
 
+interface CommissionRecord {
+  id: string;
+  affiliate_id: string;
+  affiliate_name: string;
+  referral_name: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  source_transaction?: string;
+}
+
 // No mock data needed - loading from database
 
 const statusStyles = {
@@ -54,12 +65,14 @@ export default function AffiliatePayouts() {
   });
   const [rejectionReason, setRejectionReason] = useState('');
   const [affiliatesWithEarnings, setAffiliatesWithEarnings] = useState<AffiliateWithEarnings[]>([]);
-  const [activeTab, setActiveTab] = useState<'requests' | 'affiliates'>('requests');
+  const [commissions, setCommissions] = useState<CommissionRecord[]>([]);
+  const [activeTab, setActiveTab] = useState<'requests' | 'affiliates' | 'commissions'>('requests');
 
   useEffect(() => {
     loadPayouts();
     loadStats();
     loadAffiliatesWithEarnings();
+    loadCommissions();
   }, []);
 
   const loadPayouts = async () => {
@@ -196,6 +209,36 @@ export default function AffiliatePayouts() {
       setAffiliatesWithEarnings(affiliatesWithBalance);
     } catch (error) {
       console.error('Error loading affiliates with earnings:', error);
+    }
+  };
+
+  const loadCommissions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('affiliate_earnings')
+        .select(`
+          *,
+          affiliate:profiles!affiliate_id(name),
+          referral:profiles!referral_id(name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formatted = (data || []).map((c: any) => ({
+        id: c.id,
+        affiliate_id: c.affiliate_id,
+        affiliate_name: c.affiliate?.name || 'Unknown',
+        referral_name: c.referral?.name || 'Unknown',
+        amount: Number(c.amount),
+        status: c.status,
+        created_at: c.created_at,
+        source_transaction: c.source_transaction
+      }));
+
+      setCommissions(formatted);
+    } catch (error) {
+      console.error('Error loading commissions:', error);
     }
   };
 
@@ -403,6 +446,16 @@ export default function AffiliatePayouts() {
           >
             Affiliates with Earnings ({affiliatesWithEarnings.length})
           </button>
+          <button
+            onClick={() => setActiveTab('commissions')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'commissions'
+                ? 'bg-blue-500 text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            Commissions Log ({commissions.length})
+          </button>
         </div>
 
         {/* Withdrawal Requests Table */}
@@ -490,6 +543,52 @@ export default function AffiliatePayouts() {
                           >
                             <Eye className="w-5 h-5" />
                           </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+
+        {/* Commissions Log Table */}
+        {activeTab === 'commissions' && (
+          <div className="overflow-x-auto">
+            {commissions.length === 0 ? (
+              <div className="text-center py-12">
+                <DollarSign className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-400 mb-2">No Commissions Recorded</h3>
+                <p className="text-gray-500 text-sm">
+                  Earnings will appear here once referrals purchase accounts and requests are approved.
+                </p>
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-700/50">
+                    <th className="pb-3 text-left text-gray-400 font-medium">Date</th>
+                    <th className="pb-3 text-left text-gray-400 font-medium">Affiliate</th>
+                    <th className="pb-3 text-left text-gray-400 font-medium">Referral (Trader)</th>
+                    <th className="pb-3 text-left text-gray-400 font-medium">Amount</th>
+                    <th className="pb-3 text-left text-gray-400 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {commissions.map((comm) => (
+                    <tr key={comm.id} className="border-b border-gray-700/50 hover:bg-white/5">
+                      <td className="py-4">
+                        <div className="text-sm text-gray-400">
+                          {new Date(comm.created_at).toLocaleString()}
+                        </div>
+                      </td>
+                      <td className="py-4 text-white font-medium">{comm.affiliate_name}</td>
+                      <td className="py-4 text-gray-300">{comm.referral_name}</td>
+                      <td className="py-4 text-green-400 font-bold">${comm.amount.toLocaleString()}</td>
+                      <td className="py-4">
+                        <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles[comm.status as keyof typeof statusStyles] || statusStyles.pending}`}>
+                          <span className="text-sm font-medium capitalize">{comm.status}</span>
                         </div>
                       </td>
                     </tr>

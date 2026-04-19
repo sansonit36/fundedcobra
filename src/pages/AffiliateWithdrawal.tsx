@@ -62,8 +62,8 @@ export default function AffiliateWithdrawal() {
 
     const withdrawAmount = parseFloat(amount);
 
-    if (!withdrawAmount || withdrawAmount <= 0) {
-      setError('Please enter a valid amount');
+    if (!withdrawAmount || withdrawAmount < 20) {
+      setError('Minimum withdrawal amount is $20.00');
       return;
     }
 
@@ -178,7 +178,7 @@ export default function AffiliateWithdrawal() {
             <input
               type="number"
               step="0.01"
-              min="0"
+              min="20"
               max={availableBalance}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -187,20 +187,20 @@ export default function AffiliateWithdrawal() {
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              Maximum: ${availableBalance.toFixed(2)}
+              Minimum: $20.00 | Maximum: ${availableBalance.toFixed(2)}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-2">
-              Wallet Address / Payment Details
+              USDT-TRC20 Wallet Address
             </label>
             <textarea
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
               rows={3}
               className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50"
-              placeholder="Enter your crypto wallet address or payment details"
+              placeholder="Enter your USDT (TRC-20) contract address here. Only USDT-TRC20 is supported."
               required
             />
           </div>

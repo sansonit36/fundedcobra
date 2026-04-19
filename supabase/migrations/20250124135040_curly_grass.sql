@@ -171,7 +171,7 @@ CREATE OR REPLACE FUNCTION process_account_purchase(
   admin_id uuid,
   mt5_login text,
   mt5_password text,
-  mt5_server text DEFAULT 'RivertonMarkets-Live'
+  mt5_server text DEFAULT 'Propfirm-Live'
 )
 RETURNS uuid
 LANGUAGE plpgsql

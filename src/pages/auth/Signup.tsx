@@ -22,12 +22,12 @@ export default function Signup() {
     const urlRef = new URL(window.location.href).searchParams.get('ref');
     if (urlRef) {
       refParam.current = urlRef;
-      // Store in sessionStorage as backup
-      sessionStorage.setItem('signup_ref_code', urlRef);
+      // Store in localStorage as backup
+      localStorage.setItem('affiliate_ref', urlRef);
       console.log('📎 Referral code detected:', urlRef);
     } else {
-      // Try to get from sessionStorage if URL doesn't have it
-      const storedRef = sessionStorage.getItem('signup_ref_code');
+      // Try to get from localStorage if URL doesn't have it
+      const storedRef = localStorage.getItem('affiliate_ref');
       if (storedRef) {
         refParam.current = storedRef;
         console.log('📎 Referral code from storage:', storedRef);
@@ -37,38 +37,9 @@ export default function Signup() {
     }
   }, []);
 
-  // Helper: fire-and-forget affiliate registration
-  const safeNotifyAffiliateRegistration = async (uid: string) => {
+  // Helper: notify legacy PHP affiliate system
+  const syncAffiliatePHP = async (uid: string) => {
     try {
-      // First, try to save directly to Supabase
-      const refCode = refParam.current;
-      if (refCode) {
-        // Find the referrer by their referral code
-        const { data: referrerProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('referral_code', refCode)
-          .single();
-
-        if (referrerProfile) {
-          // Create the referral relationship in Supabase
-          const { error: insertError } = await supabase
-            .from('affiliate_referrals')
-            .insert({
-              referrer_id: referrerProfile.id,
-              referred_id: uid,
-              status: 'active'
-            });
-
-          if (insertError) {
-            console.warn('Failed to create referral in Supabase:', insertError);
-          } else {
-            console.log('✅ Referral relationship created in Supabase');
-          }
-        } else {
-          console.warn('Referral code not found:', refCode);
-        }
-      }
 
       // Also call external PHP API for compatibility
       await notifyAffiliateRegistration({
@@ -107,8 +78,9 @@ export default function Signup() {
       return;
     }
 
-    // 1) Create the auth user
-    const { error: signErr } = await signUp(email, password, name);
+    // 1) Create the auth user with the referral code embedded in metadata
+    const refCode = refParam.current || localStorage.getItem('affiliate_ref') || undefined;
+    const { error: signErr } = await signUp(email, password, name, refCode);
     if (signErr) {
       setError(signErr.message);
       setLoading(false);
@@ -122,7 +94,7 @@ export default function Signup() {
     const immediateUserId = data?.user?.id;
     if (immediateUserId) {
       // 3) Notify affiliate system now
-      safeNotifyAffiliateRegistration(immediateUserId);
+      syncAffiliatePHP(immediateUserId);
       // 4) Send welcome email
       sendWelcomeEmail(immediateUserId);
     } else {
@@ -130,7 +102,7 @@ export default function Signup() {
       const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user?.id) {
           try {
-            await safeNotifyAffiliateRegistration(session.user.id);
+            await syncAffiliatePHP(session.user.id);
             await sendWelcomeEmail(session.user.id);
           } finally {
             sub.subscription.unsubscribe(); // cleanup listener
@@ -155,7 +127,7 @@ export default function Signup() {
 
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
           <h1 className="text-2xl font-bold text-white text-center mb-2">Create an account</h1>
-          <p className="text-gray-400 text-center mb-6">Get started with Riverton Markets</p>
+          <p className="text-gray-400 text-center mb-6">Get started with Propfirm</p>
 
           {error && (
             <div className="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start space-x-3">

@@ -104,8 +104,8 @@ export default function Rejected() {
             </p>
             <p className="text-gray-400 text-xs">
               Contact support at{' '}
-              <a href="mailto:support@rivertonmarkets.com" className="text-blue-400 hover:text-blue-300 underline">
-                support@rivertonmarkets.com
+              <a href={`mailto:${import.meta.env.VITE_SUPPORT_EMAIL}`} className="text-blue-400 hover:text-blue-300 underline">
+                {import.meta.env.VITE_SUPPORT_EMAIL}
               </a>
               {' '}with your account details and evidence of legitimate payment.
             </p>
@@ -122,7 +122,7 @@ export default function Rejected() {
         {/* Footer Message */}
         <div className="mt-6 text-center">
           <p className="text-gray-500 text-sm">
-            Riverton Markets · Protecting Our Community Since 2024
+            Propfirm Community Protection
           </p>
         </div>
       </div>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, CheckCircle, XCircle, AlertTriangle, User, Copy, Eye, EyeOff, Clock, Calendar } from 'lucide-react';
+import { Search, Filter, CheckCircle, XCircle, AlertTriangle, User, Users, Copy, Eye, EyeOff, Clock, Calendar } from 'lucide-react';
 import { PendingAccountRequest, getAllAccountRequests, approveAccountRequest, rejectAccountRequest } from '../../lib/database';
 import { notifyAffiliatePurchase } from "../../affiliateApi";
 import { sendEmail, logEmailSent } from '../../lib/emailService';
 import { supabase } from '../../lib/supabase';
 
 
-type StatusFilter = 'all' | 'payment_submitted' | 'approved' | 'rejected';
+type StatusFilter = 'all' | 'payment_submitted' | 'suspicious' | 'approved' | 'rejected';
 type TimeFilter = 'today' | 'week' | 'month' | 'all';
 
 const commonRejectionReasons = [
@@ -14,7 +14,8 @@ const commonRejectionReasons = [
   'Incorrect payment amount',
   'Suspicious transaction',
   'Payment not received',
-  'Duplicate request'
+  'Duplicate request',
+  'AI Verification Failed'
 ];
 
 export default function AccountApprovals() {
@@ -23,12 +24,13 @@ export default function AccountApprovals() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('payment_submitted');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('today');
   const [selectedRequest, setSelectedRequest] = useState<PendingAccountRequest | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [mt5Credentials, setMT5Credentials] = useState({
     login: '',
     password: '',
-    server: 'RivertonMarkets-Live'
+    server: 'Propfirm-Live'
   });
   const [rejectionReason, setRejectionReason] = useState('');
   const [customRejectionReason, setCustomRejectionReason] = useState('');
@@ -97,8 +99,8 @@ const handleApprove = async () => {
             affiliate_id: referralData.referrer_id,
             referral_id: selectedRequest.user_id,
             amount: commissionAmount,
-            purchase_id: selectedRequest.id,
-            status: 'pending'
+            source_transaction: selectedRequest.id,
+            status: 'approved'
           });
 
         console.log(`Credited $${commissionAmount.toFixed(2)} commission to affiliate ${referralData.referrer_id}`);
@@ -170,7 +172,7 @@ const handleApprove = async () => {
     await loadRequests();
     setShowApprovalModal(false);
     setSelectedRequest(null);
-    setMT5Credentials({ login: "", password: "", server: "RivertonMarkets-Live" });
+    setMT5Credentials({ login: "", password: "", server: "Propfirm-Live" });
   } catch (err) {
     console.error("Error approving request:", err);
     setError(err instanceof Error ? err.message : "Failed to approve account request");
@@ -242,6 +244,11 @@ const handleApprove = async () => {
         text: 'text-yellow-400',
         icon: <Clock className="w-4 h-4" />
       },
+      suspicious: {
+        bg: 'bg-orange-500/10',
+        text: 'text-orange-400',
+        icon: <AlertTriangle className="w-4 h-4" />
+      },
       approved: {
         bg: 'bg-green-500/10',
         text: 'text-green-400',
@@ -255,7 +262,9 @@ const handleApprove = async () => {
     };
 
     const config = statusConfig[status] || statusConfig.payment_submitted;
-    const displayStatus = status === 'payment_submitted' ? 'Pending' : status.charAt(0).toUpperCase() + status.slice(1);
+    let displayStatus = status === 'payment_submitted' ? 'Pending' : status.charAt(0).toUpperCase() + status.slice(1);
+    
+    if (status === 'suspicious') displayStatus = 'Suspicious';
 
     return (
       <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full ${config.bg} ${config.text}`}>
@@ -334,6 +343,7 @@ const handleApprove = async () => {
             <div className="flex flex-wrap gap-2">
               {[
                 { value: 'payment_submitted' as StatusFilter, label: 'Pending', count: requests.filter(r => r.status === 'payment_submitted').length },
+                { value: 'suspicious' as StatusFilter, label: 'Suspicious', count: requests.filter(r => r.status === 'suspicious').length },
                 { value: 'approved' as StatusFilter, label: 'Approved', count: requests.filter(r => r.status === 'approved').length },
                 { value: 'rejected' as StatusFilter, label: 'Rejected', count: requests.filter(r => r.status === 'rejected').length },
                 { value: 'all' as StatusFilter, label: 'All', count: requests.length }
@@ -402,6 +412,7 @@ const handleApprove = async () => {
                 <th className="pb-3 text-left text-gray-400 font-medium">Status</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">User</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Package</th>
+                <th className="pb-3 text-left text-gray-400 font-medium whitespace-nowrap">Security Score</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Amount</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Transaction</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Date</th>
@@ -429,16 +440,53 @@ const handleApprove = async () => {
                         <div>
                           <div className="font-medium text-white">{request.user_name}</div>
                           <div className="text-sm text-gray-400">{request.user_email}</div>
+                          {request.referrer_name && (
+                            <div className="flex items-center space-x-1 text-[10px] text-blue-400 font-bold uppercase mt-0.5">
+                              <Users className="w-3 h-3" />
+                              <span>Ref: {request.referrer_name}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td className="py-4">
                       <div className="font-medium text-white">{request.package_name}</div>
                       <div className="text-sm text-gray-400">Balance: ${request.package_balance.toLocaleString()}</div>
+                      {request.status === 'suspicious' && request.ai_reason && (
+                        <div className="mt-1 text-xs text-red-400/80 italic line-clamp-1 max-w-[200px]" title={request.ai_reason}>
+                          "{request.ai_reason}"
+                        </div>
+                      )}
                     </td>
                     <td className="py-4">
-                      <div className="font-medium text-white">${request.amount.toLocaleString()}</div>
-                      <div className="text-sm text-gray-400">Fee: ${request.package_fee.toLocaleString()}</div>
+                      {request.ai_confidence !== undefined ? (
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 rounded-full ${
+                            request.ai_confidence >= 80 ? 'bg-green-500' :
+                            request.ai_confidence >= 40 ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`} />
+                          <span className={`text-sm font-bold ${
+                            request.ai_confidence >= 80 ? 'text-green-400' :
+                            request.ai_confidence >= 40 ? 'text-yellow-400' :
+                            'text-red-400'
+                          }`}>
+                            {request.ai_confidence}%
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500 text-sm">-</span>
+                      )}
+                    </td>
+                    <td className="py-4">
+                      {request.amount < request.package_fee ? (
+                        <div>
+                          <div className="text-sm text-gray-400 line-through">${request.package_fee.toLocaleString()}</div>
+                          <div className="font-medium text-white">${request.amount.toLocaleString()}</div>
+                        </div>
+                      ) : (
+                        <div className="font-medium text-white">${request.amount.toLocaleString()}</div>
+                      )}
                     </td>
                     <td className="py-4">
                       {request.payment_screenshot_url && (
@@ -463,14 +511,25 @@ const handleApprove = async () => {
                       )}
                     </td>
                     <td className="py-4 text-right">
-                      {request.status === 'payment_submitted' ? (
+                      {request.status === 'payment_submitted' || request.status === 'suspicious' ? (
                         <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setShowDetailsModal(true);
+                            }}
+                            className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
+                            title="View Details"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
                           <button
                             onClick={() => {
                               setSelectedRequest(request);
                               setShowApprovalModal(true);
                             }}
                             className="p-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors"
+                            title="Approve"
                           >
                             <CheckCircle className="w-5 h-5" />
                           </button>
@@ -480,6 +539,7 @@ const handleApprove = async () => {
                               setShowRejectionModal(true);
                             }}
                             className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
+                            title="Reject"
                           >
                             <XCircle className="w-5 h-5" />
                           </button>
@@ -512,7 +572,7 @@ const handleApprove = async () => {
                     setMT5Credentials({
                       login: '',
                       password: '',
-                      server: 'RivertonMarkets-Live'
+                      server: 'Propfirm-Live'
                     });
                   }}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
@@ -533,6 +593,12 @@ const handleApprove = async () => {
                       <p className="text-sm text-gray-400">Package</p>
                       <p className="text-white font-medium">{selectedRequest.package_name}</p>
                     </div>
+                    {selectedRequest.referrer_name && (
+                      <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 col-span-2">
+                        <p className="text-sm text-blue-400">Referred By (Affiliate)</p>
+                        <p className="text-white font-medium">{selectedRequest.referrer_name}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -670,6 +736,139 @@ const handleApprove = async () => {
             </div>
           </div>
         )}
+        {/* Details Modal */}
+        {showDetailsModal && selectedRequest && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 overflow-y-auto pt-20 pb-20">
+            <div className="card-gradient rounded-2xl border border-white/5 p-6 max-w-2xl w-full my-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-white">Payment Verification Details</h3>
+                <button
+                  onClick={() => {
+                    setShowDetailsModal(false);
+                    setSelectedRequest(null);
+                  }}
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* User & Package Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <p className="text-sm text-gray-400 mb-1">Trader</p>
+                    <p className="text-white font-medium">{selectedRequest.user_name}</p>
+                    <p className="text-sm text-gray-500">{selectedRequest.user_email}</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <p className="text-sm text-gray-400 mb-1">Package</p>
+                    <p className="text-white font-medium">{selectedRequest.package_name}</p>
+                    <p className="text-sm text-gray-500">
+                      Amount: ${selectedRequest.amount.toLocaleString()} 
+                      {selectedRequest.amount < selectedRequest.package_fee && (
+                        <span className="ml-2 line-through text-gray-600">${selectedRequest.package_fee.toLocaleString()}</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* AI Verification Section */}
+                <div className="p-5 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
+                        <AlertTriangle className="w-5 h-5" />
+                      </div>
+                      <h4 className="font-bold text-white uppercase tracking-wider text-sm">AI Analysis Report</h4>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      (selectedRequest.ai_confidence || 0) >= 80 ? 'bg-green-500/20 text-green-400' :
+                      (selectedRequest.ai_confidence || 0) >= 40 ? 'bg-yellow-500/20 text-yellow-400' :
+                      'bg-red-500/20 text-red-400'
+                    }`}>
+                      {selectedRequest.ai_confidence || 0}% Confidence
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-blue-400 mb-1 font-bold uppercase">AI Conclusion</p>
+                      <p className="text-white text-sm bg-black/20 p-3 rounded-lg border border-white/5 italic">
+                        "{selectedRequest.ai_reason || 'No specific reasoning provided by AI.'}"
+                      </p>
+                    </div>
+
+                    {selectedRequest.ai_red_flags && Array.isArray(selectedRequest.ai_red_flags) && selectedRequest.ai_red_flags.length > 0 && (
+                      <div>
+                        <p className="text-xs text-red-400 mb-1 font-bold uppercase">Red Flags Detected</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedRequest.ai_red_flags.map((flag: string, idx: number) => (
+                            <span key={idx} className="px-2 py-1 rounded bg-red-500/10 text-red-400 text-xs border border-red-500/20">
+                              {flag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Screenshot Preview */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-400">Payment Screenshot</p>
+                  <div className="aspect-video rounded-xl bg-black/40 border border-white/5 overflow-hidden group relative">
+                    {selectedRequest.payment_screenshot_url ? (
+                      <>
+                        <img 
+                          src={selectedRequest.payment_screenshot_url} 
+                          alt="Payment Proof" 
+                          className="w-full h-full object-contain"
+                        />
+                        <a 
+                          href={selectedRequest.payment_screenshot_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white space-x-2"
+                        >
+                          <Eye className="w-5 h-5" />
+                          <span>View Full Size</span>
+                        </a>
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-500 italic">
+                        No screenshot available
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center space-x-3 pt-4 border-t border-white/5">
+                  <button
+                    onClick={() => {
+                      setShowApprovalModal(true);
+                      setShowDetailsModal(false);
+                    }}
+                    className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-green-500/20 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Override & Approve
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowRejectionModal(true);
+                      setShowDetailsModal(false);
+                    }}
+                    className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold rounded-xl transition-all border border-red-500/20 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Reject Payment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

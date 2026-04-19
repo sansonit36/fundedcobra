@@ -1,8 +1,8 @@
 import ReactPixel from 'react-facebook-pixel';
 import axios from 'axios';
 
-const PIXEL_ID = '1765985323943547';  // Your Facebook Pixel ID
-const ACCESS_TOKEN = 'EAANfl9zblnMBOy5wwmZA0JapE6IrliSh5WDEKLjqmDbHdp6j3Pz9O8C169uLmx1uJ5DZB56Vjwl70rRhOiyGsIwquwKZCammxZBHYbdN3IkPW7hBrHKfJK9ZBHNHMzvQhZCSyhM6xHbUH9p6rwb2CZB0it8qcF6CZBh66NM6mwVKHxaCrdXuZBZCclJdofB9k4klyp3AZDZD'; // Your Facebook Access Token
+const PIXEL_ID = import.meta.env.VITE_FB_PIXEL_ID;
+const ACCESS_TOKEN = import.meta.env.VITE_FB_ACCESS_TOKEN;
 const API_VERSION = 'v18.0';
 
 export const initFacebookPixel = () => {

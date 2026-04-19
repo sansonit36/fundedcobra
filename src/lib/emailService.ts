@@ -27,17 +27,17 @@ interface EmailParams {
 
 const EMAIL_TEMPLATES = {
   welcome: {
-    subject: 'Welcome to Riverton Markets - Start Your Trading Journey',
+    subject: 'Welcome to Propfirm - Start Your Trading Journey',
     html: (data: any) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 40px;">
-          <h1 style="color: #1e3a8a; margin: 0; font-size: 32px;">Welcome to Riverton Markets</h1>
+          <h1 style="color: #1e3a8a; margin: 0; font-size: 32px;">Welcome to Propfirm</h1>
         </div>
         
         <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            Thank you for joining Riverton Markets! We're excited to help you achieve your trading goals.
+            Thank you for joining Propfirm! We're excited to help you achieve your trading goals.
           </p>
         </div>
 
@@ -51,7 +51,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/dashboard" 
+          <a href="${import.meta.env.VITE_SITE_URL}/dashboard" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Go to Dashboard
           </a>
@@ -65,7 +65,7 @@ const EMAIL_TEMPLATES = {
 
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
           <p style="color: #6b7280; font-size: 14px; margin: 0;">
-            Need help? Contact us at support@rivertonmarkets.com
+            Need help? Contact us at ${import.meta.env.VITE_SUPPORT_EMAIL}
           </p>
         </div>
       </div>
@@ -83,7 +83,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #fef3c7; padding: 30px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #f59e0b;">
           <h2 style="color: #92400e; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #78350f; font-size: 16px; line-height: 1.6;">
-            You're almost there! Complete your KYC verification to start trading with Riverton Markets.
+            You're almost there! Complete your KYC verification to start trading with Propfirm.
           </p>
         </div>
 
@@ -98,7 +98,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/kyc" 
+          <a href="${import.meta.env.VITE_SITE_URL}/kyc" 
              style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Complete KYC Now
           </a>
@@ -124,7 +124,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            You're registered with Riverton Markets, but haven't chosen your trading account yet. 
+            You're registered with Propfirm, but haven't chosen your trading account yet. 
             Don't miss out on this opportunity!
           </p>
         </div>
@@ -148,7 +148,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/buy-account" 
+          <a href="${import.meta.env.VITE_SITE_URL}/buy-account" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             View All Accounts
           </a>
@@ -195,13 +195,13 @@ const EMAIL_TEMPLATES = {
             </tr>
             <tr>
               <td style="padding: 10px 0;"><strong>Server:</strong></td>
-              <td style="text-align: right;">${data.mt5Server || 'RivertonMarkets-Live'}</td>
+              <td style="text-align: right;">${data.mt5Server || 'Propfirm-Live'}</td>
             </tr>
           </table>
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/trading-accounts" 
+          <a href="${import.meta.env.VITE_SITE_URL}/trading-accounts" 
              style="background: #059669; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             View Account Details
           </a>
@@ -247,11 +247,11 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/rules" 
+          <a href="${import.meta.env.VITE_SITE_URL}/rules" 
              style="background: #dc2626; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; margin-right: 10px;">
             Review Rules
           </a>
-          <a href="https://account.rivertonmarkets.com/buy-account" 
+          <a href="${import.meta.env.VITE_SITE_URL}/buy-account" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Get New Account
           </a>
@@ -295,12 +295,12 @@ const EMAIL_TEMPLATES = {
         <div style="background: #d1fae5; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #065f46; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #047857; font-size: 16px; line-height: 1.6;">
-            Congratulations! Your identity has been verified. You now have full access to all Riverton Markets features.
+            Congratulations! Your identity has been verified. You now have full access to all Propfirm features.
           </p>
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/buy-account" 
+          <a href="${import.meta.env.VITE_SITE_URL}/buy-account" 
              style="background: #059669; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Choose Your Trading Account
           </a>
@@ -326,7 +326,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/kyc" 
+          <a href="${import.meta.env.VITE_SITE_URL}/kyc" 
              style="background: #dc2626; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Resubmit Documents
           </a>
@@ -346,7 +346,7 @@ const EMAIL_TEMPLATES = {
         <div style="background: #f3f4f6; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
           <h2 style="color: #1f2937; margin-top: 0;">Hi ${data.name},</h2>
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            It's been a week since you joined Riverton Markets. We noticed you haven't selected your trading account yet.
+            It's been a week since you joined Propfirm. We noticed you haven't selected your trading account yet.
           </p>
         </div>
 
@@ -365,7 +365,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/buy-account" 
+          <a href="${import.meta.env.VITE_SITE_URL}/buy-account" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Start Trading Today
           </a>
@@ -396,7 +396,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/buy-account" 
+          <a href="${import.meta.env.VITE_SITE_URL}/buy-account" 
              style="background: #7c3aed; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Claim Your Offer
           </a>
@@ -412,7 +412,7 @@ const EMAIL_TEMPLATES = {
   },
 
   inactive_user: {
-    subject: 'We Miss You! Come Back to Riverton Markets',
+    subject: 'We Miss You! Come Back to Propfirm',
     html: (data: any) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 40px;">
@@ -427,7 +427,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="margin-bottom: 30px;">
-          <h3 style="color: #1f2937;">What's New at Riverton Markets:</h3>
+          <h3 style="color: #1f2937;">What's New at Propfirm:</h3>
           <ul style="color: #4b5563; font-size: 16px; line-height: 1.8;">
             <li>New account sizes available</li>
             <li>Improved trading conditions</li>
@@ -437,7 +437,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/dashboard" 
+          <a href="${import.meta.env.VITE_SITE_URL}/dashboard" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Return to Dashboard
           </a>
@@ -505,7 +505,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/payouts" 
+          <a href="${import.meta.env.VITE_SITE_URL}/payouts" 
              style="background: #dc2626; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Update Payout Request
           </a>
@@ -534,7 +534,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/kyc" 
+          <a href="${import.meta.env.VITE_SITE_URL}/kyc" 
              style="background: #f59e0b; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Complete Verification
           </a>
@@ -609,7 +609,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/admin/payouts" 
+          <a href="${import.meta.env.VITE_SITE_URL}/admin/payouts" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Review Payout Request
           </a>
@@ -667,7 +667,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/dashboard" 
+          <a href="${import.meta.env.VITE_SITE_URL}/dashboard" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Go to Dashboard
           </a>
@@ -728,7 +728,7 @@ const EMAIL_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin: 40px 0;">
-          <a href="https://account.rivertonmarkets.com/admin/approvals" 
+          <a href="${import.meta.env.VITE_SITE_URL}/admin/approvals" 
              style="background: #3b82f6; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600;">
             Review Purchase Request
           </a>

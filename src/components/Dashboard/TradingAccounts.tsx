@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, CheckCircle, XCircle, AlertTriangle, User, Copy, Eye, EyeOff, DollarSign, Target, TrendingDown, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, CheckCircle, XCircle, AlertTriangle, User, Copy, Eye, EyeOff, DollarSign, Target, TrendingDown, Calendar, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { TradingAccount } from '../../types';
 import { supabase } from '../../lib/supabase';
@@ -42,7 +42,8 @@ const statusStyles = {
   breached: 'bg-red-500/10 text-red-400 border-red-400/20',
   rejected: 'bg-gray-500/10 text-gray-400 border-gray-400/20',
   pending_payment: 'bg-yellow-500/10 text-yellow-400 border-yellow-400/20',
-  payment_submitted: 'bg-blue-500/10 text-blue-400 border-blue-400/20'
+  payment_submitted: 'bg-blue-500/10 text-blue-400 border-blue-400/20',
+  suspicious: 'bg-orange-500/10 text-orange-400 border-orange-400/20'
 };
 
 const statusIcons = {
@@ -51,7 +52,8 @@ const statusIcons = {
   breached: <XCircle className="w-5 h-5 text-red-400" />,
   rejected: <XCircle className="w-5 h-5 text-gray-400" />,
   pending_payment: <AlertTriangle className="w-5 h-5 text-yellow-400" />,
-  payment_submitted: <AlertTriangle className="w-5 h-5 text-blue-400" />
+  payment_submitted: <AlertTriangle className="w-5 h-5 text-blue-400" />,
+  suspicious: <Clock className="w-5 h-5 text-orange-400" />
 };
 
 export default function TradingAccounts() {
@@ -88,7 +90,7 @@ export default function TradingAccounts() {
             price
           )
         `)
-        .in('status', ['pending_payment', 'payment_submitted'])
+        .in('status', ['pending_payment', 'payment_submitted', 'suspicious'])
         .order('created_at', { ascending: false });
 
       if (requestsError) throw requestsError;

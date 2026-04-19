@@ -75,7 +75,7 @@ const mockStats = {
   currentTier: 'Gold',
   nextTier: 'Diamond',
   referralsToNextTier: 18,
-  affiliateLink: 'https://rivertonmarkets.com/ref/USER123'
+  affiliateLink: `${import.meta.env.VITE_SITE_URL}/ref/USER123`
 };
 
 export default function Affiliate() {
@@ -85,6 +85,7 @@ export default function Affiliate() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     referrals: 0,
+    activeReferrals: 0,
     earnings: 0,
     currentTier: 'Bronze',
     currentCommission: 10,
@@ -122,14 +123,19 @@ export default function Affiliate() {
           .eq('id', user?.id);
       }
 
-      // Get referral count
-      const { data: referrals, count } = await supabase
+      // Get total signup count
+      const { data: rawReferrals, count } = await supabase
         .from('affiliate_referrals')
         .select('*', { count: 'exact' })
-        .eq('referrer_id', user?.id)
-        .eq('status', 'active');
+        .eq('referrer_id', user?.id);
 
-      const referralCount = count || 0;
+      const totalSignups = count || 0;
+
+      // Get exact active tracer count (those who purchased)
+      const { data: activeCountData } = await supabase.rpc('get_active_referral_count', {
+        p_user_id: user?.id
+      });
+      const activeTraderCount = activeCountData || 0;
 
       // Get current tier
       const { data: tierData } = await supabase.rpc('get_affiliate_tier', {
@@ -143,21 +149,29 @@ export default function Affiliate() {
         p_user_id: user?.id
       });
 
-      const earnings = earningsData?.[0]?.total_earnings || 0;
+      const totalEarnings = earningsData?.[0]?.total_earnings || 0;
 
-      // Determine next tier
-      const tiers = affiliateTiers;
-      const currentTierIndex = tiers.findIndex(t => t.name === currentTier.tier_name);
-      const nextTierData = tiers[currentTierIndex + 1];
+      // Calculate referrals needed for next tier
+      let nextTier = 'Max Tier';
+      let referralsToNextTier = 0;
+
+      const currentTierIndex = affiliateTiers.findIndex(t => t.name === currentTier.tier_name);
+      if (currentTierIndex < affiliateTiers.length - 1) {
+        const nextUserTier = affiliateTiers[currentTierIndex + 1];
+        nextTier = nextUserTier.name;
+        // The gap to next tier relies on active traders, not signups
+        referralsToNextTier = Math.max(0, nextUserTier.requiredReferrals - activeTraderCount);
+      }
 
       setStats({
-        referrals: referralCount,
-        earnings: Number(earnings),
+        referrals: totalSignups,
+        activeReferrals: activeTraderCount,
+        earnings: Number(totalEarnings),
         currentTier: currentTier.tier_name,
         currentCommission: Number(currentTier.commission_rate),
-        nextTier: nextTierData?.name || currentTier.tier_name,
-        referralsToNextTier: nextTierData ? nextTierData.requiredReferrals - referralCount : 0,
-        affiliateLink: `https://account.rivertonmarkets.com/signup?ref=${referralCode}`
+        nextTier,
+        referralsToNextTier,
+        affiliateLink: `${import.meta.env.VITE_SITE_URL}/signup?ref=${referralCode}`
       });
     } catch (error) {
       console.error('Error loading affiliate data:', error);
@@ -262,7 +276,7 @@ export default function Affiliate() {
           <div className="flex mb-2 items-center justify-between">
             <div>
               <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-blue-500/20 text-blue-400">
-                {stats.referrals} / {stats.referrals + stats.referralsToNextTier} Referrals
+                {stats.activeReferrals} / {stats.activeReferrals + stats.referralsToNextTier} Active Traders (Purchased)
               </span>
             </div>
             <div className="text-right">
@@ -273,7 +287,7 @@ export default function Affiliate() {
           </div>
           <div className="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-white/5">
             <div
-              style={{ width: `${stats.referralsToNextTier > 0 ? (stats.referrals / (stats.referrals + stats.referralsToNextTier)) * 100 : 100}%` }}
+              style={{ width: `${stats.referralsToNextTier > 0 ? (stats.activeReferrals / (stats.activeReferrals + stats.referralsToNextTier)) * 100 : 100}%` }}
               className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
             ></div>
           </div>

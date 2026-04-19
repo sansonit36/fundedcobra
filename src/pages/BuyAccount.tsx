@@ -172,8 +172,15 @@ export default function BuyAccount() {
 
     async function detectUserCountry() {
       try {
-        // Use a different IP geolocation service that supports CORS
-        const response = await fetch('https://ipapi.co/json/');
+        // Use a more reliable service with a shorter timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
         const data = await response.json();
         
         if (data.country_code) {
@@ -182,8 +189,8 @@ export default function BuyAccount() {
           console.log('User country detected:', data.country_code);
         }
       } catch (err) {
-        console.error('Error detecting user country:', err);
-        // Default to allowing all payment methods if detection fails
+        console.warn('⚠️ [GEO] Error detecting user country, using default:', err);
+        // Default to PK or international (non-India for now)
         setIsIndianUser(false);
       }
     }
@@ -400,24 +407,36 @@ export default function BuyAccount() {
       console.log('📥 [AI] Response received');
       console.log('AI Verification Result:', JSON.stringify(verificationResult, null, 2));
       
-      if (verifyError) {
+      if (verifyError || !verificationResult.success) {
         console.error('❌ [AI ERROR] Verification failed');
-        console.error('Error object:', verifyError);
-        console.error('Error message:', verifyError.message);
-        console.error('Error stack:', verifyError.stack);
-        console.error('Full error details:', JSON.stringify(verifyError, null, 2));
+        const errorMsg = verifyError?.message || verificationResult?.error || 'Unknown AI error';
+        console.error('Error details:', errorMsg);
         
-        // Show detailed error to user
-        const errorMessage = `AI Verification Error: ${verifyError.message || 'Unknown error'}. ` +
-          `Please check console for details or contact support with timestamp: ${new Date().toISOString()}`;
-        
-        throw new Error(errorMessage);
+        // CRITICAL FIX: Even if AI fails (safety filter, 500 error, etc.), 
+        // we should still save the screenshot to the DB so the admin can see it.
+        try {
+          console.log('💾 [DB FALLBACK] Saving screenshot even though AI failed...');
+          await submitPaymentProof(accountRequestId, publicUrl, {
+            confidence: 0,
+            reason: `AI Error/Safety Block: ${errorMsg}`,
+            red_flags: ['AI_VERIFICATION_FAILED'],
+            isValid: false
+          });
+          console.log('✅ [DB FALLBACK] Screenshot saved for admin review');
+        } catch (dbError) {
+          console.error('❌ [DB FALLBACK ERROR] Failed to save fallback results:', dbError);
+        }
+
+        // Navigate to suspicious page so the user knows it's being reviewed manually
+        setSuccess('AI verification was inconclusive, but your payment proof has been saved for manual review.');
+        setAiVerifying(false);
+        navigate('/suspicious-payment');
+        return;
       }
 
       // Check if verification result has expected structure
-      if (!verificationResult || !verificationResult.verification) {
+      if (!verificationResult.verification) {
         console.error('❌ [AI ERROR] Invalid response structure');
-        console.error('Received data:', verificationResult);
         throw new Error('AI returned invalid response format. Check edge function logs.');
       }
 
@@ -427,30 +446,52 @@ export default function BuyAccount() {
       console.log('💰 [AI RESULT] Payment Type:', verificationResult.verification.paymentType);
       console.log('🚩 [AI RESULT] Red Flags:', verificationResult.verification.redFlags);
 
-      // Check if account was flagged as suspicious (but don't suspend)
+      // Check confidence score
+      if (verificationResult.verification.confidence < 60) {
+        console.warn('⚠️ [LOW CONFIDENCE] Screenshot verification uncertain');
+      }
+
+      // 4) ALWAYS save the results and screenshot URL to the database
+      // This ensures even suspicious payments are visible to the admin
+      try {
+        console.log('💾 [DB] Saving verification results to database...');
+        await submitPaymentProof(accountRequestId, publicUrl, {
+          confidence: verificationResult.verification.confidence,
+          reason: verificationResult.verification.reason,
+          red_flags: verificationResult.verification.redFlags,
+          isValid: verificationResult.verification.isValid
+        });
+        console.log('✅ [DB] Verification results saved');
+      } catch (dbError: any) {
+        console.error('❌ [DB ERROR] Failed to save verification results:', dbError);
+        
+        // Show a helpful hint if it looks like a migration issue
+        if (dbError?.code === 'PGRST202') {
+          console.error('💡 HINT: Please ensure you have run the latest SQL migration to update the submit_payment_proof RPC.');
+        }
+      }
+
+      // 5) Handle Suspicious / Invalid payments
       if (!verificationResult.verification.isValid || verificationResult.verification.confidence < 40) {
         console.warn('⚠️ [SUSPICIOUS] Screenshot flagged for admin review');
         console.warn('Reason:', verificationResult.verification.reason);
         
+        // Track the suspicious attempt
+        try {
+          if (window.fbq) {
+            window.fbq('track', 'SuspiciousPayment', {
+              value: calculateFinalPrice(selectedPackage.price),
+              currency: 'USD',
+              content_name: selectedPackage.name,
+              reason: verificationResult.verification.reason
+            });
+          }
+        } catch (e) {}
+
         // Redirect to suspicious page instead of thank you page
-        setSuccess('Payment submission received but requires review. Our team will review your payment and contact you shortly.');
+        setSuccess('Payment submission received but requires manual review. Our team will verify your payment shortly.');
         setAiVerifying(false);
         navigate('/suspicious-payment');
-        return;
-      }
-
-      // Check confidence score
-      if (verificationResult.verification.confidence < 60) {
-        console.warn('⚠️ [LOW CONFIDENCE] Screenshot verification uncertain');
-        console.warn('Confidence score:', verificationResult.verification.confidence);
-        console.warn('Threshold: 60%');
-        console.warn('Reason:', verificationResult.verification.reason);
-        
-        setError(
-          `Screenshot verification uncertain (${verificationResult.verification.confidence}% confidence). ` +
-          `Reason: ${verificationResult.verification.reason}. Please upload a clearer screenshot or contact support.`
-        );
-        setSubmitting(false);
         return;
       }
 
@@ -466,9 +507,6 @@ export default function BuyAccount() {
 
       // Use the same request ID we created earlier
       const requestId = accountRequestId;
-
-      // Submit payment proof
-      await submitPaymentProof(requestId, paymentScreenshot);
 
       // Get user profile data
       const { data: userProfile } = await supabase
@@ -498,7 +536,7 @@ export default function BuyAccount() {
         // Send admin notification email
         try {
           await sendEmail({
-            to: 'dogarhusnian3@gmail.com',
+            to: import.meta.env.VITE_ADMIN_EMAIL,
             template: 'admin_account_purchase_notification',
             data: {
               userName: userProfile.name,

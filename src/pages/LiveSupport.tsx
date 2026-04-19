@@ -23,7 +23,7 @@ export default function LiveSupport() {
       const s0 = document.getElementsByTagName('script')[0];
       s1.id = 'tawkto-script';
       s1.async = true;
-      s1.src = 'https://embed.tawk.to/67d018e4ffa8241909ad5f0a/1im2e2g7j';
+      s1.src = `https://embed.tawk.to/${import.meta.env.VITE_TAWKTO_ID}`;
       s1.charset = 'UTF-8';
       s1.setAttribute('crossorigin', '*');
       s0?.parentNode?.insertBefore(s1, s0);
@@ -47,7 +47,7 @@ export default function LiveSupport() {
     {
       icon: Mail,
       title: 'Email Support',
-      description: 'support@rivertonmarkets.com',
+      description: import.meta.env.VITE_SUPPORT_EMAIL,
     },
     {
       icon: Globe,

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MT5 Integration Data Flow - Riverton Markets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .diagram {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .flow-chart {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: flex-start;
+            min-width: 100%;
+            padding-bottom: 20px;
+        }
+
+        .flow-section {
+            flex: 1;
+            min-width: 200px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            position: relative;
+        }
+
+        .flow-section.source {
+            border-left-color: #ff6b6b;
+        }
+
+        .flow-section.processor {
+            border-left-color: #ffa502;
+        }
+
+        .flow-section.storage {
+            border-left-color: #4ecdc4;
+        }
+
+        .flow-section.output {
+            border-left-color: #95e1d3;
+        }
+
+        .flow-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .flow-section.source h3 { color: #ff6b6b; }
+        .flow-section.processor h3 { color: #ffa502; }
+        .flow-section.storage h3 { color: #4ecdc4; }
+        .flow-section.output h3 { color: #95e1d3; }
+
+        .flow-item {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            border: 1px solid #e0e0e0;
+        }
+
+        .flow-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .flow-item code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            color: #d63384;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            padding: 0 5px;
+            align-self: center;
+        }
+
+        .data-flow-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-flow-table h3 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        table td code {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: #d63384;
+            font-size: 0.9em;
+        }
+
+        .endpoint-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .endpoint-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .endpoint-card .method {
+            display: inline-block;
+            background: #ffa502;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .endpoint-card .method.patch {
+            background: #667eea;
+        }
+
+        .data-field {
+            margin: 8px 0;
+            background: #f8f9fa;
+            padding: 8px;
+            border-left: 3px solid #667eea;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .data-field strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .data-field em {
+            color: #666;
+            font-style: italic;
+        }
+
+        .security-warning {
+            background: #fff3cd;
+            border-left: 5px solid #ff6b6b;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .security-warning strong {
+            color: #ff6b6b;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border-left: 5px solid;
+        }
+
+        .legend-box.source { border-left-color: #ff6b6b; background: #ffe0e0; }
+        .legend-box.processor { border-left-color: #ffa502; background: #ffe8cc; }
+        .legend-box.storage { border-left-color: #4ecdc4; background: #d0f8f5; }
+        .legend-box.output { border-left-color: #95e1d3; background: #e8fdf8; }
+
+        .sql-box {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #333;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        .json-box {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #00ff00;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timeline h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item {
+            margin-left: 30px;
+            padding-left: 20px;
+            padding-bottom: 15px;
+            border-left: 3px solid #667eea;
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            border-left-color: transparent;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+        }
+
+        .timeline-item strong {
+            color: #333;
+            display: block;
+        }
+
+        .timeline-item em {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .flow-chart {
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover,
+        .tab-btn.active {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 MT5 Integration Data Flow</h1>
+            <p>{PROJECT_NAME} - Live Account Balance & Trading Account Status Synchronization</p>
+        </div>
+
+        <!-- Legend -->
+        <div class="diagram">
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box source"></div>
+                    <span><strong>Source</strong> - Data Origin</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box processor"></div>
+                    <span><strong>Processor</strong> - PHP Endpoints</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box storage"></div>
+                    <span><strong>Storage</strong> - Databases</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box output"></div>
+                    <span><strong>Output</strong> - Cloud Services</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Data Flow Diagram -->
+        <div class="diagram">
+            <h2 style="margin-bottom: 20px; color: #667eea;">📊 Data Flow Architecture</h2>
+
+            <div class="flow-chart">
+                <!-- Source -->
+                <div class="flow-section source">
+                    <h3>🟥 MT5 System</h3>
+                    <div class="flow-item">
+                        <strong>MetaTrader 5</strong>
+                        Real-time trading platform
+                    </div>
+                    <div class="flow-item">
+                        <strong>Live Data:</strong>
+                        Account balance, equity, trades, positions
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">→</div>
+
+                <!-- Processors -->
+                <div class="flow-section processor">
+                    <h3>🟠 PHP Endpoints</h3>
+                    <div class="flow-item">
+                        <strong>insert_data.php</strong>
+                        (Receives balance data)
+                    </div>
+                    <div class="flow-item">
+                        <strong>update_trading_account.php</strong>
+                        (Receives status updates)
+                    </div>
+                    <div class="flow-item">
+                        <strong>rcv.php</strong>
+                        (MySQL direct write)
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">⇅</div>
+
+                <!-- Storage -->
+                <div class="flow-section storage">
+                    <h3>🟦 Databases</h3>
+                    <div class="flow-item">
+                        <strong>Supabase</strong>
+                        Cloud PostgreSQL via REST API
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="arrow">→</div>
+
+                <!-- Output -->
+                <div class="flow-section output">
+                    <h3>🟩 Applications</h3>
+                    <div class="flow-item">
+                        <strong>Trader Dashboard</strong>
+                        Real-time account view
+                    </div>
+                    <div class="flow-item">
+                        <strong>Admin Panel</strong>
+                        Account monitoring
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endpoints Detail -->
+        <div class="diagram">
+            <h2 style="margin-bottom: 20px; color: #667eea;">🔌 Data Ingestion Endpoints</h2>
+
+            <!-- Endpoint 1: insert_data.php -->
+            <div class="endpoint-card">
+                <h4>📥 insert_data.php - Account Balance Data</h4>
+                <div class="method">POST</div>
+                <p><strong>URL:</strong> <code>{BRIDGE_DOMAIN}/insert_data.php</code></p>
+                <p><strong>Purpose:</strong> Receive and store MT5 live account balance, equity, and trade metrics</p>
+
+                <p style="margin-top: 15px; font-weight: bold;">📋 Input Fields:</p>
+                <div class="sql-box">
+{
+  "mt5_id": "413536535",           // Account identifier
+  "client_name": "Omer Qureshi",   // Trader name
+  "daily_drawdown_limit": 8,       // Max daily loss (%)
+  "overall_drawdown_limit": 12,    // Max overall loss (%)
+  "weekly_profit_target": 10,      // Profit target (%)
+  "running_balance": 10013.31,     // Current balance ($)
+  "running_equity": 10013.31,      // Current equity ($)
+  "largest_single_trade_profit_week": 0,    // Top trade profit ($)
+  "trades_under_60s_week": 0       // Count of 60s+ trades
+}
+                </div>
+
+                <p style="margin-top: 15px; font-weight: bold;">⚙️ Processing Flow:</p>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>1. Receive POST Data</strong>
+                        <em>Read raw data from php://input</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>2. Clean & Validate</strong>
+                        <em>Remove null chars, parse JSON, check fields</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>3. Save Locally</strong>
+                        <em>Write to received_data.json for debugging</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>4. Send to Supabase</strong>
+                        <em>POST to account_data_extended table (upsert)</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>5. Log Results</strong>
+                        <em>Write all operations to debug_log.txt</em>
+                    </div>
+                </div>
+
+                <p style="margin-top: 15px; font-weight: bold;">🗄️ Database Operation:</p>
+                <div class="sql-box">
+Supabase REST API:
+POST {SUPABASE_URL}/rest/v1/account_data_extended?on_conflict=mt5_id
+
+Headers:
+- Content-Type: application/json
+- apikey: [SUPABASE_ANON_KEY]
+- Authorization: Bearer [SUPABASE_ANON_KEY]
+- Prefer: resolution=merge-duplicates,return=minimal
+
+Behavior: UPSERT - Updates if mt5_id exists, inserts if new
+                </div>
+            </div>
+
+            <!-- Endpoint 2: update_trading_account.php -->
+            <div class="endpoint-card">
+                <h4>⚠️ update_trading_account.php - Trading Account Status</h4>
+                <div class="method patch">PATCH</div>
+                <p><strong>URL:</strong> <code>{BRIDGE_DOMAIN}/update_trading_account.php</code></p>
+                <p><strong>Purpose:</strong> Update trading account status and breach alerts (rule violations)</p>
+
+                <p style="margin-top: 15px; font-weight: bold;">📋 Input Fields:</p>
+                <div class="sql-box">
+{
+  "mt5_login": "435304224",    // Account login (required)
+  "status": "breached",        // Status: active, breached, suspended
+  "breach_reason": "daily limit hit"  // Reason for breach
+}
+                </div>
+
+                <p style="margin-top: 15px; font-weight: bold;">⚙️ Processing Flow:</p>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>1. Receive & Validate</strong>
+                        <em>Read POST data, validate mt5_login presence</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>2. Save Locally</strong>
+                        <em>Write to received_trading_account.json</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>3. Send PATCH to Supabase</strong>
+                        <em>Update trading_accounts table where mt5_login matches</em>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>4. Log Response</strong>
+                        <em>Log HTTP status and response to debug_log_update.txt</em>
+                    </div>
+                </div>
+
+                <p style="margin-top: 15px; font-weight: bold;">🗄️ Database Operation:</p>
+                <div class="sql-box">
+Supabase REST API:
+PATCH {SUPABASE_URL}/rest/v1/trading_accounts?mt5_login=eq.[LOGIN]
+
+Headers:
+- Content-Type: application/json
+- apikey: [SUPABASE_ANON_KEY]
+- Authorization: Bearer [SUPABASE_ANON_KEY]
+- Prefer: resolution=merge-duplicates,return=representation
+
+Body: Updated status and breach_reason fields only
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="diagram">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('dual-write')">Dual-Write Strategy</button>
+                <button class="tab-btn" onclick="switchTab('data-mapping')">Data Field Mapping</button>
+                <button class="tab-btn" onclick="switchTab('security')">Security Analysis</button>
+                <button class="tab-btn" onclick="switchTab('integration')">Integration Points</button>
+            </div>
+
+            <!-- Supabase Upload Strategy -->
+            <div id="dual-write" class="tab-content active">
+                <h3 style="color: #667eea; margin-bottom: 15px;">🔄 Supabase Infrastructure</h3>
+                <p style="margin-bottom: 15px;">The system uses <strong>Supabase Cloud</strong> as the primary and only data store for real-time trading metrics.</p>
+
+                <div style="margin-top: 20px; background: #e8f4f8; padding: 15px; border-radius: 5px;">
+                    <strong>✅ Benefits:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Simplicity: Single source of truth (Supabase)</li>
+                        <li>Global Availability: Accessible via REST API anywhere</li>
+                        <li>Scalability: Cloud-managed PostgreSQL</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Data Field Mapping -->
+            <div id="data-mapping" class="tab-content">
+                <h3 style="color: #667eea; margin-bottom: 15px;">📊 Data Field Mapping</h3>
+
+                <p style="margin-bottom: 15px;"><strong>Account Data Extended Table:</strong></p>
+                <table>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Source</th>
+                    </tr>
+                    <tr>
+                        <td><code>mt5_id</code></td>
+                        <td>VARCHAR(50)</td>
+                        <td>MetaTrader 5 Account ID (Primary Key)</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>client_name</code></td>
+                        <td>VARCHAR(255)</td>
+                        <td>Trader's name</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>initial_equity</code></td>
+                        <td>DOUBLE</td>
+                        <td>Starting account balance</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>daily_drawdown_limit</code></td>
+                        <td>DOUBLE</td>
+                        <td>Max daily loss percentage</td>
+                        <td>Rules Engine</td>
+                    </tr>
+                    <tr>
+                        <td><code>overall_drawdown_limit</code></td>
+                        <td>DOUBLE</td>
+                        <td>Max overall loss percentage</td>
+                        <td>Rules Engine</td>
+                    </tr>
+                    <tr>
+                        <td><code>weekly_profit_target</code></td>
+                        <td>DOUBLE</td>
+                        <td>Weekly profit target percentage</td>
+                        <td>Rules Engine</td>
+                    </tr>
+                    <tr>
+                        <td><code>running_balance</code></td>
+                        <td>DOUBLE</td>
+                        <td>Current account balance (USD)</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>running_equity</code></td>
+                        <td>DOUBLE</td>
+                        <td>Current equity including open positions</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>largest_single_trade_profit_week</code></td>
+                        <td>DOUBLE</td>
+                        <td>Biggest winning trade this week (USD)</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>trades_under_60s_week</code></td>
+                        <td>INT</td>
+                        <td>Count of trades under 60 seconds</td>
+                        <td>MT5 System</td>
+                    </tr>
+                    <tr>
+                        <td><code>last_updated</code></td>
+                        <td>TIMESTAMP</td>
+                        <td>When record was last modified</td>
+                        <td>System</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Security Analysis -->
+            <div id="security" class="tab-content">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">🔒 Security Analysis</h3>
+
+                <div class="security-warning">
+                    <strong>🚨 CRITICAL: API Keys Exposed in Debug Logs</strong>
+                    <p style="margin-top: 10px;">Supabase API keys are hardcoded in PHP files and logged in plaintext to debug_log.txt. This allows unauthorized database access.</p>
+                </div>
+
+                <div class="security-warning">
+                    <strong>⚠️ HIGH: Database Credentials in Plaintext</strong>
+                    <p style="margin-top: 10px;">MySQL credentials are hardcoded in PHP files. Should use environment variables instead.</p>
+                </div>
+
+                <div class="security-warning">
+                    <strong>⚠️ HIGH: No Authentication on Endpoints</strong>
+                    <p style="margin-top: 10px;">insert_data.php and update_trading_account.php have no validation that requests come from legitimate MT5 systems. Anyone can call these endpoints.</p>
+                </div>
+
+                <div class="security-warning">
+                    <strong>⚠️ MEDIUM: Sensitive Data in JSON Files</strong>
+                    <p style="margin-top: 10px;">Client names, MT5 IDs, and balances stored in received_data.json in web root. Could be accessed by unauthorized users.</p>
+                </div>
+
+                <div class="security-warning">
+                    <strong>⚠️ MEDIUM: Debug Mode Enabled</strong>
+                    <p style="margin-top: 10px;">error_reporting(E_ALL) and display_errors enabled in production code. Could expose sensitive information in error messages.</p>
+                </div>
+
+                <p style="margin-top: 20px; font-weight: bold;">✅ Recommendations:</p>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li>Move secrets to environment variables (.env)</li>
+                    <li>Implement API key authentication on endpoints</li>
+                    <li>Use HTTPS only, implement request signing</li>
+                    <li>Disable debug logging in production</li>
+                    <li>Store sensitive data in database, not JSON files</li>
+                    <li>Implement rate limiting to prevent abuse</li>
+                    <li>Add input validation and sanitization</li>
+                    <li>Log audit trails for all data modifications</li>
+                </ul>
+            </div>
+
+            <!-- Integration Points -->
+            <div id="integration" class="tab-content">
+                <h3 style="color: #667eea; margin-bottom: 15px;">🔗 Integration Points</h3>
+
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                    <strong>This MT5 system connects to:</strong>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>System</th>
+                        <th>Path</th>
+                        <th>Purpose</th>
+                        <th>Data Shared</th>
+                    </tr>
+                    <tr>
+                        <td>Affiliate Program</td>
+                        <td><code>/affiliate/</code></td>
+                        <td>Track referrals, manage commissions</td>
+                        <td>Client registrations, purchases</td>
+                    </tr>
+                    <tr>
+                        <td>Account Dashboard</td>
+                        <td><code>/account/</code></td>
+                        <td>Trader view of their account</td>
+                        <td>Balance, equity, limit status</td>
+                    </tr>
+                    <tr>
+                        <td>Admin Panel</td>
+                        <td><code>/api/admin/</code></td>
+                        <td>Monitor all trading accounts</td>
+                        <td>All account data, breaches</td>
+                    </tr>
+                    <tr>
+                        <td>Blog/Education</td>
+                        <td><code>/blog/</code></td>
+                        <td>Trading rules documentation</td>
+                        <td>Drawdown limits, profit targets</td>
+                    </tr>
+                    <tr>
+                        <td>API System</td>
+                        <td><code>/api/</code></td>
+                        <td>Registration, purchases, tracking</td>
+                        <td>User IDs, transaction data</td>
+                    </tr>
+                </table>
+
+                <p style="margin-top: 20px; font-weight: bold;">🔄 Data Flow Between Systems:</p>
+                <div class="sql-box">
+MT5 System
+  ↓ (live account data)
+Insert_data.php / rcv.php
+  ↓ (account balance updates)
+Supabase + MySQL
+  ↓ (query account status)
+Account Dashboard (shows balance)
+Affiliate System (calculates payout)
+Admin Panel (monitors compliance)
+  ↓ (breach detected)
+Update_trading_account.php
+  ↓ (mark as breached)
+Supabase + MySQL
+  ↓ (suspension applied)
+MT5 System (closes account)
+                </div>
+            </div>
+        </div>
+
+        <!-- File Structure -->
+        <div class="diagram">
+            <h2 style="margin-bottom: 20px; color: #667eea;">📁 Integration Files</h2>
+
+            <table>
+                <tr>
+                    <th>File Name</th>
+                    <th>Type</th>
+                    <th>Purpose</th>
+                    <th>Key Function</th>
+                </tr>
+                <tr>
+                    <td><code>insert_data.php</code></td>
+                    <td>PHP Endpoint</td>
+                    <td>Main account data receiver</td>
+                    <td>POST → Validate → Save → Supabase</td>
+                </tr>
+                <tr>
+                    <td><code>update_trading_account.php</code></td>
+                    <td>PHP Endpoint</td>
+                    <td>Trading account status updater</td>
+                    <td>POST → Validate → PATCH → Supabase</td>
+                </tr>
+                <tr>
+                    <td><code>received_data.json</code></td>
+                    <td>Data File</td>
+                    <td>Sample/debug account data</td>
+                    <td>Last received message payload</td>
+                </tr>
+                <tr>
+                    <td><code>received_trading_account.json</code></td>
+                    <td>Data File</td>
+                    <td>Sample/debug status update</td>
+                    <td>Last received status message</td>
+                </tr>
+                <tr>
+                    <td><code>debug_log.txt</code></td>
+                    <td>Log File</td>
+                    <td>insert_data.php execution logs</td>
+                    <td>Detailed operation trace</td>
+                </tr>
+                <tr>
+                    <td><code>debug_log_update.txt</code></td>
+                    <td>Log File</td>
+                    <td>update_trading_account.php logs</td>
+                    <td>Status update operation trace</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Summary -->
+        <div class="diagram" style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border: 2px solid #667eea;">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📋 System Summary</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                    <h4 style="color: #ff6b6b;">Data Sources</h4>
+                    <p>MetaTrader 5 Platform sends live account data via HTTP POST requests to PHP endpoints</p>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #ffa502;">
+                    <h4 style="color: #ffa502;">Processing</h4>
+                    <p>Two parallel flows: Supabase via REST API + MySQL via direct connection for redundancy</p>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                    <h4 style="color: #4ecdc4;">Storage Model</h4>
+                    <p>Single-write strategy: data is stored in Supabase Cloud for real-time access</p>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #95e1d3;">
+                    <h4 style="color: #95e1d3;">Update Frequency</h4>
+                    <p>Real-time or periodic updates as MT5 system sends data (likely every minute to 5 minutes)</p>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <h4 style="color: #667eea;">Access Layers</h4>
+                    <p>Trader dashboard, admin panel, affiliate system all query the stored account data</p>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #764ba2;">
+                    <h4 style="color: #764ba2;">Compliance Tracking</h4>
+                    <p>System monitors drawdown limits, profit targets, and breach conditions automatically</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📊 MT5 Integration Analysis | {PROJECT_NAME} | Generated: 2026-04-19</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">For detailed code analysis, see the included PHP files and README.md</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab and mark button active
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

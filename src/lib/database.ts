@@ -36,6 +36,9 @@ export interface AccountRequest {
   amount: number;
   created_at: string;
   payment_screenshot_url?: string;
+  ai_confidence?: number;
+  ai_reason?: string;
+  ai_red_flags?: any;
 }
 
 export interface PendingAccountRequest {
@@ -50,6 +53,10 @@ export interface PendingAccountRequest {
   status: string;
   payment_screenshot_url: string;
   rejection_reason?: string;
+  ai_confidence?: number;
+  ai_reason?: string;
+  ai_red_flags?: any;
+  referrer_name?: string;
   created_at: string;
   processed_at?: string;
 }
@@ -253,26 +260,44 @@ export async function createAccountPurchase(
 
 export async function submitPaymentProof(
   requestId: string,
-  screenshot: File
+  screenshot: File | string,
+  aiData?: {
+    confidence: number;
+    reason: string;
+    red_flags: any;
+    isValid?: boolean;
+  }
 ): Promise<void> {
-  // Upload screenshot using user ID as folder name
-  const filename = `${requestId}/${Date.now()}_payment.${screenshot.name.split('.').pop()}`;
-  const { error: uploadError } = await supabase.storage
-    .from('payment-proofs')
-    .upload(filename, screenshot);
+  let publicUrl = '';
 
-  if (uploadError) throw uploadError;
+  if (screenshot instanceof File) {
+    // Upload screenshot using user ID as folder name
+    const filename = `${requestId}/${Date.now()}_payment.${screenshot.name.split('.').pop()}`;
+    const { error: uploadError } = await supabase.storage
+      .from('payment-proofs')
+      .upload(filename, screenshot);
 
-  // Get public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('payment-proofs')
-    .getPublicUrl(filename);
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: { publicUrl: url } } = supabase.storage
+      .from('payment-proofs')
+      .getPublicUrl(filename);
+    
+    publicUrl = url;
+  } else {
+    publicUrl = screenshot;
+  }
 
   // Update request
   const { error: updateError } = await supabase
     .rpc('submit_payment_proof', {
       request_id: requestId,
-      screenshot_url: publicUrl
+      screenshot_url: publicUrl,
+      p_ai_confidence: aiData?.confidence,
+      p_ai_reason: aiData?.reason,
+      p_ai_red_flags: aiData?.red_flags,
+      p_is_valid: aiData?.isValid ?? true
     });
 
   if (updateError) throw updateError;
@@ -290,7 +315,7 @@ export async function getPendingAccounts(userId: string): Promise<AccountRequest
       )
     `)
     .eq('user_id', userId)
-    .in('status', ['pending_payment', 'payment_submitted'])
+    .in('status', ['pending_payment', 'payment_submitted', 'suspicious'])
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -318,7 +343,7 @@ export async function approveAccountRequest(
   requestId: string,
   mt5Login: string,
   mt5Password: string,
-  mt5Server: string = 'RivertonMarkets-Live'
+  mt5Server: string = 'Propfirm-Live'
 ): Promise<string> {
   const { data, error } = await supabase
     .rpc('approve_account_request', {
@@ -539,7 +564,7 @@ export async function createPayoutRequest(
   try {
     const { sendEmail } = await import('./emailService');
     await sendEmail({
-      to: 'dogarhusnian3@gmail.com',
+      to: import.meta.env.VITE_ADMIN_EMAIL,
       template: 'admin_payout_requested',
       data: {
         userName: userProfile?.full_name || 'Unknown',

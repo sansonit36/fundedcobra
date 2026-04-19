@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, EyeOff, Copy, AlertTriangle, CheckCircle, AlertOctagon, XCircle, TrendingUp, Calendar, Wallet } from 'lucide-react';
+import { Search, Filter, Eye, EyeOff, Copy, AlertTriangle, CheckCircle, AlertOctagon, XCircle, TrendingUp, Calendar, Wallet, History, Info, ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { sendEmail, logEmailSent } from '../../lib/emailService';
 
@@ -55,6 +55,7 @@ export default function TradingAccounts() {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [showBreachModal, setShowBreachModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [activeModalTab, setActiveModalTab] = useState<'overview' | 'trades'>('overview');
   const [selectedAccount, setSelectedAccount] = useState<TradingAccount | null>(null);
   const [breachReason, setBreachReason] = useState('');
   const [customBreachReason, setCustomBreachReason] = useState('');
@@ -315,10 +316,33 @@ export default function TradingAccounts() {
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="suspended">Suspended</option>
-                <option value="breached">Breached</option>
+                <option value="breached">Rule Violations (Breached)</option>
               </select>
               <Filter className="absolute right-2 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
+
+            <button
+              onClick={async () => {
+                if (window.confirm('Run global compliance audit on ALL accounts? This will re-scan all history.')) {
+                  try {
+                    setProcessing(true);
+                    const { data, error } = await supabase.rpc('run_global_compliance_audit');
+                    if (error) throw error;
+                    alert(`Audit Complete!\nNew Breaches Found: ${data.new_breaches_found}\nTotal Accounts Audited: ${data.accounts_processed}`);
+                    loadAccounts();
+                  } catch (err) {
+                    alert('Error running audit: ' + err.message);
+                  } finally {
+                    setProcessing(false);
+                  }
+                }
+              }}
+              disabled={processing}
+              className="flex items-center px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-medium rounded-lg transition-colors border border-blue-500/20 shadow-lg shadow-blue-500/5 group"
+            >
+              <Shield className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+              {processing ? 'Auditing...' : 'Global Audit'}
+            </button>
           </div>
         </div>
 
@@ -655,6 +679,7 @@ export default function TradingAccounts() {
                   onClick={() => {
                     setShowViewModal(false);
                     setSelectedAccount(null);
+                    setActiveModalTab('overview');
                   }}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
                 >
@@ -662,7 +687,35 @@ export default function TradingAccounts() {
                 </button>
               </div>
 
+              {/* Tab Navigation */}
+              <div className="flex space-x-4 mb-6 border-b border-white/10">
+                <button
+                  onClick={() => setActiveModalTab('overview')}
+                  className={`pb-3 text-sm font-medium transition-colors relative ${
+                    activeModalTab === 'overview' ? 'text-blue-400' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Account Details
+                  {activeModalTab === 'overview' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveModalTab('trades')}
+                  className={`pb-3 text-sm font-medium transition-colors relative ${
+                    activeModalTab === 'trades' ? 'text-blue-400' : 'text-gray-400 hover:text-white'
+                    }`}
+                >
+                  Trade History
+                  {activeModalTab === 'trades' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
+                  )}
+                </button>
+              </div>
+
               <div className="space-y-6">
+                {activeModalTab === 'overview' ? (
+                  <div className="space-y-6">
                 {/* User Information */}
                 <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                   <h3 className="text-lg font-semibold text-white mb-4">User Information</h3>
@@ -900,6 +953,18 @@ export default function TradingAccounts() {
                   </div>
                 )}
               </div>
+            ) : (
+              <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <History className="w-5 h-5 mr-2 text-blue-400" />
+                  Trade Audit Log
+                </h3>
+                <div className="mt-4">
+                  <TradeHistoryTable mt5Id={selectedAccount.mt5_login} />
+                </div>
+              </div>
+            )}
+          </div>
 
               <div className="mt-6 flex justify-end">
                 <button
@@ -916,6 +981,105 @@ export default function TradingAccounts() {
           </div>
         );
       })()}
+    </div>
+  );
+}
+
+function TradeHistoryTable({ mt5Id }: { mt5Id: string }) {
+  const [trades, setTrades] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTrades = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('trade_history')
+          .select('*')
+          .eq('mt5_id', mt5Id)
+          .order('close_time', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+        setTrades(data || []);
+      } catch (err) {
+        console.error('Error loading trades:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTrades();
+  }, [mt5Id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (trades.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <History className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+        <p className="text-gray-400 italic">No trading history found for this account.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-xl border border-white/5">
+      <table className="w-full text-left border-collapse">
+        <thead className="bg-white/5">
+          <tr>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Symbol</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Type</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Volume</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Profit</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Duration</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Open Time</th>
+            <th className="px-4 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Close Time</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-white/5">
+          {trades.map((trade) => {
+            const duration = Math.abs(new Date(trade.close_time).getTime() - new Date(trade.open_time).getTime()) / 1000;
+            return (
+              <tr key={trade.id} className="hover:bg-white/5 transition-colors">
+                <td className="px-4 py-3">
+                  <span className="text-sm font-bold text-white uppercase">{trade.symbol}</span>
+                  <p className="text-[10px] text-gray-500">#{trade.ticket}</p>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    trade.type.toLowerCase() === 'buy' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                  }`}>
+                    {trade.type}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300 font-medium">{trade.volume.toFixed(2)}</td>
+                <td className={`px-4 py-3 text-sm font-bold ${trade.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {trade.profit >= 0 ? '+' : ''}${trade.profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </td>
+                <td className={`px-4 py-3 ${duration < 60 ? 'bg-red-500/10' : ''}`}>
+                  <div className={`flex items-center space-x-2 text-sm ${duration < 60 ? 'text-red-400 font-bold' : 'text-gray-300'}`}>
+                    {duration < 60 && <Shield className="w-4 h-4" />}
+                    <span>{Math.floor(duration / 60)}m {Math.floor(duration % 60)}s</span>
+                  </div>
+                </td>
+                <td className={`px-4 py-3 text-sm text-gray-300 ${duration < 60 ? 'bg-red-500/10' : ''}`}>
+                  {new Date(trade.open_time).toLocaleDateString()}
+                  <p className="text-xs opacity-75">{new Date(trade.open_time).toLocaleTimeString()}</p>
+                </td>
+                <td className={`px-4 py-3 text-sm text-gray-300 ${duration < 60 ? 'bg-red-500/10' : ''}`}>
+                  {new Date(trade.close_time).toLocaleDateString()}
+                  <p className="text-xs opacity-75">{new Date(trade.close_time).toLocaleTimeString()}</p>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
