@@ -175,7 +175,7 @@
     if (prm) sessionStorage.setItem('user_promo', prm);
 
     if (pre || prm) {
-        document.querySelectorAll('a[href*="app.fundingtraders.com/checkout"], a[href*="app.fundingtraders.com/express_checkout"]').forEach(l => {
+        document.querySelectorAll('a[href*="account.fundedcobra.com/checkout"], a[href*="account.fundedcobra.com/express_checkout"]').forEach(l => {
             const url = new URL(l.href, location.origin);
             if (pre && !url.searchParams.has('predefined')) url.searchParams.set('predefined', pre);
             if (prm && l.href.includes('express_checkout') && !url.searchParams.has('promo')) url.searchParams.set('promo', prm);
