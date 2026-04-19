@@ -61,17 +61,33 @@ export default function Overview() {
         ? (accounts || []) 
         : (accounts?.filter(acc => acc.status === filterType) || []);
 
-      const totalBalance = filteredAccounts.reduce((sum, acc) => sum + acc.balance, 0);
-      const totalEquity = filteredAccounts.reduce((sum, acc) => sum + acc.equity, 0);
-      const totalProfits = totalEquity - totalBalance;
-
-      // Get trades for filtered accounts
       const mt5Logins = filteredAccounts.map(acc => acc.mt5_login).filter(Boolean);
+
+      let totalBalance = 0;
+      let totalEquity = 0;
+      let totalInitial = 0;
       let totalTrades = 0;
       let dailyPL = 0;
       const today = new Date();
 
       if (mt5Logins.length > 0) {
+        // Fetch Live Metrics
+        const { data: extendedData } = await supabase
+          .from('account_data_extended')
+          .select('mt5_id, running_balance, running_equity, initial_equity')
+          .in('mt5_id', mt5Logins);
+
+        const extMap = new Map((extendedData || []).map(d => [d.mt5_id, d]));
+
+        // Calculate live balances
+        filteredAccounts.forEach(acc => {
+           const ext = extMap.get(acc.mt5_login);
+           totalBalance += ext ? ext.running_balance : acc.balance;
+           totalEquity += ext ? ext.running_equity : acc.equity;
+           totalInitial += ext ? ext.initial_equity : acc.balance; 
+        });
+
+        // Fetch Live Trades
         const { data: trades, error: tradesError } = await supabase
           .from('trade_history')
           .select('profit, close_time')
@@ -79,15 +95,22 @@ export default function Overview() {
 
         if (!tradesError && trades) {
           totalTrades = trades.length;
-          
           const todayTrades = trades.filter(t => {
             const d = new Date(t.close_time);
             return d.toDateString() === today.toDateString();
           });
           dailyPL = todayTrades.reduce((sum, t) => sum + t.profit, 0);
         }
+      } else {
+        // Fallback for no active MT5 accounts
+        totalBalance = filteredAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+        totalEquity = filteredAccounts.reduce((sum, acc) => sum + acc.equity, 0);
+        totalInitial = totalBalance;
       }
 
+      const totalProfits = totalEquity - totalInitial;
+
+      // The calculations for daily and trade array are handled above.
       const activeAccounts = accounts?.filter(acc => acc.status === 'active') || [];
       const pendingAccounts = requestsError ? 0 : pendingRequests?.length || 0;
 
