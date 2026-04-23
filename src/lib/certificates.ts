@@ -307,6 +307,30 @@ export async function getAllTraderProfiles(): Promise<TraderProfile[]> {
   return data || [];
 }
 
+export async function createTraderProfile(data: {
+  user_id: string;
+  display_name: string;
+  bio?: string;
+  is_public?: boolean;
+  is_featured?: boolean;
+  total_payouts?: number;
+  total_certificates?: number;
+}): Promise<void> {
+  const { error } = await supabase
+    .from('trader_profiles')
+    .insert({
+      id: data.user_id,
+      display_name: data.display_name,
+      bio: data.bio || null,
+      is_public: data.is_public ?? false,
+      is_featured: data.is_featured ?? false,
+      total_payouts: data.total_payouts ?? 0,
+      total_certificates: data.total_certificates ?? 0,
+    });
+
+  if (error) throw error;
+}
+
 export async function updateTraderProfile(userId: string, updates: {
   display_name?: string;
   bio?: string;

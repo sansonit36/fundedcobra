@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   Search, User, Eye, EyeOff, Star, StarOff, Plus, X, TrendingUp,
-  Trophy, Trash2, Download, Award, ShieldCheck
+  Trophy, Trash2, Download, Award, ShieldCheck, Edit2
 } from 'lucide-react';
 import {
-  getAllTraderProfiles, updateTraderProfile,
+  getAllTraderProfiles, updateTraderProfile, createTraderProfile,
   getHighlightedTrades, addHighlightedTrade, removeHighlightedTrade,
   pullTopTradesFromHistory,
   getAllLeaderboardEntries, createLeaderboardEntry,
@@ -40,6 +40,19 @@ export default function TraderProfiles() {
     display_name: '', total_payout: '', account_type: '', user_id: ''
   });
   const [users, setUsers] = useState<{ id: string; name: string; email: string }[]>([]);
+
+  // Create profile modal state
+  const [showCreateProfileModal, setShowCreateProfileModal] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    user_id: '', display_name: '', bio: '', is_public: true, is_featured: false
+  });
+
+  // Edit profile modal state
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editingProfile, setEditingProfile] = useState<TraderProfile | null>(null);
+  const [editForm, setEditForm] = useState({
+    display_name: '', bio: ''
+  });
 
   useEffect(() => {
     loadData();
@@ -85,6 +98,62 @@ export default function TraderProfiles() {
       await loadData();
     } catch (err) {
       setError('Failed to update profile');
+    }
+  };
+
+  const handleCreateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (processing) return;
+    setProcessing(true);
+    try {
+      await createTraderProfile({
+        user_id: profileForm.user_id,
+        display_name: profileForm.display_name,
+        bio: profileForm.bio || undefined,
+        is_public: profileForm.is_public,
+        is_featured: profileForm.is_featured
+      });
+      setSuccess('Trader profile created!');
+      setShowCreateProfileModal(false);
+      setProfileForm({ user_id: '', display_name: '', bio: '', is_public: true, is_featured: false });
+      await loadData();
+    } catch (err: any) {
+      if (err?.code === '23505') {
+        setError('Profile already exists for this user');
+      } else {
+        setError('Failed to create profile');
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const openEditModal = (profile: TraderProfile) => {
+    setEditingProfile(profile);
+    setEditForm({
+      display_name: profile.display_name || profile.full_name || '',
+      bio: profile.bio || ''
+    });
+    setShowEditProfileModal(true);
+  };
+
+  const handleEditProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProfile || processing) return;
+    setProcessing(true);
+    try {
+      await updateTraderProfile(editingProfile.id, {
+        display_name: editForm.display_name,
+        bio: editForm.bio || undefined
+      });
+      setSuccess('Profile updated!');
+      setShowEditProfileModal(false);
+      setEditingProfile(null);
+      await loadData();
+    } catch (err) {
+      setError('Failed to update profile');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -266,8 +335,8 @@ export default function TraderProfiles() {
 
       {activeTab === 'profiles' && (
         <div className="card-gradient rounded-2xl p-6 border border-white/5">
-          {/* Search */}
-          <div className="mb-6">
+          {/* Search + Create */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
               <input
@@ -278,6 +347,13 @@ export default function TraderProfiles() {
                 className="pl-10 pr-4 py-2 w-full sm:w-64 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50"
               />
             </div>
+            <button
+              onClick={() => setShowCreateProfileModal(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Profile</span>
+            </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -352,6 +428,13 @@ export default function TraderProfiles() {
                       <td className="py-4 text-right">
                         <div className="flex items-center justify-end space-x-2">
                           <button
+                            onClick={() => openEditModal(profile)}
+                            className="p-2 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors"
+                            title="Edit Profile"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => openTradeModal(profile.id)}
                             className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors"
                             title="Manage Highlighted Trades"
@@ -363,7 +446,7 @@ export default function TraderProfiles() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 transition-colors"
-                            title="View Profile"
+                            title="View Public Profile"
                           >
                             <Eye className="w-4 h-4" />
                           </a>
@@ -655,6 +738,161 @@ export default function TraderProfiles() {
                 className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded-lg transition-colors disabled:opacity-50"
               >
                 {processing ? 'Creating...' : 'Add to Leaderboard'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Profile Modal */}
+      {showCreateProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50">
+          <div className="card-gradient rounded-2xl border border-white/5 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-white">Create Trader Profile</h3>
+              <button
+                onClick={() => setShowCreateProfileModal(false)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateProfile} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Select User</label>
+                <select
+                  value={profileForm.user_id}
+                  onChange={e => {
+                    const uid = e.target.value;
+                    setProfileForm(prev => ({ ...prev, user_id: uid }));
+                    if (uid) {
+                      const u = users.find(u => u.id === uid);
+                      if (u && !profileForm.display_name) {
+                        setProfileForm(prev => ({ ...prev, display_name: u.name }));
+                      }
+                    }
+                  }}
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
+                >
+                  <option value="">Select a user...</option>
+                  {users.filter(u => !profiles.find(p => p.id === u.id)).map(u => (
+                    <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Only users without profiles are shown</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Display Name</label>
+                <input
+                  type="text"
+                  value={profileForm.display_name}
+                  onChange={e => setProfileForm(prev => ({ ...prev, display_name: e.target.value }))}
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
+                  placeholder="Trader's display name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Bio (optional)</label>
+                <textarea
+                  value={profileForm.bio}
+                  onChange={e => setProfileForm(prev => ({ ...prev, bio: e.target.value }))}
+                  rows={3}
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 resize-none"
+                  placeholder="A brief description about this trader..."
+                />
+              </div>
+
+              <div className="flex items-center space-x-6">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={profileForm.is_public}
+                    onChange={e => setProfileForm(prev => ({ ...prev, is_public: e.target.checked }))}
+                    className="rounded bg-white/5 border-white/20 text-primary-500 focus:ring-primary-500/50"
+                  />
+                  <span className="text-sm text-gray-300">Public</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={profileForm.is_featured}
+                    onChange={e => setProfileForm(prev => ({ ...prev, is_featured: e.target.checked }))}
+                    className="rounded bg-white/5 border-white/20 text-yellow-500 focus:ring-yellow-500/50"
+                  />
+                  <span className="text-sm text-gray-300">Featured</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={processing}
+                className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                {processing ? 'Creating...' : 'Create Profile'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && editingProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50">
+          <div className="card-gradient rounded-2xl border border-white/5 p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-white">Edit Profile</h3>
+              <button
+                onClick={() => { setShowEditProfileModal(false); setEditingProfile(null); }}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex items-center space-x-3 mb-4 p-3 rounded-lg bg-white/5">
+              <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center">
+                <User className="w-4 h-4 text-gray-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white">{editingProfile.full_name || editingProfile.display_name}</p>
+                <p className="text-xs text-gray-500">{editingProfile.email}</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleEditProfile} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Display Name</label>
+                <input
+                  type="text"
+                  value={editForm.display_name}
+                  onChange={e => setEditForm(prev => ({ ...prev, display_name: e.target.value }))}
+                  required
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Bio</label>
+                <textarea
+                  value={editForm.bio}
+                  onChange={e => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                  rows={3}
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 resize-none"
+                  placeholder="A brief description about this trader..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={processing}
+                className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                {processing ? 'Saving...' : 'Save Changes'}
               </button>
             </form>
           </div>
