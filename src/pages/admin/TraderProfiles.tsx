@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search, User, Eye, EyeOff, Star, StarOff, Plus, X, TrendingUp,
-  Trophy, Trash2, Download, Award, ShieldCheck, Edit2
+  Trophy, Trash2, Download, Award, ShieldCheck, Edit2, Camera, Loader2
 } from 'lucide-react';
+import { compressImage, validateImageFile } from '../../utils/imageCompressor';
 import {
   getAllTraderProfiles, updateTraderProfile, createTraderProfile,
   getHighlightedTrades, addHighlightedTrade, removeHighlightedTrade,
@@ -53,6 +54,8 @@ export default function TraderProfiles() {
   const [editForm, setEditForm] = useState({
     display_name: '', bio: ''
   });
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadData();
@@ -146,14 +149,70 @@ export default function TraderProfiles() {
         display_name: editForm.display_name,
         bio: editForm.bio || undefined
       });
-      setSuccess('Profile updated!');
+      setSuccess('Profile updated successfully!');
       setShowEditProfileModal(false);
-      setEditingProfile(null);
       await loadData();
     } catch (err) {
       setError('Failed to update profile');
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingProfile) return;
+
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setError(null);
+
+    try {
+      const compressed = await compressImage(file);
+      const filePath = `${editingProfile.id}/avatar.jpg`;
+
+      // Ignore old file remove errors
+      await supabase.storage.from('avatars').remove([filePath]);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, compressed.blob, {
+          contentType: 'image/jpeg',
+          upsert: true,
+          cacheControl: '0'
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      // Update profiles and loadData
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', editingProfile.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state temporarily
+      setEditingProfile({ ...editingProfile, avatar_url: publicUrl });
+      setSuccess('Avatar updated successfully!');
+      await loadData();
+    } catch (err: any) {
+      console.error('Avatar upload error:', err);
+      setError(err?.message || 'Failed to update avatar');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -854,9 +913,36 @@ export default function TraderProfiles() {
               </button>
             </div>
 
-            <div className="flex items-center space-x-3 mb-4 p-3 rounded-lg bg-white/5">
-              <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center space-x-4 mb-4 p-4 rounded-lg bg-white/5">
+              <div className="relative group flex-shrink-0">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-primary-500/50 transition-colors">
+                  {editingProfile.avatar_url ? (
+                    <img src={editingProfile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary-500/20 to-emerald-500/20 flex items-center justify-center">
+                      <User className="w-5 h-5 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  className="absolute inset-0 rounded-full bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-wait"
+                >
+                  {uploadingAvatar ? (
+                    <Loader2 className="w-4 h-4 text-white animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-white" />
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
               </div>
               <div>
                 <p className="text-sm font-medium text-white">{editingProfile.full_name || editingProfile.display_name}</p>

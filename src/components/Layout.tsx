@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, BarChart2, Wallet, DollarSign, Settings, Book, X, User, LogOut, Shield, Users, MessageCircle, Trophy } from 'lucide-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 interface NavItem {
   icon: React.ElementType;
@@ -13,9 +14,19 @@ export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    if (user?.id) {
+      supabase.from('profiles').select('avatar_url').eq('id', user.id).single()
+        .then(({ data }) => {
+          if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+        });
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -109,8 +120,12 @@ export default function Layout() {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
-                  <User className="w-4 h-4 text-gray-400" />
+                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-4 h-4 text-gray-400" />
+                  )}
                 </div>
                 <span className="text-white font-medium hidden sm:block">
                   {user?.name || user?.email}
