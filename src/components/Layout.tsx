@@ -45,6 +45,7 @@ export default function Layout() {
     { icon: Users, text: 'Affiliate Program', path: '/affiliate' },
     { icon: Book, text: 'Rules', path: '/rules' },
     { icon: Trophy, text: 'Leaderboard', path: '/leaderboard' },
+    { icon: User, text: 'My Profile', path: '/my-profile' },
     { icon: Settings, text: 'Settings', path: '/settings' },
     { icon: MessageCircle, text: 'Live Support', path: '/live-support' }
   ];

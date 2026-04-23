@@ -45,6 +45,7 @@ import CertificateVerification from './pages/public/CertificateVerification';
 import TraderProfile from './pages/public/TraderProfile';
 import PublicLeaderboard from './pages/public/Leaderboard';
 import LeaderboardPage from './pages/LeaderboardPage';
+import MyProfile from './pages/MyProfile';
 import { initFacebookPixel } from './utils/FacebookTracking';
 
 import { useEffect, useRef } from 'react';
@@ -210,6 +211,7 @@ export default function App() {
               <Route path="/suspicious-payment" element={<SuspiciousPayment />} />
               <Route path="/live-support" element={<LiveSupport />} />
               <Route path="/leaderboard" element={<LeaderboardPage />} />
+              <Route path="/my-profile" element={<MyProfile />} />
             </Route>
 
             {/* Public Pages (no auth required) */}
