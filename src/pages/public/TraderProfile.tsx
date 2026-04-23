@@ -9,12 +9,12 @@ import {
 } from '../../lib/certificates';
 import type { TraderProfile as TraderProfileType, PayoutCertificate, HighlightedTrade, LeaderboardEntry } from '../../lib/certificates';
 
-// Blue verified badge SVG (like Twitter/FTMO verified tick)
+// Verified badge (FTMO style)
 function VerifiedBadge({ className = '' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20.396 11c0-.795-.313-1.53-.85-2.09.395-.71.465-1.55.167-2.316a2.722 2.722 0 00-1.837-1.636c-.134-.77-.562-1.467-1.2-1.91a2.725 2.725 0 00-2.204-.356 2.98 2.98 0 00-2.09-.85h-.468a2.98 2.98 0 00-2.09.85 2.725 2.725 0 00-2.204.357c-.638.442-1.066 1.139-1.2 1.909a2.722 2.722 0 00-1.837 1.636 2.752 2.752 0 00.167 2.316 2.98 2.98 0 00-.85 2.09v.468c0 .795.313 1.53.85 2.09a2.752 2.752 0 00-.167 2.316 2.722 2.722 0 001.837 1.636c.134.77.562 1.467 1.2 1.91.64.443 1.42.57 2.204.356a2.98 2.98 0 002.09.85h.468a2.98 2.98 0 002.09-.85 2.725 2.725 0 002.204-.357c.638-.442 1.066-1.139 1.2-1.909a2.722 2.722 0 001.837-1.636 2.752 2.752 0 00-.167-2.316 2.98 2.98 0 00.85-2.09v-.468z" fill="#1D9BF0"/>
-      <path d="M9.585 14.929l-3.28-3.28 1.168-1.168 2.112 2.112 5.085-5.085 1.168 1.168-6.253 6.253z" fill="white"/>
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.5 12c0-.85-.34-1.63-.9-2.24.42-.76.5-1.66.18-2.48a2.91 2.91 0 00-1.95-1.75c-.14-.82-.6-1.57-1.28-2.04a2.92 2.92 0 00-2.36-.38 3.19 3.19 0 00-2.24-.91h-.5a3.19 3.19 0 00-2.24.91 2.92 2.92 0 00-2.36.38c-.68.47-1.14 1.22-1.28 2.04a2.91 2.91 0 00-1.95 1.75 2.94 2.94 0 00.18 2.48A3.19 3.19 0 004.9 12V12.5c0 .85.34 1.63.9 2.24-.42.76-.5 1.66-.18 2.48a2.91 2.91 0 001.95 1.75c.14.82.6 1.57 1.28 2.04.68.47 1.51.6 2.36.38a3.19 3.19 0 002.24.91h.5a3.19 3.19 0 002.24-.91 2.92 2.92 0 002.36-.38c.68-.47 1.14-1.22 1.28-2.04a2.91 2.91 0 001.95-1.75 2.94 2.94 0 00-.18-2.48 3.19 3.19 0 00.9-2.24V12z" fill="#1D9BF0"/>
+      <path d="M10 16.5l-4-4 1.5-1.5 2.5 2.5 6-6 1.5 1.5-7.5 7.5z" fill="white"/>
     </svg>
   );
 }
@@ -100,53 +100,35 @@ export default function TraderProfile() {
     return Math.floor((now.getTime() - joined.getTime()) / (1000 * 60 * 60 * 24));
   };
 
-  // Loading skeleton
   if (loading) {
     return (
-      <div className="min-h-screen" style={{ background: '#0d1117' }}>
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <div className="lg:col-span-4 space-y-4">
-              <div className="rounded-xl p-5 animate-pulse" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-14 h-14 rounded-full" style={{ background: '#21262d' }} />
-                  <div className="space-y-2 flex-1">
-                    <div className="h-4 rounded w-28" style={{ background: '#21262d' }} />
-                    <div className="h-3 rounded w-20" style={{ background: '#21262d' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="lg:col-span-8">
-              <div className="rounded-xl p-5 animate-pulse" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-                <div className="h-4 rounded w-36 mb-4" style={{ background: '#21262d' }} />
-                <div className="flex space-x-3">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-24 h-28 rounded-lg flex-shrink-0" style={{ background: '#21262d' }} />
-                  ))}
-                </div>
-              </div>
-            </div>
+      <div className="min-h-screen bg-[#0E1117]">
+        <div className="max-w-[1240px] mx-auto px-6 py-10 flex space-x-8">
+          <div className="w-[380px] space-y-6 flex-shrink-0 animate-pulse">
+             <div className="h-64 rounded-xl bg-[#161B22] border border-white/5" />
+             <div className="h-32 rounded-xl bg-[#161B22] border border-white/5" />
+          </div>
+          <div className="flex-1 space-y-6 animate-pulse">
+            <div className="h-48 rounded-xl bg-[#161B22] border border-white/5" />
+            <div className="h-96 rounded-xl bg-[#161B22] border border-white/5" />
           </div>
         </div>
       </div>
     );
   }
 
-  // Not found
   if (notFound || !profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d1117' }}>
-        <div className="text-center px-4">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: '#161b22' }}>
-            <User className="w-7 h-7" style={{ color: '#484f58' }} />
+      <div className="min-h-screen bg-[#0E1117] flex items-center justify-center">
+        <div className="text-center px-4 max-w-sm">
+          <div className="w-20 h-20 rounded-full bg-[#161B22] border border-white/5 flex items-center justify-center mx-auto mb-6">
+            <User className="w-8 h-8 text-[#8B949E]" />
           </div>
-          <h1 className="text-lg font-semibold mb-2" style={{ color: '#e6edf3' }}>Profile Not Available</h1>
-          <p className="text-sm mb-6" style={{ color: '#7d8590' }}>This trader's profile is either private or doesn't exist.</p>
+          <h1 className="text-xl font-bold text-[#E6EDF3] mb-3">Profile Not Available</h1>
+          <p className="text-sm text-[#8B949E] leading-relaxed mb-8">This trader's profile is either set to private or does not exist on our records.</p>
           <a
             href="https://fundedcobra.com"
-            className="inline-block px-5 py-2 rounded-lg text-sm font-medium transition-colors"
-            style={{ background: '#7c3aed', color: '#fff' }}
+            className="inline-block w-full py-3 px-6 rounded-lg font-medium text-white transition-all bg-[#8A2BE2] hover:bg-[#7220BC]"
           >
             Visit FundedCobra
           </a>
@@ -160,183 +142,169 @@ export default function TraderProfile() {
   const visibleTrades = showAllTrades ? trades : trades.slice(0, 4);
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d1117', color: '#e6edf3', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+    <div className="min-h-screen bg-[#0E1117] text-[#E6EDF3] font-sans antialiased selection:bg-[#8A2BE2] selection:text-white pb-20">
 
-      {/* ========== HEADER ========== */}
-      <header style={{ borderBottom: '1px solid #21262d', background: '#0d1117' }}>
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="FundedCobra" className="h-7 object-contain" />
+      {/* ========== NAVBAR ========== */}
+      <header className="sticky top-0 z-50 bg-[#0E1117]/80 backdrop-blur-lg border-b border-white/[0.04]">
+        <div className="max-w-[1240px] mx-auto px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center group">
+            {/* Logo scaling up by 1.5x compared to before (h-10 = 40px) */}
+            <img src="/logo.png" alt="FundedCobra" className="h-10 object-contain transition-opacity group-hover:opacity-90" />
           </Link>
-          <div className="flex items-center space-x-4">
-            <a href="https://fundedcobra.com" className="text-sm transition-colors" style={{ color: '#7d8590' }}>
-              Home
+          <nav>
+            <a 
+              href="https://fundedcobra.com" 
+              className="text-sm font-medium text-[#8B949E] hover:text-[#E6EDF3] px-3 py-2 transition-colors inline-block"
+            >
+              Dashboard
             </a>
-          </div>
+          </nav>
         </div>
       </header>
 
-      {/* ========== MAIN ========== */}
-      <main className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      {/* ========== MAIN GRID ========== */}
+      <main className="max-w-[1240px] mx-auto px-6 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-          {/* ========== LEFT COLUMN ========== */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* ----- LEFT COLUMN (380px wide equivalent) ----- */}
+          <div className="lg:col-span-4 space-y-6">
 
-            {/* Profile Card */}
-            <div className="rounded-xl overflow-hidden" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-              <div className="p-5">
-                {/* Avatar + Name */}
-                <div className="flex items-start space-x-3 mb-3">
-                  <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0" style={{ border: '2px solid #30363d' }}>
-                    {profile.avatar_url ? (
-                      <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: '#21262d' }}>
-                        <span className="text-lg font-semibold" style={{ color: '#7d8590' }}>
-                          {getInitials(displayName)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0 pt-1">
-                    <div className="flex items-center space-x-1">
-                      <h1 className="text-base font-semibold truncate" style={{ color: '#e6edf3' }}>
-                        {displayName}
-                      </h1>
-                      <VerifiedBadge className="w-[18px] h-[18px] flex-shrink-0" />
-                    </div>
-                    <div className="flex items-center space-x-2 mt-0.5">
-                      <span className="text-xs" style={{ color: '#7d8590' }}>
-                        <Calendar className="w-3 h-3 inline mr-1" style={{ color: '#484f58' }} />
-                        with FundedCobra: <strong style={{ color: '#e6edf3' }}>{daysSinceJoined}</strong> days
+            {/* Profile Identity Card */}
+            <div className="rounded-2xl bg-[#161B22] border border-white/[0.04] p-8">
+              <div className="flex items-start space-x-5">
+                <div className="w-[72px] h-[72px] rounded-full overflow-hidden flex-shrink-0 border border-white/10 ring-4 ring-[#0E1117] bg-[#21262D]">
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-[#21262D]">
+                      <span className="text-xl font-bold text-[#8B949E] tracking-tight">
+                        {getInitials(displayName)}
                       </span>
                     </div>
+                  )}
+                </div>
+                <div className="pt-1.5 flex-1 min-w-0">
+                  <div className="flex items-center space-x-2">
+                    {/* H1 Hierarchy */}
+                    <h1 className="text-[22px] font-bold text-[#E6EDF3] tracking-tight truncate leading-none">
+                      {displayName}
+                    </h1>
+                    <VerifiedBadge className="w-5 h-5 flex-shrink-0 translate-y-[-1px]" />
+                  </div>
+                  <div className="mt-2.5">
+                    <span className="inline-flex items-center text-xs font-medium text-[#8B949E]">
+                      <Calendar className="w-[14px] h-[14px] mr-1.5 opacity-70" />
+                      with FundedCobra: <span className="ml-1 text-[#C9D1D9]">{daysSinceJoined}</span> days
+                    </span>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center space-x-2 mb-4">
-                  <button
-                    onClick={handleShare}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
-                    style={{ background: '#21262d', color: '#e6edf3', border: '1px solid #30363d' }}
-                  >
-                    <Share2 className="w-3 h-3" />
-                    <span>{copied ? 'Copied!' : 'Share profile'}</span>
-                  </button>
-                </div>
-
-                {/* Bio */}
-                {profile.bio && (
-                  <div>
-                    <p className={`text-sm leading-relaxed ${!showBioFull ? 'line-clamp-3' : ''}`} style={{ color: '#7d8590' }}>
-                      {profile.bio}
-                    </p>
-                    {profile.bio.length > 120 && (
-                      <button
-                        onClick={() => setShowBioFull(!showBioFull)}
-                        className="text-xs mt-1 transition-colors"
-                        style={{ color: '#58a6ff' }}
-                      >
-                        {showBioFull ? 'Show less' : 'Show more'}
-                      </button>
-                    )}
-                  </div>
-                )}
               </div>
+
+              {/* Action */}
+              <div className="mt-7">
+                <button
+                  onClick={handleShare}
+                  className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors bg-[#21262D] hover:bg-[#30363D] text-[#E6EDF3] border border-white/[0.05] w-fit"
+                >
+                  <Share2 className="w-4 h-4 opacity-70" />
+                  <span>{copied ? 'Link Copied!' : 'Share Profile'}</span>
+                </button>
+              </div>
+
+              {/* Bio */}
+              {profile.bio && (
+                <div className="mt-7 pt-7 border-t border-white/[0.04]">
+                  <p className={`text-[15px] leading-relaxed text-[#8B949E] ${!showBioFull ? 'line-clamp-4' : ''}`}>
+                    {profile.bio}
+                  </p>
+                  {profile.bio.length > 200 && (
+                    <button
+                      onClick={() => setShowBioFull(!showBioFull)}
+                      className="text-[13px] font-medium mt-2 transition-colors text-[#58A6FF] hover:text-[#79C0FF]"
+                    >
+                      {showBioFull ? 'Show less' : 'Read more'}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Total Rewarded */}
-            <div className="rounded-xl p-5 text-center" style={{ background: '#0d2818', border: '1px solid #1b4332' }}>
-              <p className="text-2xl font-bold tracking-tight" style={{ color: '#3fb950' }}>
+            {/* Rewarded Value Card */}
+            <div className="rounded-2xl bg-[#161B22] border border-white/[0.04] p-8 text-center">
+              <p className="text-4xl font-extrabold tracking-tight text-[#3FB950] tabular-nums">
                 {formatAmountShort(profile.total_payouts)}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: '#3fb950', opacity: 0.7 }}>Rewarded</p>
+              <p className="text-sm font-medium mt-2 text-[#8B949E] uppercase tracking-widest">
+                Total Rewarded
+              </p>
             </div>
 
-            {/* CTA */}
-            <div className="rounded-xl p-5" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-              <h3 className="text-sm font-semibold mb-1" style={{ color: '#e6edf3' }}>Start your trading journey</h3>
-              <p className="text-xs mb-3" style={{ color: '#7d8590' }}>Get funded and trade with our capital.</p>
-              <div className="flex items-center space-x-2">
-                <a
-                  href="https://fundedcobra.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-1.5 rounded-md text-xs font-medium"
-                  style={{ background: '#7c3aed', color: '#fff' }}
-                >
-                  FundedCobra Challenge
-                </a>
-                <a
-                  href="https://fundedcobra.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-1.5 rounded-md text-xs font-medium"
-                  style={{ background: '#21262d', color: '#e6edf3', border: '1px solid #30363d' }}
-                >
-                  Free Trial
-                </a>
-              </div>
+            {/* Start Journey CTA */}
+            <div className="rounded-2xl bg-[#161B22] border border-white/[0.04] p-8 text-center pt-9 pb-9">
+              <h3 className="text-lg font-bold text-[#E6EDF3] mb-2 tracking-tight">Become a FundedCobra Trader</h3>
+              <p className="text-[15px] text-[#8B949E] mb-7 leading-relaxed px-2">Take the challenge, prove your edge, and trade with our capital.</p>
+              <a
+                href="https://fundedcobra.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3.5 rounded-xl font-semibold text-[15px] transition-all bg-[#8A2BE2] hover:bg-[#7220BC] text-white shadow-lg shadow-[#8A2BE2]/20"
+              >
+                Start Challenge
+              </a>
             </div>
           </div>
 
-          {/* ========== RIGHT COLUMN ========== */}
-          <div className="lg:col-span-8 space-y-5">
+          {/* ----- RIGHT COLUMN ----- */}
+          <div className="lg:col-span-8 space-y-8">
 
-            {/* Certificates */}
-            <div className="rounded-xl" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-              <div className="flex items-center justify-between px-5 pt-4 pb-3">
-                <div className="flex items-center space-x-2">
-                  <h2 className="text-sm font-semibold" style={{ color: '#e6edf3' }}>My certificates</h2>
-                  <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: '#21262d', color: '#7d8590' }}>
+            {/* Certificates Section */}
+            <section className="rounded-2xl bg-[#161B22] border border-white/[0.04]">
+              {/* Section Header */}
+              <div className="flex items-center justify-between px-8 pt-7 pb-5 border-b border-white/[0.04]">
+                <div className="flex items-center space-x-3">
+                  <h2 className="text-lg font-bold text-[#E6EDF3] tracking-tight">Certificates</h2>
+                  <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#21262D] text-[#8B949E] border border-white/[0.04]">
                     {certificates.length}
                   </span>
                 </div>
                 {certificates.length > 5 && (
                   <button
                     onClick={() => setShowAllCerts(!showAllCerts)}
-                    className="text-xs px-2.5 py-1 rounded-md transition-colors"
-                    style={{ background: '#21262d', color: '#7d8590', border: '1px solid #30363d' }}
+                    className="text-sm font-medium px-4 py-1.5 rounded-lg transition-colors bg-[#21262D] hover:bg-[#30363D] text-[#E6EDF3] border border-white/[0.05]"
                   >
-                    {showAllCerts ? 'Show less' : 'Show all'}
+                    {showAllCerts ? 'Show less' : 'View all'}
                   </button>
                 )}
               </div>
 
-              <div className="px-5 pb-4">
+              <div className="px-8 py-8">
                 {certificates.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Award className="w-7 h-7 mx-auto mb-2" style={{ color: '#30363d' }} />
-                    <p className="text-xs" style={{ color: '#484f58' }}>No certificates earned yet</p>
+                  <div className="text-center py-10 opacity-60">
+                    <Award className="w-10 h-10 mx-auto mb-4 text-[#30363D]" />
+                    <p className="text-[15px] text-[#7D8590] mt-1">No certificates awarded yet.</p>
                   </div>
                 ) : (
                   <div className={showAllCerts
-                    ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3'
-                    : 'flex space-x-3 overflow-x-auto pb-1'
-                  } style={{ scrollbarWidth: 'thin', scrollbarColor: '#21262d transparent' }}>
+                    ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
+                    : 'flex space-x-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10'
+                  }>
                     {(showAllCerts ? certificates : certificates.slice(0, 5)).map(cert => (
                       <Link
                         key={cert.id}
                         to={`/verify/${cert.certificate_number}`}
-                        className={`flex-shrink-0 block ${showAllCerts ? '' : 'w-[100px]'}`}
+                        className={`flex-shrink-0 block group ${showAllCerts ? '' : 'w-[124px]'}`}
                       >
-                        <div className="rounded-lg p-2.5 text-center transition-colors group"
-                          style={{ background: '#0d1117', border: '1px solid #21262d' }}
-                        >
+                        <div className="rounded-xl p-3 text-center transition-all duration-300 bg-[#0E1117] border border-white/[0.04] hover:border-white/10">
                           {/* Mini cert thumbnail */}
-                          <div className="w-full aspect-[3/4] rounded-md mb-1.5 flex flex-col items-center justify-center relative overflow-hidden"
-                            style={{ background: 'linear-gradient(135deg, #161b22 0%, #0d1117 100%)', border: '1px solid #21262d' }}
-                          >
-                            <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(to right, #3fb950, #7c3aed)' }} />
-                            <img src="/logo.png" alt="" className="h-3 object-contain opacity-40 mb-0.5" />
-                            <p className="text-[9px] font-bold" style={{ color: '#3fb950' }}>
+                          <div className="w-full aspect-[3/4] rounded-lg mb-3 flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-br from-[#161B22] to-[#0E1117] border border-white/[0.04] group-hover:shadow-[0_0_15px_rgba(138,43,226,0.1)] transition-shadow">
+                            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#8A2BE2] to-[#58A6FF]" />
+                            <img src="/logo.png" alt="" className="h-4 object-contain opacity-40 mb-1" />
+                            <p className="text-[11px] font-bold text-[#E6EDF3] tracking-tight mt-1">
                               {formatAmount(cert.payout_amount)}
                             </p>
                           </div>
-                          <p className="text-[10px] truncate" style={{ color: '#7d8590' }}>
-                            {cert.account_type || 'Rewards'}
+                          <p className="text-xs font-medium text-[#8B949E] truncate px-1">
+                            {cert.account_type || 'Payout'}
                           </p>
                         </div>
                       </Link>
@@ -344,190 +312,132 @@ export default function TraderProfile() {
                   </div>
                 )}
               </div>
-            </div>
+            </section>
 
-            {/* Highlighted Trades */}
-            <div className="rounded-xl" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-              <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                <div className="flex items-center space-x-2">
-                  <h2 className="text-sm font-semibold" style={{ color: '#e6edf3' }}>Highlighted trades</h2>
-                  <TrendingUp className="w-3.5 h-3.5" style={{ color: '#484f58' }} />
-                </div>
+            {/* Highlighted Trades Section */}
+            <section className="rounded-2xl bg-[#161B22] border border-white/[0.04]">
+              {/* Section Header */}
+              <div className="flex items-center justify-between px-8 pt-7 pb-5 border-b border-white/[0.04]">
+                <h2 className="text-lg font-bold text-[#E6EDF3] tracking-tight flex items-center">
+                  Highlighted Trades
+                  <TrendingUp className="w-4 h-4 ml-2.5 text-[#484F58]" />
+                </h2>
                 {trades.length > 4 && (
                   <button
                     onClick={() => setShowAllTrades(!showAllTrades)}
-                    className="text-xs px-2.5 py-1 rounded-md transition-colors"
-                    style={{ background: '#21262d', color: '#7d8590', border: '1px solid #30363d' }}
+                    className="text-sm font-medium px-4 py-1.5 rounded-lg transition-colors bg-[#21262D] hover:bg-[#30363D] text-[#E6EDF3] border border-white/[0.05]"
                   >
-                    {showAllTrades ? 'Show less' : 'Show all'}
+                    {showAllTrades ? 'Show less' : 'View all'}
                   </button>
                 )}
               </div>
-              <p className="px-5 text-[11px] mb-3" style={{ color: '#484f58' }}>
-                These trades were chosen by the trader for display purposes and do not necessarily reflect their overall results, strategy, or consistency.
-              </p>
+              
+              <div className="px-8 py-5">
+                <p className="text-[13px] leading-relaxed text-[#7D8590] mb-5">
+                  These trades were chosen by the trader for display purposes and do not necessarily reflect complete consistency or strategy metrics.
+                </p>
 
-              <div className="px-5 pb-4 space-y-2">
-                {trades.length === 0 ? (
-                  <div className="text-center py-6">
-                    <BarChart3 className="w-7 h-7 mx-auto mb-2" style={{ color: '#30363d' }} />
-                    <p className="text-xs" style={{ color: '#484f58' }}>No highlighted trades yet</p>
-                  </div>
-                ) : (
-                  <>
-                    {visibleTrades.map(trade => (
-                      <div
-                        key={trade.id}
-                        className="relative rounded-lg overflow-hidden"
-                        style={{ background: '#0d1117', border: '1px solid #21262d' }}
-                      >
-                        {/* Left accent bar */}
-                        <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ background: 'linear-gradient(to bottom, #3fb950, #2ea043)' }} />
-                        {/* Subtle left glow */}
-                        <div className="absolute left-0 top-0 bottom-0 w-20" style={{ background: 'linear-gradient(to right, rgba(63,185,80,0.04), transparent)' }} />
-
-                        <div className="relative flex items-center py-3 px-4 pl-5">
-                          {/* Profit */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-lg font-bold tracking-tight" style={{ color: '#3fb950' }}>
-                              {formatAmount(trade.profit)}
-                            </p>
-                            <p className="text-[11px]" style={{ color: '#484f58' }}>Profit</p>
-                            {trade.account_type && (
-                              <p className="text-[11px] mt-0.5" style={{ color: '#484f58' }}>
-                                <span style={{ color: '#7c3aed' }}>↗</span> {trade.account_type}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Middle stats */}
-                          <div className="hidden sm:flex items-center space-x-5 mr-5">
-                            {trade.duration && (
-                              <div className="text-center">
-                                <p className="text-xs font-medium" style={{ color: '#e6edf3' }}>{trade.duration}</p>
-                                <p className="text-[10px]" style={{ color: '#484f58' }}>Duration</p>
-                              </div>
-                            )}
-                            {trade.close_date && (
-                              <div className="text-center">
-                                <p className="text-xs font-medium" style={{ color: '#e6edf3' }}>{formatDate(trade.close_date)}</p>
-                                <p className="text-[10px]" style={{ color: '#484f58' }}>Closed</p>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Symbol + Direction */}
-                          <div className="flex items-center space-x-3">
-                            <div className="text-right">
-                              <div className="flex items-center space-x-1.5 justify-end">
-                                <span className="text-xs font-semibold" style={{ color: '#e6edf3' }}>{trade.symbol}</span>
-                                <span className="text-[10px] font-bold px-1.5 py-[1px] rounded" style={{
-                                  background: trade.direction === 'buy' ? 'rgba(63,185,80,0.1)' : 'rgba(248,81,73,0.1)',
-                                  color: trade.direction === 'buy' ? '#3fb950' : '#f85149',
-                                  border: `1px solid ${trade.direction === 'buy' ? 'rgba(63,185,80,0.2)' : 'rgba(248,81,73,0.2)'}`
-                                }}>
-                                  {trade.direction === 'buy' ? 'Buy' : 'Sell'}
-                                </span>
-                              </div>
-                              <p className="text-[10px] mt-0.5" style={{ color: '#484f58' }}>Symbol</p>
-                            </div>
-                            {trade.volume > 0 && (
-                              <div className="text-center pl-3" style={{ borderLeft: '1px solid #21262d' }}>
-                                <p className="text-xs font-medium" style={{ color: '#e6edf3' }}>{trade.volume}</p>
-                                <p className="text-[10px]" style={{ color: '#484f58' }}>Volume</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {trades.length > 4 && !showAllTrades && (
-                      <button
-                        onClick={() => setShowAllTrades(true)}
-                        className="w-full py-2 text-xs font-medium rounded-lg transition-colors"
-                        style={{ background: '#21262d', color: '#7d8590', border: '1px solid #30363d' }}
-                      >
-                        Show more
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Community */}
-            {community.length > 0 && (
-              <div className="rounded-xl" style={{ background: '#161b22', border: '1px solid #21262d' }}>
-                <div className="flex items-center justify-between px-5 pt-4 pb-3">
-                  <h2 className="text-sm font-semibold" style={{ color: '#e6edf3' }}>FundedCobra Community</h2>
-                  <Link
-                    to="/public/leaderboard"
-                    className="text-xs px-2.5 py-1 rounded-md transition-colors"
-                    style={{ background: '#21262d', color: '#7d8590', border: '1px solid #30363d' }}
-                  >
-                    Show all
-                  </Link>
-                </div>
-
-                <div className="px-5 pb-4">
-                  <div className="flex space-x-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#21262d transparent' }}>
-                    {community.map(trader => (
-                      <Link
-                        key={trader.id}
-                        to={trader.user_id ? `/trader/${trader.user_id}` : '#'}
-                        className="flex-shrink-0 w-[120px] block"
-                      >
-                        <div className="rounded-lg p-3 text-center transition-colors"
-                          style={{ background: '#0d1117', border: '1px solid #21262d' }}
+                <div className="space-y-3">
+                  {trades.length === 0 ? (
+                    <div className="text-center py-12 opacity-60">
+                      <BarChart3 className="w-10 h-10 mx-auto mb-4 text-[#30363D]" />
+                      <p className="text-[15px] text-[#7D8590]">No highlighted trades added.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {visibleTrades.map(trade => (
+                        <div
+                          key={trade.id}
+                          className="relative rounded-xl overflow-hidden bg-[#0E1117] border border-white/[0.04] transition-colors hover:border-white/10"
                         >
-                          <div className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden"
-                            style={{ background: '#21262d', border: '1px solid #30363d' }}
-                          >
-                            {trader.avatar_url ? (
-                              <img src={trader.avatar_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="text-xs font-semibold" style={{ color: '#7d8590' }}>
-                                {getInitials(trader.display_name)}
-                              </span>
-                            )}
+                          <div className="relative flex items-center py-4 px-6">
+                            {/* Base Profit */}
+                            <div className="flex-1 min-w-0 pr-4">
+                              <p className="text-xl font-bold tracking-tight text-[#3FB950] tabular-nums">
+                                {formatAmount(trade.profit)}
+                              </p>
+                              <p className="text-[12px] font-medium text-[#8B949E] mt-0.5 uppercase tracking-wider">Profit</p>
+                            </div>
+
+                            {/* Center Stats (Grid) */}
+                            <div className="hidden md:flex items-center space-x-12 px-6 border-l border-r border-white/[0.04]">
+                              {trade.duration && (
+                                <div>
+                                  <p className="text-[15px] font-medium text-[#E6EDF3]">{trade.duration}</p>
+                                  <p className="text-[11px] font-medium text-[#7D8590] mt-0.5 uppercase tracking-wider">Duration</p>
+                                </div>
+                              )}
+                              {trade.close_date && (
+                                <div>
+                                  <p className="text-[15px] font-medium text-[#E6EDF3]">{formatDate(trade.close_date)}</p>
+                                  <p className="text-[11px] font-medium text-[#7D8590] mt-0.5 uppercase tracking-wider">Closed</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Right: Symbol & Action */}
+                            <div className="flex items-center justify-end min-w-[140px] pl-4">
+                              <div className="text-right">
+                                <div className="flex items-center justify-end space-x-2">
+                                  <span className="text-[15px] font-bold text-[#E6EDF3]">{trade.symbol}</span>
+                                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                                    trade.direction === 'buy'
+                                      ? 'bg-[#3FB950]/10 text-[#3FB950]'
+                                      : 'bg-[#F85149]/10 text-[#F85149]'
+                                  }`}>
+                                    {trade.direction === 'buy' ? 'Buy' : 'Sell'}
+                                  </span>
+                                </div>
+                                {trade.account_type && (
+                                  <p className="text-[12px] font-medium text-[#8B949E] mt-1 text-right">
+                                    {trade.account_type}
+                                  </p>
+                                )}
+                              </div>
+                              {trade.volume > 0 && (
+                                <div className="ml-5 pl-5 border-l border-white/[0.04] text-right">
+                                  <p className="text-[15px] font-medium text-[#E6EDF3] tabular-nums">{trade.volume}</p>
+                                  <p className="text-[11px] font-medium text-[#7D8590] mt-0.5 uppercase tracking-wider">Vol</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-[11px] font-semibold truncate" style={{ color: '#e6edf3' }}>{trader.display_name}</p>
-                          <p className="text-[10px] mt-0.5" style={{ color: '#484f58' }}>
-                            Rewarded: <span style={{ color: '#3fb950' }}>${trader.total_payout.toLocaleString()}</span>
-                          </p>
-                          <button
-                            className="mt-2 w-full py-1 rounded-md text-[10px] font-medium transition-colors"
-                            style={{ background: '#7c3aed', color: '#fff' }}
-                          >
-                            View
-                          </button>
                         </div>
-                      </Link>
-                    ))}
-                  </div>
+                      ))}
+
+                      {trades.length > 4 && !showAllTrades && (
+                        <button
+                          onClick={() => setShowAllTrades(true)}
+                          className="w-full mt-2 py-3 rounded-xl text-sm font-medium transition-colors bg-[#21262D]/50 hover:bg-[#21262D] text-[#8B949E] hover:text-[#E6EDF3] border border-dashed border-white/[0.05]"
+                        >
+                          View {trades.length - 4} more highlighted trades
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
-            )}
+            </section>
+
           </div>
         </div>
       </main>
 
       {/* ========== FOOTER ========== */}
-      <footer style={{ borderTop: '1px solid #21262d' }} className="mt-10">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6">
-          <p className="text-[10px] leading-relaxed" style={{ color: '#484f58' }}>
-            All trades are simulated and provided for informational and educational purposes only. They do not constitute financial, investment, legal, or tax advice.
-            Users may be onboarded under different legal entities and subject to varying rules, trading conditions, regulatory requirements, and investor protections.
+      <footer className="border-t border-[#21262D] mt-10">
+        <div className="max-w-[1240px] mx-auto px-6 py-10">
+          <p className="text-xs leading-relaxed text-[#7D8590] text-justify md:text-left font-medium">
+            All trades shown are simulated and provided for informational and educational purposes only. They do not constitute financial, investment, legal, or tax advice. 
+            Users may be onboarded under different legal entities and subject to varying rules, trading conditions, regulatory requirements, and investor protections. 
             Variations in leverage and other trading parameters may materially affect performance outcomes. Past performance is not indicative of future results.
           </p>
-          <p className="text-[10px] leading-relaxed mt-3" style={{ color: '#484f58' }}>
-            All information provided on this site is intended solely for educational purposes related to trading on financial markets and does not serve in any way as a specific investment recommendation,
-            business recommendation, investment opportunity analysis or similar general recommendation regarding the trading of investment instruments. FundedCobra only provides services of simulated trading
-            and educational tools for traders. FundedCobra does not act as a broker and do not accept any deposits.
+          <p className="text-xs leading-relaxed text-[#7D8590] text-justify md:text-left mt-4 font-medium">
+            All information provided on this site is intended solely for educational purposes related to trading on financial markets and does not serve in any way as a specific 
+            investment recommendation, business recommendation, investment opportunity analysis or similar general recommendation regarding the trading of investment instruments. 
+            FundedCobra only provides services of simulated trading and educational tools for traders. FundedCobra does not act as a broker and does not accept any deposits.
           </p>
-          <p className="text-[10px] mt-4" style={{ color: '#30363d' }}>
-            {new Date().getFullYear()} © Copyright · FundedCobra · Made with ❤️ for trading.
+          <p className="text-xs mt-8 text-[#484F58] font-semibold">
+            {new Date().getFullYear()} © Copyright · FundedCobra
           </p>
         </div>
       </footer>
