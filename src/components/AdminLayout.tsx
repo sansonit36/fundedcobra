@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, CheckSquare, Settings, Shield, DollarSign, Users2, Coins, LogOut, Wallet, Mail, BookOpen, Package } from 'lucide-react';
+import { LayoutDashboard, Users, CheckSquare, Settings, Shield, DollarSign, Users2, Coins, LogOut, Wallet, Mail, BookOpen, Package, Award, UserCheck } from 'lucide-react';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 
 interface AdminLayoutProps {
@@ -19,6 +19,8 @@ const navItems = [
   { icon: Mail, text: 'Email Management', path: '/admin/email-management' },
   { icon: BookOpen, text: 'Account Rules', path: '/admin/account-rules' },
   { icon: Package, text: 'Packages & Offers', path: '/admin/packages-offers' },
+  { icon: Award, text: 'Certificates', path: '/admin/certificates' },
+  { icon: UserCheck, text: 'Trader Profiles', path: '/admin/trader-profiles' },
   { icon: Settings, text: 'Settings', path: '/admin/settings' }
 ];
 

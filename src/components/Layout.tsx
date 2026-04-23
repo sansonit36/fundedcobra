@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, BarChart2, Wallet, DollarSign, Settings, Book, X, User, LogOut, Shield, Users, MessageCircle } from 'lucide-react';
+import { Menu, BarChart2, Wallet, DollarSign, Settings, Book, X, User, LogOut, Shield, Users, MessageCircle, Trophy } from 'lucide-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -44,6 +44,7 @@ export default function Layout() {
     { icon: Shield, text: 'KYC Verification', path: '/kyc' },
     { icon: Users, text: 'Affiliate Program', path: '/affiliate' },
     { icon: Book, text: 'Rules', path: '/rules' },
+    { icon: Trophy, text: 'Leaderboard', path: '/leaderboard' },
     { icon: Settings, text: 'Settings', path: '/settings' },
     { icon: MessageCircle, text: 'Live Support', path: '/live-support' }
   ];
