@@ -39,12 +39,12 @@ export default function CertificateManager() {
       setLoading(true);
       const [certsData, { data: usersData }] = await Promise.all([
         getAllCertificates(),
-        supabase.from('profiles').select('id, full_name, name, email').order('email')
+        supabase.from('profiles').select('id, name, email').order('email')
       ]);
       setCertificates(certsData);
       setUsers((usersData || []).map(u => ({
         id: u.id,
-        name: u.full_name || u.name || u.email,
+        name: u.name || u.email,
         email: u.email
       })));
     } catch (err) {
