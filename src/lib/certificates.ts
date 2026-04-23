@@ -392,11 +392,22 @@ export async function removeHighlightedTrade(tradeId: string): Promise<void> {
 }
 
 export async function pullTopTradesFromHistory(userId: string, limit: number = 5): Promise<void> {
-  // Pull biggest trades from trade_history and insert as highlighted
+  // 1. Get user's MT5 accounts to link trades
+  const { data: accounts, error: accError } = await supabase
+    .from('trading_accounts')
+    .select('mt5_login, package_name')
+    .eq('user_id', userId);
+
+  if (accError) throw accError;
+  if (!accounts || accounts.length === 0) return; // No accounts to pull from
+
+  const mt5Logins = accounts.map(a => a.mt5_login);
+
+  // 2. Pull biggest trades from trade_history
   const { data: trades, error: fetchError } = await supabase
     .from('trade_history')
     .select('*')
-    .eq('user_id', userId)
+    .in('mt5_id', mt5Logins)
     .gt('profit', 0)
     .order('profit', { ascending: false })
     .limit(limit);
@@ -404,18 +415,21 @@ export async function pullTopTradesFromHistory(userId: string, limit: number = 5
   if (fetchError) throw fetchError;
 
   if (trades && trades.length > 0) {
-    const highlighted = trades.map(t => ({
-      user_id: userId,
-      symbol: t.symbol || 'Unknown',
-      direction: (t.type?.toLowerCase()?.includes('sell') ? 'sell' : 'buy') as 'buy' | 'sell',
-      profit: t.profit || 0,
-      volume: t.volume || 0.01,
-      duration: t.duration || null,
-      account_type: t.account_type || null,
-      close_date: t.close_time || t.created_at || null,
-      is_manual: false,
-      added_by_admin: true
-    }));
+    const highlighted = trades.map(t => {
+      const package_name = accounts.find(a => a.mt5_login === t.mt5_id)?.package_name || null;
+      return {
+        user_id: userId,
+        symbol: t.symbol || 'Unknown',
+        direction: (t.type?.toLowerCase()?.includes('sell') ? 'sell' : 'buy') as 'buy' | 'sell',
+        profit: t.profit || 0,
+        volume: t.volume || 0.01,
+        duration: t.duration || null,
+        account_type: package_name,
+        close_date: t.close_time || t.created_at || null,
+        is_manual: false,
+        added_by_admin: true
+      };
+    });
 
     const { error: insertError } = await supabase
       .from('highlighted_trades')

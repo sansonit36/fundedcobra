@@ -325,11 +325,11 @@ export default function CertificateManager() {
                   value={formData.user_id}
                   onChange={e => handleUserSelect(e.target.value)}
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
+                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50 [&>option]:bg-gray-900"
                 >
-                  <option value="">Select user...</option>
+                  <option className="bg-gray-900 text-white" value="">Select user...</option>
                   {users.map(u => (
-                    <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                    <option className="bg-gray-900 text-white" key={u.id} value={u.id}>{u.name} ({u.email})</option>
                   ))}
                 </select>
               </div>
