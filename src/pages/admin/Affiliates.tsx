@@ -161,15 +161,37 @@ export default function Affiliates() {
   const loadTiers = async () => {
     setLoadingTiers(true);
     try {
-      const { data } = await supabase.from('affiliate_tiers').select('*').order('min_referrals');
+      const { data, error } = await supabase.from('affiliate_tiers').select('*').order('min_referrals');
+      if (error) throw error;
       if (data) {
         setTierRows(data);
         const initVals: Record<string, { commission_rate: string; min_referrals: string }> = {};
         data.forEach(t => { initVals[t.id] = { commission_rate: String(t.commission_rate), min_referrals: String(t.min_referrals) }; });
         setTierEditValues(initVals);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error loading tiers:', e);
+      alert('Failed to load tiers: ' + (e.message || 'Unknown error'));
+    } finally {
+      setLoadingTiers(false);
+    }
+  };
+
+  const seedDefaultTiers = async () => {
+    setLoadingTiers(true);
+    try {
+      const defaults = [
+        { name: 'Bronze', commission_rate: 5, min_referrals: 0 },
+        { name: 'Silver', commission_rate: 8, min_referrals: 10 },
+        { name: 'Gold', commission_rate: 10, min_referrals: 25 },
+        { name: 'Diamond', commission_rate: 12, min_referrals: 50 }
+      ];
+      const { error } = await supabase.from('affiliate_tiers').insert(defaults);
+      if (error) throw error;
+      await loadTiers();
+    } catch (e: any) {
+      console.error('Error seeding tiers:', e);
+      alert('Failed to seed tiers: ' + (e.message || 'Unknown error'));
     } finally {
       setLoadingTiers(false);
     }
@@ -431,6 +453,17 @@ export default function Affiliates() {
 
             {loadingTiers ? (
               <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#bd4dd6]"></div></div>
+            ) : tierRows.length === 0 ? (
+              <div className="text-center py-10 bg-[#161616] rounded-xl border border-[#2A2A2A] border-dashed">
+                <AlertTriangle className="w-8 h-8 text-orange-400 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm mb-4">No affiliate tiers found in the database.</p>
+                <button
+                  onClick={seedDefaultTiers}
+                  className="px-4 py-2 bg-[#bd4dd6] hover:bg-[#aa44c0] text-white text-xs font-bold rounded-lg transition-colors"
+                >
+                  Seed Default Tiers (5%, 8%, 10%, 12%)
+                </button>
+              </div>
             ) : (
               <div className="space-y-3">
                 <div className="grid grid-cols-4 gap-2 px-3 pb-2 border-b border-[#2A2A2A]">
