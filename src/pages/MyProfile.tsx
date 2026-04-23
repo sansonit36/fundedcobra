@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Eye, EyeOff, ExternalLink, ShieldCheck, Award, Save, Loader2 } from 'lucide-react';
+import { User, Eye, EyeOff, ExternalLink, ShieldCheck, Award, Save, Loader2, Camera, ImagePlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import {
   getPublicTraderProfile, getCertificatesByUser,
   updateTraderProfile
 } from '../lib/certificates';
+import { compressImage, validateImageFile } from '../utils/imageCompressor';
 import CertificateCard from '../components/Certificate/CertificateCard';
 import type { PayoutCertificate, TraderProfile } from '../lib/certificates';
 
@@ -25,6 +26,11 @@ export default function MyProfile() {
   const [bio, setBio] = useState('');
   const [isPublic, setIsPublic] = useState(false);
 
+  // Avatar state
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Default user info (fallback)
   const [defaultName, setDefaultName] = useState('');
   const [defaultEmail, setDefaultEmail] = useState('');
@@ -39,13 +45,14 @@ export default function MyProfile() {
       // Get default profile info
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('full_name, name, email')
+        .select('full_name, name, email, avatar_url')
         .eq('id', user.id)
         .single();
 
       if (profileData) {
         setDefaultName(profileData.full_name || profileData.name || '');
         setDefaultEmail(profileData.email || user.email || '');
+        if (profileData.avatar_url) setAvatarUrl(profileData.avatar_url);
       }
 
       // Get trader profile (if exists)
@@ -56,6 +63,7 @@ export default function MyProfile() {
         setDisplayName(traderProfile.display_name || traderProfile.full_name || '');
         setBio(traderProfile.bio || '');
         setIsPublic(traderProfile.is_public);
+        if (traderProfile.avatar_url) setAvatarUrl(traderProfile.avatar_url);
       } else {
         // No profile yet — prefill with defaults
         setDisplayName(profileData?.full_name || profileData?.name || '');
@@ -115,6 +123,70 @@ export default function MyProfile() {
   useEffect(() => {
     if (success) { const t = setTimeout(() => setSuccess(null), 3000); return () => clearTimeout(t); }
   }, [success]);
+
+  // Avatar upload handler
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    // Validate file type
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setError(null);
+
+    try {
+      // Compress the image client-side
+      const compressed = await compressImage(file);
+      const compressionRatio = Math.round((1 - compressed.compressedSize / compressed.originalSize) * 100);
+      console.log(`Image compressed: ${(compressed.originalSize / 1024).toFixed(0)}KB → ${(compressed.compressedSize / 1024).toFixed(0)}KB (${compressionRatio}% smaller)`);
+
+      // Upload to Supabase Storage
+      const filePath = `${user.id}/avatar.jpg`;
+
+      // Delete old avatar first (ignore errors if not found)
+      await supabase.storage.from('avatars').remove([filePath]);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, compressed.blob, {
+          contentType: 'image/jpeg',
+          upsert: true,
+          cacheControl: '0'
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      // Update profiles table
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      setSuccess('Profile picture updated!');
+    } catch (err: any) {
+      console.error('Avatar upload error:', err);
+      setError(err?.message || 'Failed to upload profile picture');
+    } finally {
+      setUploadingAvatar(false);
+      // Reset file input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   if (loading) {
     return (
@@ -180,6 +252,54 @@ export default function MyProfile() {
             )}
 
             <div className="space-y-5">
+              {/* Profile Picture Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Profile Picture</label>
+                <div className="flex items-center space-x-4">
+                  <div className="relative group">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-primary-500/50 transition-colors">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary-500/20 to-emerald-500/20 flex items-center justify-center">
+                          <User className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    {/* Upload overlay */}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                      className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-wait"
+                    >
+                      {uploadingAvatar ? (
+                        <Loader2 className="w-5 h-5 text-white animate-spin" />
+                      ) : (
+                        <Camera className="w-5 h-5 text-white" />
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                      className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 transition-colors disabled:opacity-50"
+                    >
+                      <ImagePlus className="w-3.5 h-3.5" />
+                      <span>{uploadingAvatar ? 'Uploading...' : 'Upload Photo'}</span>
+                    </button>
+                    <p className="text-[10px] text-gray-500 mt-1.5">JPG, PNG, WebP or GIF · Max 5MB · Auto-compressed</p>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1.5">Display Name</label>
                 <input
@@ -274,8 +394,14 @@ export default function MyProfile() {
           <div className="card-gradient rounded-2xl p-6 border border-white/5">
             <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Preview</h3>
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500/20 to-emerald-500/20 flex items-center justify-center border border-white/10">
-                <User className="w-6 h-6 text-gray-400" />
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-white/10">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-primary-500/20 to-emerald-500/20 flex items-center justify-center">
+                    <User className="w-6 h-6 text-gray-400" />
+                  </div>
+                )}
               </div>
               <div>
                 <p className="font-bold text-white">

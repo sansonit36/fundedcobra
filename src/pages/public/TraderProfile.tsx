@@ -176,12 +176,16 @@ export default function TraderProfile() {
               {/* Banner */}
               <div className="h-20 bg-gradient-to-r from-primary-600/30 via-primary-500/20 to-emerald-500/10 relative">
                 <div className="absolute -bottom-8 left-5">
-                  <div className="w-16 h-16 rounded-full bg-[#12121f] border-4 border-[#12121f] flex items-center justify-center">
-                    <div className="w-full h-full rounded-full bg-gradient-to-br from-primary-500/30 to-emerald-500/20 flex items-center justify-center">
-                      <span className="text-xl font-bold text-primary-300">
-                        {getInitials(displayName)}
-                      </span>
-                    </div>
+                  <div className="w-16 h-16 rounded-full bg-[#12121f] border-4 border-[#12121f] overflow-hidden">
+                    {profile.avatar_url ? (
+                      <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-primary-500/30 to-emerald-500/20 flex items-center justify-center">
+                        <span className="text-xl font-bold text-primary-300">
+                          {getInitials(displayName)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {/* Badge */}
