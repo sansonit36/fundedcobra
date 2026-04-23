@@ -117,7 +117,7 @@ export default function Rules() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y divide-[#2A2A2A]">
               {[
-                { icon: TrendingDown, label: 'Daily Loss Limit', value: '8%', note: 'Trailing from peak', color: 'text-red-400' },
+                { icon: TrendingDown, label: 'Daily Loss Limit', value: '8%', note: 'From start-of-day equity', color: 'text-red-400' },
                 { icon: AlertTriangle, label: 'Max Loss Limit', value: '12%', note: 'Static from start', color: 'text-orange-400' },
                 { icon: Target, label: 'Single Trade Limit', value: '25%', note: 'of payout target', color: 'text-yellow-400' },
                 { icon: Activity, label: 'Platform', value: 'MT5', note: 'Exness · 1:100 leverage', color: 'text-[#bd4dd6]' },
@@ -138,7 +138,7 @@ export default function Rules() {
           <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 flex items-start gap-3">
             <Info className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-gray-300 space-y-1">
-              <p><strong className="text-white">Daily Loss (8% trailing):</strong> Calculated from the highest equity you reached that day. If you peak at $11,000, your floor is $10,120. It never drops below your gains.</p>
+              <p><strong className="text-white">Daily Loss (8%):</strong> Calculated from your equity at the <strong className="text-white">start of each trading day</strong>. If you begin the day at $10,500, your floor for that day is $9,660 — you cannot lose more than 8% of that opening balance.</p>
               <p><strong className="text-white">Overall Loss (12% static):</strong> Fixed from your starting balance — never moves. On a $10K account, you can never go below $8,800.</p>
             </div>
           </div>
@@ -307,7 +307,7 @@ export default function Rules() {
               <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20">
                 <h4 className="text-sm font-bold text-red-400 mb-3">⚠️ Loss Limits</h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2"><span className="text-red-400 font-bold">•</span><span><strong className="text-white">Daily (trailing): 8%.</strong> Moves up with your profits — measured from the highest equity of the day.</span></li>
+                  <li className="flex items-start gap-2"><span className="text-red-400 font-bold">•</span><span><strong className="text-white">Daily: 8%.</strong> Measured from your equity at the <strong className="text-white">start of each trading day</strong>. If your day opens at $10,500, the maximum you can lose that day is $840 (8% of $10,500).</span></li>
                   <li className="flex items-start gap-2"><span className="text-red-400 font-bold">•</span><span><strong className="text-white">Overall (static): 12%.</strong> Fixed from starting balance — never changes regardless of profits.</span></li>
                 </ul>
               </div>
