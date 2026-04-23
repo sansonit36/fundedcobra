@@ -20,8 +20,8 @@ export default function CertificateCard({ certificate, compact = false }: Certif
         width: compact ? 80 : 120,
         margin: 1,
         color: {
-          dark: '#FFFFFF',
-          light: 'transparent'
+          dark: '#E6EDF3', // Light gray/white for QR on dark bg
+          light: '#0E1117' // GitHub dark background color
         },
         errorCorrectionLevel: 'M'
       });
@@ -32,7 +32,7 @@ export default function CertificateCard({ certificate, compact = false }: Certif
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', {
       day: 'numeric',
-      month: 'short',
+      month: 'long',
       year: 'numeric'
     });
   };
@@ -47,38 +47,32 @@ export default function CertificateCard({ certificate, compact = false }: Certif
 
   if (compact) {
     return (
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] p-4 transition-all duration-300 hover:border-primary-500/30 hover:shadow-lg hover:shadow-primary-500/5">
-        {/* Decorative accent */}
-        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-bl-full" />
-        
+      <div className="relative overflow-hidden rounded-lg border border-[#30363D] bg-[#0E1117] p-5 transition-all duration-300 hover:border-white/20">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                Payout Certificate
-              </span>
-            </div>
-            <p className="text-lg font-bold text-emerald-400">
+          <div className="flex-1 pr-4">
+            <h3 className="text-[14px] font-bold text-[#E6EDF3] uppercase tracking-wide">
+              Payout Certificate
+            </h3>
+            <p className="text-xl font-bold text-[#1D9BF0] mt-1.5 leading-tight">
               {formatAmount(certificate.payout_amount)}
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              {formatDate(certificate.payout_date)}
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {certificate.account_type} · ${certificate.account_size.toLocaleString()}
+            <p className="text-[12px] text-[#8B949E] mt-1">
+              Issued {formatDate(certificate.payout_date)}
             </p>
           </div>
-          <canvas ref={qrCanvasRef} className="rounded" />
+          <div className="p-1 rounded bg-[#0E1117] border border-[#30363D]">
+            <canvas ref={qrCanvasRef} className="rounded-sm" />
+          </div>
         </div>
         
-        <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-          <span className="text-[10px] text-gray-500 font-mono">
-            {certificate.certificate_number}
+        <div className="mt-4 pt-3 border-t border-[#30363D] flex items-center justify-between">
+          <span className="text-[11px] text-[#7D8590] font-mono tracking-widest uppercase">
+            ID: {certificate.certificate_number}
           </span>
           {certificate.is_verified && (
-            <span className="text-[10px] text-emerald-400 font-medium">
-              ✓ Verified
+            <span className="text-[11px] text-[#3FB950] font-bold tracking-wide uppercase flex items-center">
+              <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+              Verified
             </span>
           )}
         </div>
@@ -87,96 +81,95 @@ export default function CertificateCard({ certificate, compact = false }: Certif
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] shadow-2xl">
-      {/* Top accent bar */}
-      <div className="h-1.5 bg-gradient-to-r from-emerald-500 via-primary-500 to-cyan-500" />
-
-      {/* Decorative corner elements */}
-      <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-bl-full" />
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-primary-500/5 to-transparent rounded-tr-full" />
-
-      <div className="relative p-8">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-1">
-              <img src="/logo.png" alt="FundedCobra" className="h-8 object-contain" />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight mt-3">
-              PAYOUT
-            </h2>
-            <p className="text-sm text-gray-400 font-medium tracking-widest uppercase mt-1">
-              Certificate
-            </p>
-          </div>
-
-          {/* QR Code */}
-          <div className="flex flex-col items-center">
-            <div className="p-2 rounded-lg bg-white/5 border border-white/10">
-              <canvas ref={qrCanvasRef} className="rounded" />
-            </div>
-            <span className="text-[9px] text-gray-500 mt-1">Scan to verify</span>
-          </div>
-        </div>
-
-        {/* Trader Info */}
-        <div className="mb-6">
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">
-            Proudly presented to
+    <div className="relative w-full rounded-none sm:rounded-sm border border-[#30363D] bg-[#0E1117] shadow-xl overflow-hidden text-left p-8 md:p-14">
+      {/* Header Block constraints */}
+      <div className="flex flex-col md:flex-row md:items-start justify-between border-b border-[#30363D] pb-10">
+        <div>
+          <img src="/logo.png" alt="FundedCobra" className="h-10 object-contain block mb-6 opacity-90" />
+          <h1 className="text-3xl md:text-5xl font-extrabold text-[#E6EDF3] tracking-tight uppercase leading-none">
+            PAYOUT CERTIFICATE
+          </h1>
+          <p className="text-sm text-[#8B949E] font-medium tracking-widest uppercase mt-3">
+            Official Financial Document
           </p>
-          <p className="text-xl md:text-2xl font-bold text-primary-400">
+        </div>
+        {certificate.is_verified && (
+          <div className="hidden md:flex flex-col items-end">
+            <div className="flex items-center space-x-2 text-[#3FB950] border border-[#3FB950]/20 bg-[#3FB950]/5 px-3 py-1.5 rounded-full">
+              <ShieldCheck className="w-4 h-4" />
+              <span className="text-[11px] font-bold tracking-widest uppercase">
+                Authentic
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Recipient Details */}
+      <div className="mt-12 space-y-12">
+        <div>
+          <p className="text-[11px] text-[#7D8590] uppercase tracking-widest mb-2 font-semibold">
+            Awarded To
+          </p>
+          <p className="text-3xl md:text-4xl font-bold text-[#E6EDF3]">
             {certificate.trader_name}
           </p>
         </div>
 
-        {/* Payout Amount */}
-        <div className="mb-8">
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">
-            Your payout
+        {/* Payout Block (Accent) */}
+        <div>
+          <p className="text-[11px] text-[#7D8590] uppercase tracking-widest mb-3 font-semibold">
+            Authorized Payout Amount
           </p>
-          <p className="text-4xl md:text-5xl font-extrabold text-emerald-400 tracking-tight">
+          <p className="text-5xl md:text-6xl font-black text-[#1D9BF0] tracking-tighter">
             {formatAmount(certificate.payout_amount)}
           </p>
-          <div className="flex items-center space-x-4 mt-2">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-500/10 text-primary-400 border border-primary-500/20">
-              {certificate.account_type}
-            </span>
-            <span className="text-sm text-gray-400">
-              ${certificate.account_size.toLocaleString()} Account
+          <div className="inline-flex mt-4">
+            <span className="text-[13px] font-bold text-[#E6EDF3] bg-[#21262D] border border-[#30363D] px-4 py-1.5 rounded-none sm:rounded">
+              {certificate.account_type} — ${certificate.account_size.toLocaleString()}
             </span>
           </div>
         </div>
+      </div>
 
-        {/* Footer with date and signature */}
-        <div className="flex items-end justify-between pt-6 border-t border-white/10">
-          <div>
-            <p className="text-sm font-medium text-white">
-              {formatDate(certificate.payout_date)}
-            </p>
-            <p className="text-xs text-gray-500">Date</p>
+      {/* Footer / Verification Layout */}
+      <div className="mt-16 pt-10 border-t border-[#30363D] grid grid-cols-1 md:grid-cols-2 gap-10">
+        
+        {/* QR Verification Block */}
+        <div className="flex items-start space-x-5">
+          <div className="p-1 border border-[#30363D] bg-[#0E1117] flex-shrink-0">
+            <canvas ref={qrCanvasRef} className="rounded-sm" />
           </div>
-          <div className="text-right">
-            <p className="text-lg font-script italic text-gray-300" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="flex flex-col justify-center py-1">
+            <span className="text-[11px] font-bold text-[#E6EDF3] tracking-widest uppercase mb-1">
+              Scan to Verify
+            </span>
+            <span className="text-[13px] text-[#8B949E] font-medium leading-relaxed mb-3">
+              Aim your camera at the code <br className="hidden md:block" />
+              to validate origin.
+            </span>
+            <div>
+              <p className="text-[10px] text-[#7D8590] uppercase tracking-widest mb-0.5">Certificate ID</p>
+              <p className="text-[13px] font-mono text-[#E6EDF3] font-semibold">{certificate.certificate_number}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Authorized Signature Block */}
+        <div className="flex flex-col justify-end md:items-end">
+          <div className="w-48 border-b border-[#30363D] pb-3 text-left md:text-right">
+            <p className="text-2xl font-serif italic text-[#8B949E] mb-2 pr-2">
               FundedCobra
             </p>
-            <p className="text-xs text-gray-500">CEO, FundedCobra</p>
           </div>
+          <p className="text-[11px] text-[#7D8590] font-bold tracking-widest uppercase mt-3 text-left md:text-right">
+            Authorized Signature
+          </p>
+          <p className="text-[11px] text-[#7D8590] uppercase tracking-widest mt-1 text-left md:text-right">
+            Dated: {formatDate(certificate.payout_date)}
+          </p>
         </div>
 
-        {/* Certificate ID */}
-        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-          <span className="text-xs text-gray-600 font-mono">
-            Certificate: {certificate.certificate_number}
-          </span>
-          {certificate.is_verified && (
-            <div className="flex items-center space-x-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-semibold text-emerald-400">
-                Verified by FundedCobra
-              </span>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
