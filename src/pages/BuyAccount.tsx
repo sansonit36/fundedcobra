@@ -1263,7 +1263,7 @@ export default function BuyAccount() {
                         <Check className="w-5 h-5 text-green-400" />
                       </div>
                       <div className="flex-1">
-                        <span className="text-green-400 font-semibold">Ramadan Kareem Offer - 50% OFF</span>
+                        <span className="text-green-400 font-semibold">Growing Sale Offer - 50% OFF</span>
                         <p className="text-xs text-gray-400 mt-0.5">Auto-applied to all premium instant accounts</p>
                       </div>
                     </div>
