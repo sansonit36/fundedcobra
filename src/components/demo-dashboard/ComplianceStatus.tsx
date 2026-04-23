@@ -34,33 +34,27 @@ export default function ComplianceStatus() {
   if (loading || breachedAccounts.length === 0) return null;
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-sm p-5 border-l-2 border-l-red-500">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-start space-x-4">
-          <div className="w-10 h-10 bg-red-500/10 flex items-center justify-center shrink-0 border border-red-500/20">
-            <AlertOctagon className="w-5 h-5 text-red-500" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-[#E6EDF3] tracking-wider uppercase">Compliance Violation</h3>
-            <p className="text-[#8B949E] text-xs mt-1">
-              One or more of your trading accounts has breached risk parameters.
-            </p>
-            <div className="mt-2 space-y-1">
-              {breachedAccounts.map(acc => (
-                <div key={acc.id} className="text-[11px] text-red-500 font-mono">
-                  ACC {acc.mt5_login} // {acc.breach_reason || 'Automated rule violation'}
-                </div>
-              ))}
-            </div>
-          </div>
+    <div className="mb-6 rounded-md bg-[#1e1e1e] border border-[#2A2A2A] shadow-sm overflow-hidden">
+      <div className="p-8 flex flex-col md:flex-row items-center justify-between">
+        <div className="max-w-2xl text-center md:text-left mb-6 md:mb-0">
+          <h3 className="text-2xl font-bold text-white mb-3">
+            Keep growing in your trading journey with FundedCobra
+          </h3>
+          <p className="text-[#a0a0a0] text-sm leading-relaxed">
+            Your previous {breachedAccounts.length} account{breachedAccounts.length > 1 ? 's are' : ' is'} now behind you. 
+            Keep your momentum going! Unlike other firms, our accounts are 100% instant—no evaluations, no waiting periods.
+            Grab a new allocation and jump straight back into the action.
+          </p>
         </div>
-        <button
-          onClick={() => navigate('/trading-accounts')}
-          className="w-full sm:w-auto px-6 py-2 bg-[#161B22] hover:bg-[#30363D] text-[#E6EDF3] text-xs font-bold uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center border border-[#30363D]"
-        >
-          View Details
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </button>
+        
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <button
+            onClick={() => navigate('/buy-account')} 
+            className="px-6 py-2.5 bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-bold rounded text-sm transition-colors w-full sm:w-auto text-nowrap"
+          >
+            Get Instant Funding
+          </button>
+        </div>
       </div>
     </div>
   );

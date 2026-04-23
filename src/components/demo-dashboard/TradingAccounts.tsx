@@ -149,7 +149,7 @@ export default function TradingAccounts() {
   }
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-sm p-5">
+    <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md shadow-sm">
       {/* Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="relative">
@@ -164,69 +164,72 @@ export default function TradingAccounts() {
         </div>
         
         <div className="w-full sm:w-auto">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full sm:w-auto appearance-none pl-4 pr-8 py-2 rounded-sm bg-[#0E1117] border border-[#30363D] text-[#E6EDF3] text-sm uppercase tracking-wider font-bold focus:outline-none focus:border-[#1D9BF0] transition-colors"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="pending">Pending</option>
-            <option value="pending_payment">Pending Payment</option>
-            <option value="payment_submitted">Payment Submitted</option>
-            <option value="breached">Breached</option>
-            <option value="rejected">Rejected</option>
-          </select>
-        </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full sm:w-auto appearance-none pl-4 pr-8 py-2 bg-[#1A112A] text-white text-sm uppercase tracking-wider font-bold focus:outline-none transition-colors"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="pending_payment">Pending Payment</option>
+                <option value="payment_submitted">Payment Submitted</option>
+                <option value="breached">Breached</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
       </div>
 
       {/* Accounts Table */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="border-b border-[#30363D]">
-              <th className="pb-3 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest pl-2">Status</th>
-              <th className="pb-3 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Account Identification</th>
-              <th className="pb-3 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Balance</th>
-              <th className="pb-3 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Origin Date</th>
-              <th className="pb-3 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest text-right pr-2">Actions</th>
+            <tr className="border-b border-[#2A2A2A]">
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">Status</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">Account Identification</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">Balance</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">Origin Date</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080] text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#30363D]">
+          <tbody className="divide-y divide-[#2A2A2A]">
             {filteredAccounts.map((account) => (
               <React.Fragment key={account.id}>
-                <tr className="hover:bg-[#30363D]/20 transition-colors">
-                  <td className="py-4 pl-2">
-                    <div className={`inline-flex items-center px-2 py-0.5 rounded-sm border ${statusStyles[account.status]}`}>
-                      {statusIcons[account.status]}
-                      <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wider">
+                <tr className="hover:bg-[#2A2A2A]/30 transition-colors">
+                  <td className="py-4 px-6">
+                    <div className={`inline-flex items-center px-2 py-0.5 rounded-sm bg-[#2A2A2A] text-xs font-bold ${
+                      account.status === 'active' ? 'text-green-500' : 
+                      account.status === 'passed' ? 'text-[#bd4dd6]' : 
+                      'text-red-500'
+                    }`}>
+                      <span className="ml-1 uppercase">
                         {account.status.replace('_', ' ')}
                       </span>
                     </div>
                   </td>
-                  <td className="py-4">
-                    <div className="font-mono text-[#E6EDF3] text-sm font-semibold">
+                  <td className="py-4 px-6">
+                    <div className="font-mono text-[#e0e0e0] text-sm">
                       {account.type === 'request' ? account.packageName : `#${account.id}`}
                     </div>
                   </td>
-                  <td className="py-4">
-                    <div className="font-mono text-[#E6EDF3] font-bold">${account.balance.toLocaleString()}</div>
+                  <td className="py-4 px-6">
+                    <div className="font-bold text-white">${account.balance.toLocaleString()}</div>
                     {account.type === 'account' && account.equity && (
-                      <div className="text-[10px] text-[#8B949E] uppercase tracking-widest mt-0.5">
+                      <div className="text-xs text-[#a0a0a0] mt-0.5">
                         Equity: ${account.equity.toLocaleString()}
                       </div>
                     )}
                   </td>
-                  <td className="py-4">
-                    <div className="text-[12px] text-[#8B949E] uppercase tracking-widest">
+                  <td className="py-4 px-6">
+                    <div className="text-xs text-[#a0a0a0]">
                       {new Date(account.createdAt).toLocaleDateString()}
                     </div>
                   </td>
-                  <td className="py-4 pr-2 text-right">
+                  <td className="py-4 px-6 text-right">
                     {account.type === 'account' && (
                       <button
                         onClick={() => setExpandedRow(expandedRow === account.id ? null : account.id)}
-                        className="inline-flex items-center px-4 py-1.5 rounded-sm bg-[#0E1117] border border-[#30363D] hover:border-[#1D9BF0] text-[#E6EDF3] text-[11px] font-bold uppercase tracking-widest transition-colors"
+                        className="inline-flex items-center px-4 py-1.5 border border-[#404040] bg-[#2A2A2A] hover:bg-[#333333] text-white text-xs font-bold rounded transition-colors"
                       >
                         Details
                       </button>

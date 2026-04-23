@@ -133,7 +133,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
         const extended = extendedData[account.mt5_login];
         
         return (
-          <div key={account.id} className="p-6 rounded-lg bg-white/5 border border-white/10">
+          <div key={account.id} className="p-6 rounded-md bg-[#1e1e1e] border border-[#2A2A2A] shadow-sm">
             <div className="flex flex-col lg:flex-row justify-between gap-6">
               <div className="space-y-4 flex-1">
                 <div>
@@ -234,7 +234,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Daily Drawdown */}
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <div className="p-4 rounded-md bg-[#161616] border border-[#2A2A2A]">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Daily Guard</p>
@@ -266,7 +266,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     </div>
 
                     {/* Overall Drawdown */}
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <div className="p-4 rounded-md bg-[#161616] border border-[#2A2A2A]">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Max Safety</p>
@@ -317,7 +317,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                       </a>
                       <a
                         href="/buy-account"
-                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white transition-colors text-sm font-medium"
+                        className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-[#bd4dd6] hover:bg-[#a63aba] text-white transition-colors text-sm font-medium"
                       >
                         Get New Account
                       </a>
@@ -406,7 +406,7 @@ function TradeHistoryTable({ mt5Id, breachReason }: { mt5Id: string, breachReaso
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/5">
+    <div className="overflow-x-auto rounded-md border border-[#2A2A2A]">
       {breachReason && (
         <div className="bg-red-500/10 px-4 py-3 border-b border-white/5 flex items-start space-x-2">
           <AlertOctagon className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
@@ -517,7 +517,7 @@ export default function TradingAccounts() {
 
   if (loading) {
     return (
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
+      <div className="bg-transparent rounded-md p-6">
         <div className="animate-pulse space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex items-center space-x-4">
@@ -535,7 +535,7 @@ export default function TradingAccounts() {
 
   if (error) {
     return (
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
+      <div className="bg-transparent rounded-md p-6">
         <div className="text-red-400">{error}</div>
       </div>
     );
@@ -561,7 +561,7 @@ export default function TradingAccounts() {
         
         <button
           onClick={() => navigate('/buy-account')}
-          className="flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
+          className="flex items-center px-4 py-2 bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-medium rounded-md transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Buy Account
@@ -607,14 +607,14 @@ export default function TradingAccounts() {
       </div>
 
       {/* Selected Tab Content */}
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
+      <div className="bg-transparent pt-4">
         {selectedTab === 'active' && (
           <AccountsTab accounts={activeAccounts} searchQuery={searchQuery} type="active" />
         )}
         {selectedTab === 'pending' && pendingAccounts.length > 0 && (
           <div className="space-y-4">
             {pendingAccounts.map((request) => (
-              <div key={request.id} className="p-6 rounded-lg bg-white/5 border border-white/10">
+              <div key={request.id} className="p-6 rounded-md bg-[#1e1e1e] border border-[#2A2A2A]">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles[request.status as keyof typeof statusStyles] || statusStyles.pending}`}>
                     {statusIcons[request.status as keyof typeof statusIcons] || statusIcons.pending}

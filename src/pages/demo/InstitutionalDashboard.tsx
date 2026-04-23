@@ -11,10 +11,11 @@ export default function InstitutionalDashboard() {
 
   return (
     <div className="space-y-8 max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8 py-8">
-      <div className="flex justify-between items-end pb-4 border-b border-[#30363D]">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#E6EDF3] tracking-tight uppercase">Trading Desk</h1>
-          <p className="text-sm font-medium tracking-widest uppercase text-[#8B949E] mt-1">Live Institutional Data Feed</p>
+      <div className="pb-6">
+        <div className="flex items-center space-x-2 text-sm text-[#808080]">
+          <span>Trader</span>
+          <span>/</span>
+          <span className="text-white font-medium">Accounts overview</span>
         </div>
       </div>
       

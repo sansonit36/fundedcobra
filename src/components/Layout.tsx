@@ -92,11 +92,11 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-[#161616] text-[#e0e0e0] font-sans">
       {/* Header */}
       <header className="fixed w-full z-50">
-        <div className="glass-effect-dark border-b border-gray-700/50">
-          <div className="flex items-center justify-between px-4 sm:px-6 py-1">
+        <div className="bg-[#1e1e1e] border-b border-[#2A2A2A] shadow-sm">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-2 h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -136,7 +136,7 @@ export default function Layout() {
               {showProfileMenu && (
                 <div
                   id="profile-menu"
-                  className="absolute right-0 mt-2 w-48 rounded-lg card-gradient border border-white/10 shadow-lg overflow-hidden"
+                  className="absolute right-0 mt-2 w-48 rounded-md bg-[#1e1e1e] border border-[#2A2A2A] shadow-lg overflow-hidden"
                 >
                   <div className="py-2">
                     <button
@@ -144,14 +144,14 @@ export default function Layout() {
                         setShowProfileMenu(false);
                         navigate('/settings');
                       }}
-                      className="w-full px-4 py-2 text-left text-gray-300 hover:bg-white/5 flex items-center space-x-2"
+                      className="w-full px-4 py-2 text-left text-[#a0a0a0] hover:text-white hover:bg-[#2A2A2A] flex items-center space-x-2 text-sm"
                     >
                       <Settings className="w-4 h-4" />
                       <span>Settings</span>
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="w-full px-4 py-2 text-left text-red-400 hover:bg-white/5 flex items-center space-x-2"
+                      className="w-full px-4 py-2 text-left text-red-500 hover:bg-[#2A2A2A] hover:text-red-400 flex items-center space-x-2 text-sm"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Logout</span>
@@ -166,31 +166,38 @@ export default function Layout() {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed left-0 top-0 h-full w-full md:w-72 transition-transform duration-300 ease-out transform ${
+        className={`fixed left-0 top-0 h-full w-full md:w-64 transition-transform duration-300 ease-out transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${isMobile ? 'z-40 bg-gray-900' : ''}`}
-        style={{ paddingTop: '84px' }}
+        } ${isMobile ? 'z-40 bg-[#1e1e1e]' : ''}`}
+        style={{ paddingTop: '64px' }}
       >
-        <div className="h-full glass-effect-dark border-r border-gray-700/50">
-          <nav className="p-4 sm:p-6">
+        <div className="h-full bg-[#1e1e1e] border-r border-[#2A2A2A] flex flex-col">
+          <div className="p-4 pt-6">
+            <button 
+              onClick={() => navigate('/buy-account')}
+              className="w-full bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-bold py-2.5 rounded text-sm mb-4 transition-colors"
+             >
+              New Evaluation
+            </button>
+          </div>
+
+          <nav className="px-3 pb-6 flex-1 overflow-y-auto">
             <div className="space-y-1">
+              <p className="text-[11px] font-bold text-[#808080] px-3 mb-2 mt-2">Main menu</p>
               {navItems.map((item, index) => {
-                const isActive = location.pathname === item.path;
+                const isActive = location.pathname.includes(item.path.split('/')[1]);
                 return (
                   <button
                     key={index}
                     onClick={() => handleNavigation(item.path)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-md transition-colors font-medium ${
                       isActive
-                        ? 'bg-gradient-to-r from-primary-500/20 to-primary-500/20 text-white'
-                        : 'text-gray-400 hover:bg-white/5 hover:text-gray-100'
+                        ? 'bg-[#2A2A2A] text-[#bd4dd6]'
+                        : 'text-[#a0a0a0] hover:text-white hover:bg-[#2A2A2A]/50'
                     }`}
                   >
-                    <item.icon className={`w-5 h-5 ${isActive ? 'text-primary-400' : ''}`} />
-                    <span className="font-medium">{item.text}</span>
-                    {isActive && (
-                      <div className="ml-auto w-2 h-2 rounded-full bg-primary-400"></div>
-                    )}
+                    <item.icon className={`w-4 h-4 ${isActive ? 'text-[#bd4dd6]' : ''}`} />
+                    <span className="text-sm">{item.text}</span>
                   </button>
                 );
               })}
@@ -209,8 +216,8 @@ export default function Layout() {
 
       {/* Main Content */}
       <main 
-        className={`transition-all duration-300 ease-out ${isSidebarOpen && !isMobile ? 'md:ml-72' : 'ml-0'}`}
-        style={{ paddingTop: '84px' }}
+        className={`transition-all duration-300 ease-out ${isSidebarOpen && !isMobile ? 'md:ml-64' : 'ml-0'}`}
+        style={{ paddingTop: '64px' }}
       >
         <div className="p-4 sm:p-6">
           <Outlet />

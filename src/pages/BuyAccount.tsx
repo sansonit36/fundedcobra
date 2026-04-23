@@ -36,6 +36,9 @@ export default function BuyAccount() {
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'usdt' | 'pkr' | null>(null);
   const [selectedPkrMethod, setSelectedPkrMethod] = useState<PaymentMethod | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState('MT5');
+  const [selectedServer, setSelectedServer] = useState('Exness');
+  const [accountType, setAccountType] = useState<'Special' | 'Premium'>('Special');
   const [showDiscountBanner, setShowDiscountBanner] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [discountExpired, setDiscountExpired] = useState(false);
@@ -680,7 +683,7 @@ export default function BuyAccount() {
       {aiVerifying && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="max-w-lg w-full">
-            <div className="card-gradient rounded-2xl p-8 border-2 border-primary-500/30 shadow-2xl">
+            <div className="bg-[#1e1e1e] rounded-2xl p-8 border-2 border-[#bd4dd6]/30 shadow-2xl">
               {/* Animated Robot/AI Icon */}
               <div className="flex justify-center mb-6">
                 <div className="relative">
@@ -715,7 +718,7 @@ export default function BuyAccount() {
                     verificationStep > 0
                       ? 'bg-green-500 scale-100'
                       : verificationStep === 0
-                      ? 'bg-primary-500 animate-pulse scale-110'
+                      ? 'bg-[#bd4dd6] animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     {verificationStep > 0 ? (
@@ -738,7 +741,7 @@ export default function BuyAccount() {
                     verificationStep > 1
                       ? 'bg-green-500 scale-100'
                       : verificationStep === 1
-                      ? 'bg-primary-500 animate-pulse scale-110'
+                      ? 'bg-[#bd4dd6] animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     {verificationStep > 1 ? (
@@ -761,7 +764,7 @@ export default function BuyAccount() {
                     verificationStep > 2
                       ? 'bg-green-500 scale-100'
                       : verificationStep === 2
-                      ? 'bg-primary-500 animate-pulse scale-110'
+                      ? 'bg-[#bd4dd6] animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     {verificationStep > 2 ? (
@@ -782,7 +785,7 @@ export default function BuyAccount() {
                 }`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                     verificationStep === 3
-                      ? 'bg-primary-500 animate-pulse scale-110'
+                      ? 'bg-[#bd4dd6] animate-pulse scale-110'
                       : 'bg-white/10'
                   }`}>
                     <Check className="w-4 h-4 text-white" />
@@ -795,8 +798,8 @@ export default function BuyAccount() {
               </div>
 
               {/* Fun Messages */}
-              <div className="bg-primary-500/10 border border-primary-500/30 rounded-xl p-4 text-center">
-                <p className="text-primary-300 text-sm font-medium">
+              <div className="bg-[#bd4dd6]/10 border border-[#bd4dd6]/30 rounded-xl p-4 text-center">
+                <p className="text-[#bd4dd6] text-sm font-medium">
                   {verificationStep === 0 && "📤 Hang tight! We're uploading your screenshot..."}
                   {verificationStep === 1 && "🤖 Our AI is examining every pixel of your screenshot..."}
                   {verificationStep === 2 && "🔍 Smart verification in action! Checking transaction details..."}
@@ -819,9 +822,9 @@ export default function BuyAccount() {
 
               {/* Security Notice */}
               <div className="mt-6 flex items-start space-x-2 text-xs text-gray-400">
-                <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary-400" />
+                <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#bd4dd6]" />
                 <p>
-                  We use <span className="text-primary-400 font-semibold">GPT-4 Vision AI</span> to ensure all payment screenshots are genuine. 
+                  We use <span className="text-[#bd4dd6] font-semibold">GPT-4 Vision AI</span> to ensure all payment screenshots are genuine. 
                   This protects our community from fraud.
                 </p>
               </div>
@@ -833,7 +836,7 @@ export default function BuyAccount() {
       {/* Exit-Intent Modal */}
       {showExitIntent && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="max-w-md w-full card-gradient rounded-2xl p-8 border border-primary-500/30 shadow-2xl text-center">
+          <div className="max-w-md w-full bg-[#1e1e1e] rounded-2xl p-8 border border-[#bd4dd6]/30 shadow-2xl text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
               <span className="text-3xl">🚀</span>
             </div>
@@ -876,7 +879,7 @@ export default function BuyAccount() {
               <p className="text-sm text-gray-300 transition-all duration-500">
                 💸 <span className="text-white font-semibold">{payoutTicker[tickerIndex].trader}</span> just withdrew{' '}
                 <span className="text-green-400 font-bold">{payoutTicker[tickerIndex].amount}</span> from their{' '}
-                <span className="text-primary-400">{payoutTicker[tickerIndex].pkg}</span>{' '}·{' '}
+                <span className="text-[#bd4dd6]">{payoutTicker[tickerIndex].pkg}</span>{' '}·{' '}
                 <span className="text-gray-500 text-xs">{payoutTicker[tickerIndex].time}</span>
               </p>
             </div>
@@ -893,122 +896,192 @@ export default function BuyAccount() {
             </div>
           </div>
 
-          {/* Special Instant Accounts Highlight */}
-          <div className="card-gradient rounded-2xl p-6 border-2 border-yellow-500/30 bg-gradient-to-br from-yellow-500/5 to-transparent">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 flex items-center justify-center">
-                <Zap className="w-6 h-6 text-yellow-400" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">⚡ Special Instant Accounts</h2>
-                <p className="text-yellow-400 font-medium">5% Withdrawal Target | Daily Payouts</p>
-              </div>
+          {/* Main Account Configuration Builder */}
+          <div className="bg-[#1e1e1e] rounded-2xl border border-[#2A2A2A] overflow-hidden">
+            <div className="p-6 border-b border-[#2A2A2A] bg-gradient-to-br from-black/20 to-transparent">
+               <h2 className="text-2xl font-bold text-white mb-2">Configure Your Account</h2>
+               <p className="text-gray-400">Follow the steps below to customize your funding parameters.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {packages.filter(pkg => ['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)).map((pkg) => (
-                <div key={pkg.id} className="relative">
-                  {/* Viewing count badge */}
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-gray-800 border border-yellow-500/30 flex items-center space-x-1 whitespace-nowrap">
-                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
-                    <span className="text-yellow-400 text-[10px] font-medium">{getViewingCount(pkg.name)} viewing now</span>
-                  </div>
-                  <button
-                    onClick={() => setSelectedPackage(pkg)}
-                    className={`relative w-full p-5 rounded-xl border-2 transition-all ${selectedPackage?.id === pkg.id
-                        ? 'bg-yellow-500/20 border-yellow-500/60 shadow-lg shadow-yellow-500/20'
-                        : 'bg-white/5 border-yellow-500/20 hover:bg-yellow-500/10 hover:border-yellow-500/40'
-                    }`}
-                  >
-                    {selectedPackage?.id === pkg.id && (
-                      <div className="absolute -top-2 -right-2 w-7 h-7 bg-yellow-500 rounded-full flex items-center justify-center">
-                        <Check className="w-5 h-5 text-black" />
+
+            <div className="p-5 md:p-6 space-y-8">
+              {/* Step 1: Platform Selection */}
+              <div>
+                <h3 className="text-sm font-bold text-[#a0a0a0] mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#bd4dd6] text-white flex items-center justify-center text-xs">1</div> 
+                  Trading Platform
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button className="flex items-center justify-between p-4 rounded-xl border-2 border-[#bd4dd6] bg-[#bd4dd6]/10 text-left transition-all relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-[#bd4dd6]"></div>
+                    <div className="flex items-center gap-3 relative z-10">
+                      <div className="w-10 h-10 rounded bg-[#161616] flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">5</span>
                       </div>
-                    )}
-                    <div className="text-2xl font-bold text-white mb-2">
-                      ${pkg.balance.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      Fee: <span className="text-yellow-400 font-bold">${pkg.price}</span>
-                    </div>
-                    <div className="mt-3 space-y-1">
-                      <div className="flex items-center text-xs text-green-400">
-                        <Check className="w-3 h-3 mr-1" />
-                        <span>Daily Payouts</span>
-                      </div>
-                      <div className="flex items-center text-xs text-green-400">
-                        <Check className="w-3 h-3 mr-1" />
-                        <span>5% Withdrawal Target</span>
+                      <div>
+                        <div className="text-white font-bold text-lg">MetaTrader 5</div>
+                        <div className="text-xs text-[#bd4dd6]">Industry Standard</div>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleBuyNow(pkg); }}
-                      className="mt-4 w-full py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black font-bold text-sm transition-all flex items-center justify-center space-x-1.5 shadow-lg shadow-yellow-500/20"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>Buy Now →</span>
-                    </button>
+                    <Check className="w-5 h-5 text-[#bd4dd6] relative z-10" />
+                  </button>
+                  <button disabled className="flex items-center justify-between p-4 rounded-xl border-2 border-[#2A2A2A] bg-black/40 text-left opacity-50 cursor-not-allowed">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded bg-[#161616] flex items-center justify-center grayscale">
+                        <span className="text-white font-bold text-lg">4</span>
+                      </div>
+                      <div>
+                        <div className="text-gray-400 font-bold text-lg">MetaTrader 4</div>
+                        <div className="text-xs text-gray-500">Currently Unavailable</div>
+                      </div>
+                    </div>
                   </button>
                 </div>
-              ))}
+              </div>
+
+              {/* Step 2: Server Selection */}
+              <div>
+                <h3 className="text-sm font-bold text-[#a0a0a0] mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#bd4dd6] text-white flex items-center justify-center text-xs">2</div> 
+                  Broker Server
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => setSelectedServer('Exness')}
+                    className={`flex items-center justify-between p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden ${
+                      selectedServer === 'Exness' 
+                        ? 'border-[#bd4dd6] bg-[#bd4dd6]/10 shadow-[0_0_15px_rgba(189,77,214,0.15)]' 
+                        : 'border-[#2A2A2A] bg-[#161616] hover:border-[#404040]'
+                    }`}
+                  >
+                    {selectedServer === 'Exness' && <div className="absolute top-0 left-0 w-1 h-full bg-[#bd4dd6]"></div>}
+                    <div className="flex items-center gap-3 relative z-10">
+                      <div className="w-10 h-10 rounded bg-white flex items-center justify-center p-1">
+                        <span className="text-black font-black text-xl italic tracking-tighter">ex</span>
+                      </div>
+                      <div>
+                        <div className="text-white font-bold text-lg">Exness</div>
+                        <div className="text-xs text-green-400">Optimal Spreads</div>
+                      </div>
+                    </div>
+                    {selectedServer === 'Exness' && <Check className="w-5 h-5 text-[#bd4dd6] relative z-10" />}
+                  </button>
+                  <button disabled className="flex items-center justify-between p-4 rounded-xl border-2 border-[#2A2A2A] bg-black/40 text-left opacity-60 cursor-not-allowed relative">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded bg-black flex items-center justify-center overflow-hidden border border-[#2A2A2A]">
+                         <span className="text-[#bd4dd6] font-black absolute">FC</span>
+                      </div>
+                      <div>
+                        <div className="text-gray-400 font-bold text-lg flex items-center gap-2">FundedCobra <Lock className="w-3 h-3 text-red-400" /></div>
+                        <div className="text-[10px] uppercase font-bold text-red-400 bg-red-400/10 px-2 py-0.5 rounded inline-block mt-0.5">Servers Full</div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Step 3: Account Type */}
+              <div>
+                <h3 className="text-sm font-bold text-[#a0a0a0] mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#bd4dd6] text-white flex items-center justify-center text-xs">3</div> 
+                  Account Category
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => {
+                      setAccountType('Special');
+                      setSelectedPackage(null);
+                    }}
+                    className={`p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden ${
+                      accountType === 'Special' 
+                        ? 'border-yellow-500 bg-yellow-500/10 shadow-[0_0_15px_rgba(234,179,8,0.15)]' 
+                        : 'border-[#2A2A2A] bg-[#161616] hover:border-[#404040]'
+                    }`}
+                  >
+                    {accountType === 'Special' && <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>}
+                    <div className="flex items-center gap-2 mb-2">
+                      <Zap className={`w-5 h-5 ${accountType === 'Special' ? 'text-yellow-400' : 'text-gray-500'}`} />
+                      <span className={`font-bold text-lg ${accountType === 'Special' ? 'text-white' : 'text-gray-400'}`}>Special Instant</span>
+                    </div>
+                    <p className={`text-xs ${accountType === 'Special' ? 'text-yellow-400/80' : 'text-gray-500'}`}>Daily Payouts • 5% Withdrawal Target</p>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setAccountType('Premium');
+                      setSelectedPackage(null);
+                    }}
+                    className={`p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden ${
+                      accountType === 'Premium' 
+                        ? 'border-[#bd4dd6] bg-[#bd4dd6]/10 shadow-[0_0_15px_rgba(189,77,214,0.15)]' 
+                        : 'border-[#2A2A2A] bg-[#161616] hover:border-[#404040]'
+                    }`}
+                  >
+                    {accountType === 'Premium' && <div className="absolute top-0 left-0 w-1 h-full bg-[#bd4dd6]"></div>}
+                    <div className="flex items-center gap-2 mb-2">
+                       <Star className={`w-5 h-5 ${accountType === 'Premium' ? 'text-[#bd4dd6]' : 'text-gray-500'}`} />
+                       <span className={`font-bold text-lg ${accountType === 'Premium' ? 'text-white' : 'text-gray-400'}`}>Premium Instant</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-[10px] font-bold text-white bg-green-500 px-2 py-0.5 rounded uppercase font-mono shadow-sm">50% Off</div>
+                      <p className={`text-xs ${accountType === 'Premium' ? 'text-[#bd4dd6]/80' : 'text-gray-500'}`}>Weekly Payouts • Scale Capital</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Step 4: Account Size Selection */}
+              <div>
+                <h3 className="text-sm font-bold text-[#a0a0a0] mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#bd4dd6] text-white flex items-center justify-center text-xs">4</div> 
+                  Account Size
+                </h3>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {packages.filter(pkg => 
+                    accountType === 'Special' 
+                      ? ['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)
+                      : !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)
+                  ).map((pkg) => (
+                    <button
+                      key={pkg.id}
+                      onClick={() => setSelectedPackage(pkg)}
+                      className={`relative p-4 rounded-xl border-2 text-center transition-all flex flex-col items-center justify-center ${
+                        selectedPackage?.id === pkg.id
+                          ? accountType === 'Special' ? 'border-yellow-500 bg-yellow-500/10' : 'border-[#bd4dd6] bg-[#bd4dd6]/10'
+                          : 'border-[#2A2A2A] bg-[#161616] hover:bg-white/5 hover:border-[#404040]'
+                      }`}
+                    >
+                      {accountType === 'Premium' && (
+                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-white bg-green-500 px-2 py-0.5 rounded shadow whitespace-nowrap">
+                           SAVE 50%
+                         </div>
+                      )}
+                      {selectedPackage?.id === pkg.id && (
+                        <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center z-10 ${accountType === 'Special' ? 'bg-yellow-500' : 'bg-[#bd4dd6]'}`}>
+                          <Check className={`w-3 h-3 ${accountType === 'Special' ? 'text-black' : 'text-white'}`} />
+                        </div>
+                      )}
+                      <div className={`font-bold text-lg md:text-xl mb-1 ${selectedPackage?.id === pkg.id ? 'text-white' : 'text-gray-300'}`}>
+                        ${pkg.balance.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-500 flex flex-col items-center">
+                        {accountType === 'Premium' ? (
+                          <>
+                            <span className="line-through text-gray-600">${pkg.price}</span>
+                            <span className="text-green-400 font-bold text-sm mt-0.5">${(pkg.price * 0.5).toFixed(0)}</span>
+                          </>
+                        ) : (
+                          <span className="text-yellow-400 font-bold text-sm">Fee: ${pkg.price}</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Premium Instant Accounts */}
-          <div className="card-gradient rounded-2xl p-6 border border-white/5">
-            <h2 className="text-2xl font-bold text-white mb-2">Premium Instant Accounts</h2>
-            <p className="text-gray-400 mb-6">5% Withdrawal Target | Weekly Payouts | 4 Trading Days</p>
-            
-            {/* Account Packages Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {packages.filter(pkg => !['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(pkg.name)).map((pkg) => (
-                <div key={pkg.id} className="relative">
-                  {/* Viewing count badge */}
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-gray-800 border border-primary-500/30 flex items-center space-x-1 whitespace-nowrap">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse"></span>
-                    <span className="text-primary-400 text-[10px] font-medium">{getViewingCount(pkg.name)} viewing now</span>
-                  </div>
-                  <button
-                    onClick={() => setSelectedPackage(pkg)}
-                    className={`relative w-full p-4 rounded-xl border transition-all ${
-                      selectedPackage?.id === pkg.id
-                        ? 'bg-primary-500/20 border-primary-500/50'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10'
-                    }`}
-                  >
-                    {/* 50% OFF Badge */}
-                    <div className="absolute -top-2 -left-2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
-                      50% OFF
-                    </div>
-                    {selectedPackage?.id === pkg.id && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center z-10">
-                        <Check className="w-4 h-4 text-white" />
-                      </div>
-                    )}
-                    <div className="text-2xl font-bold text-white mb-2 mt-2">
-                      ${pkg.balance.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-400 mb-1">
-                      <span className="line-through">${pkg.price}</span>
-                      {' '}
-                      <span className="text-green-400 font-bold text-lg">${(pkg.price * 0.5).toFixed(0)}</span>
-                    </div>
-                    <div className="text-xs text-green-400 font-medium mb-2">
-                      Save ${(pkg.price * 0.5).toFixed(0)}!
-                    </div>
-                    <div className="text-xs text-primary-400 mt-2">
-                      Refundable after 5 payouts
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleBuyNow(pkg); }}
-                      className="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700 text-white font-bold text-sm transition-all flex items-center justify-center space-x-1.5 shadow-md shadow-primary-500/20"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>Buy Now →</span>
-                    </button>
-                  </button>
-                </div>
-              ))}
-            </div>
+          {/* Main Account Extra Info */}
+          <div className="bg-[#1e1e1e] rounded-2xl p-6 border border-[#2A2A2A] mt-6">
 
             {/* Profit Split Info Card */}
             <div className="mt-8">
@@ -1017,7 +1090,7 @@ export default function BuyAccount() {
                 <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-semibold text-white">Initial Split</h4>
-                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary-500/20 text-primary-400">
+                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-[#bd4dd6]/20 text-[#bd4dd6]">
                       First 5 Payouts
                     </span>
                   </div>
@@ -1052,11 +1125,11 @@ export default function BuyAccount() {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 p-4 rounded-lg bg-primary-500/10 border border-primary-500/20">
+              <div className="mt-4 p-4 rounded-lg bg-[#bd4dd6]/10 border border-primary-500/20">
                 <div className="flex items-start space-x-3">
-                  <Info className="w-5 h-5 text-primary-400 mt-0.5" />
+                  <Info className="w-5 h-5 text-[#bd4dd6] mt-0.5" />
                   <div>
-                    <p className="text-primary-400 font-medium">Fee Refund Policy</p>
+                    <p className="text-[#bd4dd6] font-medium">Fee Refund Policy</p>
                     <p className="text-gray-300 mt-1">
                       Your initial fee is fully refundable after completing 5 successful payouts. Once achieved, you'll receive 90% of future profits.
                     </p>
@@ -1074,7 +1147,7 @@ export default function BuyAccount() {
                 { icon: HelpCircle, text: "24/7 Support" }
               ].map((feature, index) => (
                 <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-white/5">
-                  <feature.icon className="w-5 h-5 text-primary-400" />
+                  <feature.icon className="w-5 h-5 text-[#bd4dd6]" />
                   <span className="text-gray-200">{feature.text}</span>
                 </div>
               ))}
@@ -1082,12 +1155,12 @@ export default function BuyAccount() {
           </div>
 
           {/* Trading Rules Summary */}
-          <div className="card-gradient rounded-2xl p-6 border border-white/5">
+          <div className="bg-[#1e1e1e] rounded-2xl p-6 border border-[#2A2A2A]">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Key Trading Rules</h3>
               <button
                 onClick={() => setShowRules(!showRules)}
-                className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
+                className="text-sm text-[#bd4dd6] hover:text-[#bd4dd6] transition-colors"
               >
                 View full rules →
               </button>
@@ -1106,13 +1179,13 @@ export default function BuyAccount() {
                 </ul>
               </div>
               {/* Premium Accounts */}
-              <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
-                <h4 className="text-base font-semibold text-primary-400 mb-3 flex items-center gap-2">
+              <div className="p-4 rounded-xl bg-[#bd4dd6]/5 border border-primary-500/20">
+                <h4 className="text-base font-semibold text-[#bd4dd6] mb-3 flex items-center gap-2">
                   <Star className="w-4 h-4" /> Premium Instant Accounts
                 </h4>
                 <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-primary-400 mt-0.5 flex-shrink-0" /><span>Reach 5% profit → request weekly payout</span></li>
-                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-primary-400 mt-0.5 flex-shrink-0" /><span>Trade at least 4 days per week</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-[#bd4dd6] mt-0.5 flex-shrink-0" /><span>Reach 5% profit → request weekly payout</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-[#bd4dd6] mt-0.5 flex-shrink-0" /><span>Trade at least 4 days per week</span></li>
                   <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 red-400 mt-0.5 flex-shrink-0" /><span>Max 8% daily loss / 12% total loss</span></li>
                 </ul>
               </div>
@@ -1134,14 +1207,14 @@ export default function BuyAccount() {
 
         {/* Purchase Summary */}
         <div className="w-full lg:w-1/3 sticky top-24">
-          <div className="card-gradient rounded-2xl p-6 border border-white/5">
+          <div className="bg-[#1e1e1e] rounded-2xl p-6 border border-[#2A2A2A]">
             <h3 className="text-xl font-bold text-white mb-6">Purchase Summary</h3>
             {selectedPackage ? (
               <>
                 {/* Discount Banner - Only for Special Accounts */}
                 {showDiscountBanner && !discountExpired && timeRemaining === 0 && selectedPackage && 
                   ['$1,250 Account', '$3,500 Account', '$5,000 Account'].includes(selectedPackage.name) && (
-                  <div className="mb-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border border-primary-500/30 p-6">
+                  <div className="mb-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border border-[#bd4dd6]/30 p-6">
                     {/* Background gradient effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-primary-600/10 via-purple-600/10 to-primary-600/10 opacity-50"></div>
                     
@@ -1149,8 +1222,8 @@ export default function BuyAccount() {
                       {/* Header */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
-                            <Tag className="w-5 h-5 text-primary-400" />
+                          <div className="w-10 h-10 rounded-lg bg-[#bd4dd6]/20 flex items-center justify-center">
+                            <Tag className="w-5 h-5 text-[#bd4dd6]" />
                           </div>
                           <div>
                             <h4 className="text-lg font-bold text-white">Welcome Offer</h4>
@@ -1273,16 +1346,16 @@ export default function BuyAccount() {
 
                 {/* Trust Badges */}
                 <div className="mt-4 grid grid-cols-3 gap-2">
-                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-[#2A2A2A]">
                     <Shield className="w-4 h-4 text-green-400" />
                     <span className="text-gray-400 text-xs text-center leading-tight">256-bit SSL</span>
                   </div>
-                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-[#2A2A2A]">
                     <Zap className="w-4 h-4 text-yellow-400" />
                     <span className="text-gray-400 text-xs text-center leading-tight">Instant Access</span>
                   </div>
-                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-white/5">
-                    <Star className="w-4 h-4 text-primary-400" />
+                  <div className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/5 border border-[#2A2A2A]">
+                    <Star className="w-4 h-4 text-[#bd4dd6]" />
                     <span className="text-gray-400 text-xs text-center leading-tight">Fee Refund</span>
                   </div>
                 </div>
@@ -1290,7 +1363,7 @@ export default function BuyAccount() {
                 {/* Social proof */}
                 <div className="mt-3 flex items-center justify-center space-x-1.5">
                   <div className="flex -space-x-1.5">
-                    {['bg-primary-500', 'bg-primary-500', 'bg-purple-500', 'bg-pink-500'].map((color, i) => (
+                    {['bg-[#bd4dd6]', 'bg-[#bd4dd6]', 'bg-purple-500', 'bg-pink-500'].map((color, i) => (
                       <div key={i} className={`w-5 h-5 rounded-full ${color} border border-gray-900 flex items-center justify-center`}>
                         <span className="text-white text-[7px] font-bold">T</span>
                       </div>
@@ -1364,16 +1437,16 @@ export default function BuyAccount() {
                     <li className="flex items-start gap-2"><span className="text-yellow-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
                   </ul>
                 </div>
-                <div className="p-4 rounded-xl bg-primary-500/5 border border-primary-500/20">
-                  <h4 className="text-sm font-bold text-primary-400 mb-3 flex items-center gap-2">
+                <div className="p-4 rounded-xl bg-[#bd4dd6]/5 border border-primary-500/20">
+                  <h4 className="text-sm font-bold text-[#bd4dd6] mb-3 flex items-center gap-2">
                     <Star className="w-4 h-4" /> Premium Instant Accounts
                     <span className="text-xs text-gray-500 font-normal">($7.5K – $200K)</span>
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-300">
-                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Withdrawal target:</strong> Make 5% profit → request a weekly payout</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Payout schedule:</strong> Weekly only</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Trading days:</strong> Must trade at least 4 days per week</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary-400 flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
+                    <li className="flex items-start gap-2"><span className="text-[#bd4dd6] flex-shrink-0">•</span><span><strong className="text-white">Withdrawal target:</strong> Make 5% profit → request a weekly payout</span></li>
+                    <li className="flex items-start gap-2"><span className="text-[#bd4dd6] flex-shrink-0">•</span><span><strong className="text-white">Payout schedule:</strong> Weekly only</span></li>
+                    <li className="flex items-start gap-2"><span className="text-[#bd4dd6] flex-shrink-0">•</span><span><strong className="text-white">Trading days:</strong> Must trade at least 4 days per week</span></li>
+                    <li className="flex items-start gap-2"><span className="text-[#bd4dd6] flex-shrink-0">•</span><span><strong className="text-white">Min. withdrawal:</strong> $50</span></li>
                   </ul>
                 </div>
               </div>
@@ -1444,7 +1517,7 @@ export default function BuyAccount() {
 
               {/* PKR amount row — only when PKR is selected */}
               {selectedPaymentMethod === 'pkr' && (
-                <div className="flex justify-between items-center p-3 rounded-lg bg-primary-500/10 border border-primary-500/20 text-sm">
+                <div className="flex justify-between items-center p-3 rounded-lg bg-[#bd4dd6]/10 border border-primary-500/20 text-sm">
                   <span className="text-gray-400">Amount in PKR</span>
                   <span className="text-white font-bold">PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}</span>
                 </div>
@@ -1500,14 +1573,14 @@ export default function BuyAccount() {
                         }}
                         className="flex items-center space-x-4 p-4 rounded-xl bg-white/5 border-2 border-white/10 hover:border-primary-500/50 hover:bg-white/10 transition-all text-left"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-primary-500/15 flex items-center justify-center flex-shrink-0">
-                          <CreditCard className="w-5 h-5 text-primary-400" />
+                        <div className="w-10 h-10 rounded-lg bg-[#bd4dd6]/15 flex items-center justify-center flex-shrink-0">
+                          <CreditCard className="w-5 h-5 text-[#bd4dd6]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-white font-semibold text-sm">Pakistani Methods</p>
                           <p className="text-xs text-gray-400">JazzCash, Nayapay, Bank</p>
                         </div>
-                        <span className="text-primary-400 font-bold text-sm flex-shrink-0">
+                        <span className="text-[#bd4dd6] font-bold text-sm flex-shrink-0">
                           PKR {(calculateFinalPrice(selectedPackage.price) * usdToPkr).toLocaleString()}
                         </span>
                       </button>
@@ -1521,7 +1594,7 @@ export default function BuyAccount() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-white">USDT (TRC20) Details</p>
-                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-primary-400 hover:text-primary-300">
+                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-[#bd4dd6] hover:text-[#bd4dd6]">
                       Change
                     </button>
                   </div>
@@ -1533,16 +1606,16 @@ export default function BuyAccount() {
                     <div>
                       <p className="text-xs text-gray-400 mb-1.5">Wallet Address</p>
                       <div className="flex items-center space-x-2 bg-black/30 p-3 rounded-lg">
-                        <code className="text-primary-400 text-xs flex-1 break-all leading-relaxed">
+                        <code className="text-[#bd4dd6] text-xs flex-1 break-all leading-relaxed">
                           TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5
                         </code>
                         <button
                           onClick={() => copyToClipboard('TDiAo8WAhsmgs64Z35mgk5fEqn6GqJsDR5', 'usdt')}
-                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-primary-500/15 hover:bg-primary-500/25 transition-colors"
+                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-[#bd4dd6]/15 hover:bg-[#bd4dd6]/25 transition-colors"
                         >
                           {copiedAccount === 'usdt'
                             ? <Check className="w-4 h-4 text-green-400" />
-                            : <><Copy className="w-3.5 h-3.5 text-primary-400 mr-1" /><span className="text-primary-400 text-xs">Copy</span></>}
+                            : <><Copy className="w-3.5 h-3.5 text-[#bd4dd6] mr-1" /><span className="text-[#bd4dd6] text-xs">Copy</span></>}
                         </button>
                       </div>
                     </div>
@@ -1555,7 +1628,7 @@ export default function BuyAccount() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-white">Choose PKR method</p>
-                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-primary-400 hover:text-primary-300">
+                    <button onClick={() => setSelectedPaymentMethod(null)} className="text-xs text-[#bd4dd6] hover:text-[#bd4dd6]">
                       Change
                     </button>
                   </div>
@@ -1569,8 +1642,8 @@ export default function BuyAccount() {
                           onClick={() => setSelectedPkrMethod(method)}
                           className="w-full flex items-center space-x-3 p-3.5 rounded-xl bg-white/5 border-2 border-white/10 hover:border-primary-500/50 hover:bg-white/10 transition-all text-left"
                         >
-                          <div className="w-9 h-9 rounded-lg bg-primary-500/15 flex items-center justify-center flex-shrink-0">
-                            <CreditCard className="w-4 h-4 text-primary-400" />
+                          <div className="w-9 h-9 rounded-lg bg-[#bd4dd6]/15 flex items-center justify-center flex-shrink-0">
+                            <CreditCard className="w-4 h-4 text-[#bd4dd6]" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold text-sm">{method.name}</p>
@@ -1589,7 +1662,7 @@ export default function BuyAccount() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-white">{selectedPkrMethod.name}</p>
-                    <button onClick={() => setSelectedPkrMethod(null)} className="text-xs text-primary-400 hover:text-primary-300">
+                    <button onClick={() => setSelectedPkrMethod(null)} className="text-xs text-[#bd4dd6] hover:text-[#bd4dd6]">
                       Change
                     </button>
                   </div>
@@ -1601,14 +1674,14 @@ export default function BuyAccount() {
                     <div>
                       <p className="text-xs text-gray-400 mb-1.5">Account Number</p>
                       <div className="flex items-center space-x-2 bg-black/30 p-3 rounded-lg">
-                        <code className="text-primary-400 font-medium text-sm flex-1">{selectedPkrMethod.account_number}</code>
+                        <code className="text-[#bd4dd6] font-medium text-sm flex-1">{selectedPkrMethod.account_number}</code>
                         <button
                           onClick={() => copyToClipboard(selectedPkrMethod.account_number, selectedPkrMethod.id)}
-                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-primary-500/15 hover:bg-primary-500/25 transition-colors"
+                          className="flex-shrink-0 flex items-center px-2.5 py-1.5 rounded-lg bg-[#bd4dd6]/15 hover:bg-[#bd4dd6]/25 transition-colors"
                         >
                           {copiedAccount === selectedPkrMethod.id
                             ? <Check className="w-4 h-4 text-green-400" />
-                            : <><Copy className="w-3.5 h-3.5 text-primary-400 mr-1" /><span className="text-primary-400 text-xs">Copy</span></>}
+                            : <><Copy className="w-3.5 h-3.5 text-[#bd4dd6] mr-1" /><span className="text-[#bd4dd6] text-xs">Copy</span></>}
                         </button>
                       </div>
                     </div>

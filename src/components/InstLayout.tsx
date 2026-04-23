@@ -91,10 +91,11 @@ export default function Layout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-    <div className="min-h-screen bg-[#0E1117]">
+  return (
+    <div className="min-h-screen bg-[#161616] text-[#e0e0e0] font-sans">
       {/* Structural Header */}
-      <header className="fixed w-full z-50 bg-[#161B22] border-b border-[#30363D]">
-        <div>
+      <header className="fixed w-full z-50 bg-[#1e1e1e] border-b border-[#2A2A2A] shadow-sm">
+        <div className="relative z-10">
           <div className="flex items-center justify-between px-4 sm:px-6 h-16">
             <div className="flex items-center space-x-4">
               <button
@@ -168,27 +169,33 @@ export default function Layout() {
       <aside 
         className={`fixed left-0 top-0 h-full w-full md:w-64 transition-transform duration-300 ease-out transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${isMobile ? 'z-40 bg-[#0E1117]' : ''}`}
+        } ${isMobile ? 'z-40 bg-[#1e1e1e]' : ''}`}
         style={{ paddingTop: '64px' }}
       >
-        <div className="h-full bg-[#0E1117] border-r border-[#30363D]">
-          <nav className="p-4">
+        <div className="h-full bg-[#1e1e1e] border-r border-[#2A2A2A] flex flex-col">
+          <div className="p-4 pt-6">
+            <button className="w-full bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-bold py-2.5 rounded text-sm mb-4 transition-colors">
+              New Evaluation
+            </button>
+          </div>
+          
+          <nav className="px-3 flex-1 overflow-y-auto">
             <div className="space-y-1">
-              <p className="text-[10px] uppercase font-bold tracking-widest text-[#8B949E] px-4 mb-3 mt-2">Core Tools</p>
+              <p className="text-[11px] font-bold text-[#808080] px-3 mb-2 mt-4">Main menu</p>
               {navItems.map((item, index) => {
                 const isActive = location.pathname.includes(item.path.split('/')[1]);
                 return (
                   <button
                     key={index}
                     onClick={() => handleNavigation(item.path)}
-                    className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-sm transition-colors ${
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-md transition-colors font-medium ${
                       isActive
-                        ? 'bg-[#161B22] border-l-2 border-[#1D9BF0] text-[#E6EDF3]'
-                        : 'border-l-2 border-transparent text-[#8B949E] hover:bg-[#161B22] hover:text-[#E6EDF3]'
+                        ? 'bg-[#2A2A2A] text-[#bd4dd6]'
+                        : 'text-[#a0a0a0] hover:text-white hover:bg-[#2A2A2A]/50'
                     }`}
                   >
-                    <item.icon className={`w-4 h-4 ${isActive ? 'text-[#1D9BF0]' : ''}`} />
-                    <span className="text-sm font-semibold tracking-wide">{item.text}</span>
+                    <item.icon className={`w-4 h-4 ${isActive ? 'text-[#bd4dd6]' : ''}`} />
+                    <span className="text-sm">{item.text}</span>
                   </button>
                 );
               })}
@@ -207,7 +214,7 @@ export default function Layout() {
 
       {/* Main Content */}
       <main 
-        className={`transition-all duration-300 ease-out ${isSidebarOpen && !isMobile ? 'md:ml-64' : 'ml-0'}`}
+        className={`relative z-10 transition-all duration-300 ease-out ${isSidebarOpen && !isMobile ? 'md:ml-64' : 'ml-0'}`}
         style={{ paddingTop: '64px' }}
       >
         <div className="p-0">

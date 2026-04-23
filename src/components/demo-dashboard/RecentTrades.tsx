@@ -85,15 +85,15 @@ export default function RecentTrades({ filterType = 'all' }: { filterType?: stri
   }
 
   return (
-    <div className="bg-[#161B22] border border-[#30363D] rounded-sm">
-      <div className="flex items-center justify-between p-5 border-b border-[#30363D]">
-        <div className="flex items-center space-x-2">
-          <History className="w-4 h-4 text-[#8B949E]" />
-          <h3 className="text-sm font-bold text-[#E6EDF3] uppercase tracking-widest">Recent Activity Ledger</h3>
+    <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md shadow-sm mt-6">
+      <div className="flex items-center justify-between p-6 border-b border-[#2A2A2A]">
+        <div className="flex items-center space-x-3">
+          <History className="w-5 h-5 text-[#bd4dd6]" />
+          <h3 className="text-lg font-bold text-white">History</h3>
         </div>
         <button 
           onClick={() => navigate('/trading-accounts')}
-          className="text-[11px] font-bold text-[#8B949E] uppercase tracking-widest hover:text-[#E6EDF3] transition-colors flex items-center"
+          className="text-xs font-bold text-[#bd4dd6] hover:text-[#a63aba] transition-colors"
         >
           View All Context
         </button>
@@ -102,33 +102,33 @@ export default function RecentTrades({ filterType = 'all' }: { filterType?: stri
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#0E1117] border-b border-[#30363D]">
-              <th className="py-2.5 px-4 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Symbol</th>
-              <th className="py-2.5 px-4 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Type</th>
-              <th className="py-2.5 px-4 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">MT5 Account</th>
-              <th className="py-2.5 px-4 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">P/L</th>
-              <th className="py-2.5 px-4 text-[10px] font-bold text-[#8B949E] uppercase tracking-widest">Execution Time</th>
+            <tr className="border-b border-[#2A2A2A]">
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">Symbol</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">Type</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">MT5 Account</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080]">P/L</th>
+              <th className="py-4 px-6 text-xs font-bold text-[#808080] text-right">Execution Time</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#30363D]">
+          <tbody className="divide-y divide-[#2A2A2A]">
             {trades.map((trade) => (
-              <tr key={trade.id} className="hover:bg-[#30363D]/20 transition-colors">
-                <td className="py-3 px-4">
-                  <span className="text-[12px] font-bold text-[#E6EDF3] uppercase tracking-wide">{trade.symbol}</span>
-                  <p className="text-[10px] text-[#8B949E] font-mono">#{trade.ticket}</p>
+              <tr key={trade.id} className="hover:bg-[#2A2A2A]/30 transition-colors">
+                <td className="py-4 px-6">
+                  <span className="text-sm font-bold text-white">{trade.symbol}</span>
+                  <div className="text-[10px] text-[#808080] mt-0.5">#{trade.ticket}</div>
                 </td>
-                <td className="py-3 px-4">
-                  <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase ${
-                    trade.type.toLowerCase() === 'buy' ? 'bg-[#3FB950]/10 text-[#3FB950]' : 'bg-[#F85149]/10 text-[#F85149]'
+                <td className="py-4 px-6">
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-sm ${
+                    trade.type.toLowerCase() === 'buy' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
                   }`}>
-                    {trade.type}
+                    {trade.type.toUpperCase()}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-[12px] text-[#8B949E] font-mono">{trade.mt5_id}</td>
-                <td className={`py-3 px-4 text-[13px] font-mono font-bold ${trade.profit >= 0 ? 'text-[#3FB950]' : 'text-[#F85149]'}`}>
+                <td className="py-4 px-6 text-sm text-[#a0a0a0] font-mono">{trade.mt5_id}</td>
+                <td className={`py-4 px-6 text-sm font-bold ${trade.profit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {trade.profit >= 0 ? '+' : ''}${trade.profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </td>
-                <td className="py-3 px-4 text-[11px] text-[#8B949E] uppercase tracking-wider">
+                <td className="py-4 px-6 text-xs text-[#a0a0a0] text-right">
                   {new Date(trade.close_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </td>
               </tr>

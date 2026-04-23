@@ -222,47 +222,47 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Balance */}
-        <div className="bg-[#161B22] border border-[#30363D] rounded-sm p-6 relative overflow-hidden">
-          <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest mb-4">Total Balance</p>
+        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
+          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Total Balance</p>
           <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-[#E6EDF3] tracking-tighter tabular-nums">${stats.totalBalance.toLocaleString()}</h3>
+            <h3 className="text-3xl font-bold text-white">${stats.totalBalance.toLocaleString()}</h3>
           </div>
-          <div className="mt-5 flex items-center text-[11px] font-semibold tracking-wide text-[#3FB950] uppercase">
+          <div className="mt-4 flex items-center text-xs font-bold text-[#bd4dd6]">
             <span>+{stats.monthlyChange.toFixed(1)}% Active Change</span>
           </div>
         </div>
 
         {/* Active Accounts */}
-        <div className="bg-[#161B22] border border-[#30363D] rounded-sm p-6 relative overflow-hidden">
-          <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest mb-4">Active Accounts</p>
+        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
+          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Active Accounts</p>
           <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-[#E6EDF3] tracking-tighter tabular-nums">{stats.activeAccounts}</h3>
+            <h3 className="text-3xl font-bold text-white">{stats.activeAccounts}</h3>
           </div>
-          <div className="mt-5 flex items-center text-[11px] font-semibold tracking-wide text-[#8B949E] uppercase">
+          <div className="mt-4 flex items-center text-xs font-bold text-[#a0a0a0]">
             <span>{stats.pendingAccounts} Pending Approval</span>
           </div>
         </div>
 
         {/* Total Trades */}
-        <div className="bg-[#161B22] border border-[#30363D] rounded-sm p-6 relative overflow-hidden">
-          <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest mb-4">Total Executions</p>
+        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
+          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Total Executions</p>
           <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-[#E6EDF3] tracking-tighter tabular-nums">{stats.totalTrades}</h3>
+            <h3 className="text-3xl font-bold text-white">{stats.totalTrades}</h3>
           </div>
-          <div className="mt-5 flex items-center text-[11px] font-semibold tracking-wide text-[#1D9BF0] uppercase">
-            <span>Total Realized Profit: ${stats.totalProfits.toLocaleString()}</span>
+          <div className="mt-4 flex items-center text-xs font-bold text-[#bd4dd6]">
+            <span className="text-white mr-1">${stats.totalProfits.toLocaleString()}</span> Realized
           </div>
         </div>
 
         {/* Average Trade Size */}
-        <div className="bg-[#161B22] border border-[#30363D] rounded-sm p-6 relative overflow-hidden">
-          <p className="text-[10px] font-bold text-[#8B949E] uppercase tracking-widest mb-4">Avg Profit Context</p>
+        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
+          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Avg Profit Context</p>
           <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-[#E6EDF3] tracking-tighter tabular-nums">
+            <h3 className="text-3xl font-bold text-white">
               ${stats.totalTrades > 0 ? (stats.totalProfits / stats.totalTrades).toFixed(2) : '0.00'}
             </h3>
           </div>
-          <div className="mt-5 flex items-center text-[11px] font-semibold tracking-wide text-[#8B949E] uppercase">
+          <div className="mt-4 flex items-center text-xs font-bold text-[#bd4dd6]">
             <span>Per Closed Action</span>
           </div>
         </div>
