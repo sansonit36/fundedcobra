@@ -13,6 +13,8 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import AdminLogin from './pages/auth/AdminLogin';
 import Dashboard from './pages/Dashboard';
+import InstitutionalDashboard from './pages/demo/InstitutionalDashboard';
+import InstLayout from './components/InstLayout';
 import TradingAccounts from './pages/TradingAccounts';
 import BuyAccount from './pages/BuyAccount';
 import ThankYou from './pages/ThankYou';
@@ -212,6 +214,15 @@ export default function App() {
               <Route path="/live-support" element={<LiveSupport />} />
               <Route path="/leaderboard" element={<LeaderboardPage />} />
               <Route path="/my-profile" element={<MyProfile />} />
+            </Route>
+
+            {/* Institutional Layout (Demo) */}
+            <Route element={
+              <PrivateRoute>
+                <InstLayout />
+              </PrivateRoute>
+            }>
+              <Route path="/institutional-demo" element={<InstitutionalDashboard />} />
             </Route>
 
             {/* Public Pages (no auth required) */}
