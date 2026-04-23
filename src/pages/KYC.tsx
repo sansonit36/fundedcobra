@@ -177,7 +177,7 @@ export default function KYC() {
       )}
 
       {verification?.status === 'approved' ? (
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
+        <div className="card-gradient rounded-2xl p-6 border border-[#2A2A2A] bg-[#1e1e1e]">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 rounded-xl bg-green-500/10 flex-shrink-0 flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-green-400" />
@@ -227,7 +227,7 @@ export default function KYC() {
           </div>
         </div>
       ) : verification?.status === 'rejected' ? (
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
+        <div className="card-gradient rounded-2xl p-6 border border-[#2A2A2A] bg-[#1e1e1e]">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 rounded-xl bg-red-500/10 flex-shrink-0 flex items-center justify-center">
               <XCircle className="w-6 h-6 text-red-400" />
@@ -255,7 +255,7 @@ export default function KYC() {
 
       {/* Instructions Card - Only show if not approved */}
       {verification?.status !== 'approved' && (
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
+        <div className="card-gradient rounded-2xl p-6 border border-[#2A2A2A] bg-[#1e1e1e]">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex-shrink-0 flex items-center justify-center">
               <Shield className="w-6 h-6 text-primary-400" />
@@ -300,7 +300,7 @@ export default function KYC() {
 
       {/* Upload Section - Only show if not approved */}
       {verification?.status !== 'approved' && (
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
+        <div className="card-gradient rounded-2xl p-6 border border-[#2A2A2A] bg-[#1e1e1e]">
           <div className="space-y-6">
             {/* Status Section */}
             {verification && (
@@ -351,8 +351,8 @@ export default function KYC() {
                         htmlFor="id-front"
                         className={`flex flex-col items-center justify-center w-full h-48 rounded-lg border-2 border-dashed ${
                           uploadedFiles.id_front 
-                            ? 'border-green-500/50 bg-green-500/5' 
-                            : 'border-gray-600 hover:border-gray-500 bg-white/5'
+                            ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_15px_rgba(34,197,94,0.15)]' 
+                            : 'border-[#2A2A2A] bg-[#161616] hover:border-[#bd4dd6] hover:bg-[#bd4dd6]/5'
                         } cursor-pointer transition-colors`}
                       >
                         {uploadedFiles.id_front ? (
@@ -389,8 +389,8 @@ export default function KYC() {
                         htmlFor="id-back"
                         className={`flex flex-col items-center justify-center w-full h-48 rounded-lg border-2 border-dashed ${
                           uploadedFiles.id_back 
-                            ? 'border-green-500/50 bg-green-500/5' 
-                            : 'border-gray-600 hover:border-gray-500 bg-white/5'
+                            ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_15px_rgba(34,197,94,0.15)]' 
+                            : 'border-[#2A2A2A] bg-[#161616] hover:border-[#bd4dd6] hover:bg-[#bd4dd6]/5'
                         } cursor-pointer transition-colors`}
                       >
                         {uploadedFiles.id_back ? (
@@ -427,8 +427,8 @@ export default function KYC() {
                         htmlFor="selfie"
                         className={`flex flex-col items-center justify-center w-full h-48 rounded-lg border-2 border-dashed ${
                           uploadedFiles.selfie 
-                            ? 'border-green-500/50 bg-green-500/5' 
-                            : 'border-gray-600 hover:border-gray-500 bg-white/5'
+                            ? 'border-green-500/50 bg-green-500/5 shadow-[0_0_15px_rgba(34,197,94,0.15)]' 
+                            : 'border-[#2A2A2A] bg-[#161616] hover:border-[#bd4dd6] hover:bg-[#bd4dd6]/5'
                         } cursor-pointer transition-colors`}
                       >
                         {uploadedFiles.selfie ? (
@@ -452,7 +452,7 @@ export default function KYC() {
                   <button
                     onClick={handleSubmit}
                     disabled={uploading || !uploadedFiles.id_front || !uploadedFiles.id_back || !uploadedFiles.selfie}
-                    className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="px-6 py-2.5 bg-[#bd4dd6] hover:bg-[#aa44c0] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-[#bd4dd6]/20"
                   >
                     {uploading ? (
                       <>
