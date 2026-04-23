@@ -65,9 +65,6 @@ export default function Rules() {
     { label: 'Automated Bots / Expert Advisors (EAs)', note: 'All trading must be done manually by you.' },
     { label: 'High-Frequency Trading (HFT)', note: 'No rapid-fire orders placed by scripts.' },
     { label: 'Trades Held Under 60 Seconds', note: 'Every trade must stay open for at least 1 minute.' },
-    { label: 'Martingale Strategy', note: 'Doubling down after losses to recover is not allowed.' },
-    { label: 'Grid Trading', note: 'Pre-placed orders at set intervals are not permitted.' },
-    { label: 'Arbitrage', note: 'Exploiting price differences across brokers is not allowed.' },
     { label: '3+ Consecutive Same-Direction Trades', note: "Don't keep placing the same buy or sell over and over." },
     { label: 'Hedging On The Same Pair', note: 'No simultaneous buy and sell on the same instrument.' },
   ];
