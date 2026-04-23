@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FundedCobra — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ════════════════════════════════════════════════════════════════
+       DESIGN SYSTEM — "VENOM"
+       A dark, alive, premium aesthetic for FundedCobra
+       ════════════════════════════════════════════════════════════════ */
+    :root {
+      /* The void — deep blacks with blue undertone */
+      --void-0: #04060b;
+      --void-1: #080c14;
+      --void-2: #0c111c;
+      --void-3: #111827;
+      --void-4: #1a2235;
+      --void-5: #243049;
+
+      /* Cobra purple — rich, saturated, alive */
+      --cobra-50:  #f5f0ff;
+      --cobra-100: #ede5ff;
+      --cobra-200: #daccff;
+      --cobra-300: #c4a8ff;
+      --cobra-400: #a97aff;
+      --cobra-500: #8b5cf6;
+      --cobra-600: #7c3aed;
+      --cobra-700: #6d28d9;
+      --cobra-800: #5b21b6;
+
+      /* Venom green — the secondary accent */
+      --venom-400: #34d399;
+      --venom-500: #10b981;
+      --venom-600: #059669;
+
+      /* Danger */
+      --fang-400: #f87171;
+      --fang-500: #ef4444;
+
+      /* Amber */
+      --amber-400: #fbbf24;
+      --amber-500: #f59e0b;
+
+      /* Glass */
+      --glass-bg: rgba(255,255,255,0.03);
+      --glass-border: rgba(255,255,255,0.06);
+      --glass-hover: rgba(255,255,255,0.08);
+
+      /* Text */
+      --text-100: #f8fafc;
+      --text-200: #e2e8f0;
+      --text-300: #cbd5e1;
+      --text-400: #94a3b8;
+      --text-500: #64748b;
+      --text-600: #475569;
+
+      /* Fonts */
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       RESET
+       ════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--void-0);
+      color: var(--text-200);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ════════════════════════════════════════════════════════════════
+       ANIMATED MESH GRADIENT BACKGROUND — the "alive" layer
+       ════════════════════════════════════════════════════════════════ */
+    .mesh-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .mesh-bg .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.12;
+      animation: drift 20s ease-in-out infinite alternate;
+    }
+    .mesh-bg .orb-1 {
+      width: 600px; height: 600px;
+      background: var(--cobra-600);
+      top: -15%; left: -10%;
+      animation-delay: 0s;
+    }
+    .mesh-bg .orb-2 {
+      width: 500px; height: 500px;
+      background: var(--cobra-800);
+      bottom: -20%; right: -5%;
+      animation-delay: -5s;
+      animation-duration: 25s;
+    }
+    .mesh-bg .orb-3 {
+      width: 400px; height: 400px;
+      background: var(--venom-600);
+      top: 40%; left: 50%;
+      opacity: 0.06;
+      animation-delay: -10s;
+      animation-duration: 30s;
+    }
+    @keyframes drift {
+      0% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -40px) scale(1.05); }
+      66% { transform: translate(-20px, 30px) scale(0.95); }
+      100% { transform: translate(10px, -10px) scale(1.02); }
+    }
+
+    /* Noise texture overlay for depth */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       APP SHELL
+       ════════════════════════════════════════════════════════════════ */
+    .app-shell { position: relative; z-index: 2; display: flex; min-height: 100vh; }
+
+    /* ════════════════════════════════════════════════════════════════
+       SIDEBAR — frosted glass, floating
+       ════════════════════════════════════════════════════════════════ */
+    .sidebar {
+      width: 72px;
+      min-height: 100vh;
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      background: rgba(8,12,20,0.6);
+      backdrop-filter: blur(24px) saturate(1.2);
+      border-right: 1px solid var(--glass-border);
+      z-index: 60;
+    }
+
+    .sidebar-logo {
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--cobra-700) 0%, var(--cobra-500) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+      box-shadow:
+        0 0 0 1px rgba(139,92,246,0.2),
+        0 4px 16px rgba(139,92,246,0.2),
+        0 0 40px rgba(139,92,246,0.1);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .sidebar-logo:hover {
+      transform: scale(1.08) rotate(-4deg);
+      box-shadow:
+        0 0 0 1px rgba(139,92,246,0.3),
+        0 8px 24px rgba(139,92,246,0.35),
+        0 0 60px rgba(139,92,246,0.15);
+    }
+    .sidebar-logo svg { width: 24px; height: 24px; }
+
+    .nav-rail {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 8px;
+    }
+
+    .nav-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-500);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+    }
+    .nav-icon svg { width: 20px; height: 20px; transition: transform 0.2s; }
+    .nav-icon:hover { color: var(--text-300); background: var(--glass-hover); }
+    .nav-icon:hover svg { transform: scale(1.1); }
+
+    .nav-icon.active {
+      color: var(--cobra-400);
+      background: rgba(139,92,246,0.1);
+    }
+    .nav-icon.active::after {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 16px;
+      border-radius: 0 4px 4px 0;
+      background: var(--cobra-500);
+      box-shadow: 0 0 8px var(--cobra-500);
+    }
+
+    .nav-icon .badge-dot {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--fang-500);
+      border: 2px solid var(--void-1);
+    }
+
+    /* Tooltip on hover */
+    .nav-icon .tooltip {
+      position: absolute;
+      left: 60px;
+      top: 50%;
+      transform: translateY(-50%) translateX(-4px);
+      background: var(--void-4);
+      color: var(--text-200);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .nav-icon:hover .tooltip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    .nav-divider {
+      width: 24px;
+      height: 1px;
+      background: var(--glass-border);
+      margin: 8px 0;
+    }
+
+    .sidebar-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 8px;
+    }
+
+    .sidebar-avatar {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cobra-700), var(--cobra-500));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 8px;
+    }
+    .sidebar-avatar:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(139,92,246,0.3);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       MAIN CONTENT AREA
+       ════════════════════════════════════════════════════════════════ */
+    .main-area {
+      flex: 1;
+      margin-left: 72px;
+      min-height: 100vh;
+    }
+
+    /* ── Top Bar ── */
+    .top-bar {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(4,6,11,0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .top-bar-left { display: flex; align-items: center; gap: 16px; }
+    .breadcrumb { font-size: 13px; color: var(--text-500); display: flex; align-items: center; gap: 6px; }
+    .breadcrumb span { color: var(--text-300); font-weight: 600; }
+
+    .top-bar-right { display: flex; align-items: center; gap: 8px; }
+    .top-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      color: var(--text-400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .top-btn:hover { background: var(--glass-hover); border-color: rgba(255,255,255,0.1); color: var(--text-200); }
+    .top-btn svg { width: 18px; height: 18px; }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      background: linear-gradient(135deg, var(--cobra-600), var(--cobra-500));
+      color: white;
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.3), 0 2px 8px rgba(139,92,246,0.25);
+    }
+    .cta-btn:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.4), 0 8px 24px rgba(139,92,246,0.35);
+    }
+    .cta-btn svg { width: 16px; height: 16px; }
+
+    /* ── Content Canvas ── */
+    .canvas { padding: 28px 32px 60px; max-width: 1360px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       HERO BALANCE CARD — the centerpiece
+       ════════════════════════════════════════════════════════════════ */
+    .hero-card {
+      position: relative;
+      border-radius: 20px;
+      padding: 32px;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(139,92,246,0.08) 0%, rgba(16,185,129,0.04) 100%);
+      border: 1px solid rgba(139,92,246,0.12);
+      margin-bottom: 20px;
+    }
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 50%;
+      height: 100%;
+      background: radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Decorative snake scale pattern */
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -20px;
+      width: 280px;
+      height: 280px;
+      background-image: radial-gradient(circle, rgba(139,92,246,0.06) 1px, transparent 1px);
+      background-size: 16px 16px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-greeting {
+      font-size: 14px;
+      color: var(--text-400);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .hero-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-100);
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+    .hero-name em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--cobra-400), var(--venom-400));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-balance-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-500);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-balance-label .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--venom-500);
+      box-shadow: 0 0 10px var(--venom-500);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .hero-balance {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--text-100);
+      letter-spacing: -2px;
+      line-height: 1;
+      font-family: var(--font-sans);
+    }
+    .hero-balance .dollar { font-size: 32px; font-weight: 600; color: var(--text-400); margin-right: 2px; vertical-align: top; line-height: 1.6; }
+    .hero-balance .cents { font-size: 24px; font-weight: 500; color: var(--text-500); }
+
+    .hero-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(16,185,129,0.1);
+      color: var(--venom-400);
+      border: 1px solid rgba(16,185,129,0.15);
+    }
+    .hero-change svg { width: 14px; height: 14px; }
+
+    .hero-sparkline {
+      position: relative;
+      z-index: 2;
+      width: 300px;
+    }
+
+    /* Sub-stats row */
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .hero-stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-500);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hero-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-200);
+    }
+    .hero-stat-value.green { color: var(--venom-400); }
+    .hero-stat-value.brand { color: var(--cobra-400); }
+
+    /* ════════════════════════════════════════════════════════════════
+       BENTO GRID
+       ════════════════════════════════════════════════════════════════ */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .bento-card {
+      background: var(--void-2);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .bento-card:hover {
+      border-color: rgba(255,255,255,0.1);
+      background: var(--void-3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .bento-card .glow {
+      position: absolute;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .bento-card:hover .glow { opacity: 1; }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    /* ── Card internal styles ── */
+    .card-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-600);
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-200);
+      margin-bottom: 16px;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       MINI STAT — inside bento cards
+       ════════════════════════════════════════════════════════════════ */
+    .mini-stat-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .mini-stat-icon svg { width: 18px; height: 18px; }
+    .mini-stat-icon.green { background: rgba(16,185,129,0.1); color: var(--venom-400); border: 1px solid rgba(16,185,129,0.1); }
+    .mini-stat-icon.brand { background: rgba(139,92,246,0.1); color: var(--cobra-400); border: 1px solid rgba(139,92,246,0.1); }
+    .mini-stat-icon.amber { background: rgba(245,158,11,0.1); color: var(--amber-400); border: 1px solid rgba(245,158,11,0.1); }
+    .mini-stat-icon.blue { background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.1); }
+
+    .mini-stat-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-100);
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+    }
+    .mini-stat-label { font-size: 12px; color: var(--text-500); font-weight: 500; }
+    .mini-stat-sub { font-size: 11px; color: var(--text-600); margin-top: 10px; display: flex; align-items: center; gap: 4px; }
+    .mini-stat-sub svg { width: 12px; height: 12px; }
+    .mini-stat-sub.positive { color: var(--venom-400); }
+
+    /* Sparkline canvas */
+    .sparkline-wrap { margin-top: 16px; height: 40px; }
+    .sparkline-canvas { width: 100%; height: 40px; display: block; }
+
+    /* ════════════════════════════════════════════════════════════════
+       ACCOUNT STATUS CARD
+       ════════════════════════════════════════════════════════════════ */
+    .account-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .account-row:last-child { border-bottom: none; }
+    .account-row:first-child { padding-top: 0; }
+
+    .account-left { display: flex; align-items: center; gap: 14px; }
+    .account-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .account-icon.active { background: rgba(16,185,129,0.08); color: var(--venom-400); border: 1px solid rgba(16,185,129,0.12); }
+    .account-icon.breached { background: rgba(239,68,68,0.08); color: var(--fang-400); border: 1px solid rgba(239,68,68,0.12); }
+
+    .account-id { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-200); }
+    .account-pkg { font-size: 11px; color: var(--text-500); margin-top: 2px; }
+
+    .account-right { text-align: right; }
+    .account-balance { font-size: 14px; font-weight: 700; color: var(--text-200); }
+    .account-pnl { font-size: 11px; font-weight: 600; margin-top: 2px; }
+    .account-pnl.positive { color: var(--venom-400); }
+    .account-pnl.negative { color: var(--fang-400); }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .status-pill.active { background: rgba(16,185,129,0.1); color: var(--venom-400); }
+    .status-pill.breached { background: rgba(239,68,68,0.1); color: var(--fang-400); }
+
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .status-dot.green { background: var(--venom-500); }
+    .status-dot.red { background: var(--fang-500); }
+
+    /* ════════════════════════════════════════════════════════════════
+       DRAWDOWN GAUGE — circular
+       ════════════════════════════════════════════════════════════════ */
+    .gauge-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 8px 0;
+    }
+    .gauge { position: relative; width: 110px; height: 110px; }
+    .gauge svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+    .gauge circle {
+      fill: none;
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+    .gauge .track { stroke: rgba(255,255,255,0.04); }
+    .gauge .fill-green { stroke: var(--venom-500); filter: drop-shadow(0 0 6px rgba(16,185,129,0.4)); }
+    .gauge .fill-brand { stroke: var(--cobra-500); filter: drop-shadow(0 0 6px rgba(139,92,246,0.4)); }
+    .gauge-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .gauge-value { font-size: 20px; font-weight: 800; color: var(--text-100); }
+    .gauge-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-500); margin-top: 2px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       TRADES TABLE — refined
+       ════════════════════════════════════════════════════════════════ */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    table thead th {
+      padding: 10px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-600);
+      text-align: left;
+      background: rgba(255,255,255,0.015);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    table tbody td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-400);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    table tbody tr { transition: background 0.15s; }
+    table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    table tbody tr:last-child td { border-bottom: none; }
+
+    .symbol-cell { display: flex; align-items: center; gap: 10px; }
+    .symbol-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .symbol-icon.forex { background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.1); }
+    .symbol-icon.gold { background: rgba(245,158,11,0.1); color: var(--amber-400); border: 1px solid rgba(245,158,11,0.1); }
+    .symbol-name { font-weight: 700; color: var(--text-200); }
+    .symbol-ticket { font-size: 10px; color: var(--text-600); font-family: var(--font-mono); }
+
+    .type-pill {
+      display: inline-flex;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .type-pill.buy { background: rgba(16,185,129,0.08); color: var(--venom-400); }
+    .type-pill.sell { background: rgba(239,68,68,0.08); color: var(--fang-400); }
+
+    .profit-cell { font-weight: 700; font-family: var(--font-mono); }
+    .profit-cell.win { color: var(--venom-400); }
+    .profit-cell.loss { color: var(--fang-400); }
+
+    .mono { font-family: var(--font-mono); font-size: 12px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       GHOST BUTTON
+       ════════════════════════════════════════════════════════════════ */
+    .ghost-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-500);
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+    }
+    .ghost-btn:hover { color: var(--text-300); border-color: rgba(255,255,255,0.12); background: var(--glass-hover); }
+    .ghost-btn svg { width: 14px; height: 14px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       PROGRESS BAR
+       ════════════════════════════════════════════════════════════════ */
+    .progress { width: 100%; height: 5px; background: rgba(255,255,255,0.04); border-radius: 100px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 100px; transition: width 1.5s cubic-bezier(0.4,0,0.2,1); }
+    .progress-bar.green { background: linear-gradient(90deg, var(--venom-600), var(--venom-400)); box-shadow: 0 0 10px rgba(16,185,129,0.3); }
+    .progress-bar.brand { background: linear-gradient(90deg, var(--cobra-700), var(--cobra-400)); box-shadow: 0 0 10px rgba(139,92,246,0.3); }
+
+    /* ════════════════════════════════════════════════════════════════
+       ANIMATIONS
+       ════════════════════════════════════════════════════════════════ */
+    .fade-up {
+      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+      opacity: 0;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.10s; }
+    .d3 { animation-delay: 0.15s; }
+    .d4 { animation-delay: 0.20s; }
+    .d5 { animation-delay: 0.25s; }
+    .d6 { animation-delay: 0.30s; }
+    .d7 { animation-delay: 0.35s; }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION DIVIDER
+       ════════════════════════════════════════════════════════════════ */
+    .section-divider {
+      margin: 60px 0;
+      border: none;
+      border-top: 1px dashed rgba(255,255,255,0.06);
+    }
+
+    .demo-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      background: rgba(139,92,246,0.08);
+      color: var(--cobra-400);
+      border: 1px solid rgba(139,92,246,0.12);
+      margin-bottom: 24px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       LOGIN PAGE (full bleed)
+       ════════════════════════════════════════════════════════════════ */
+    .login-section {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .login-glow {
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: var(--cobra-700);
+      filter: blur(150px);
+      opacity: 0.12;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo-icon {
+      width: 52px; height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--cobra-700), var(--cobra-500));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 0 40px rgba(139,92,246,0.2), 0 0 80px rgba(139,92,246,0.08);
+    }
+    .login-logo-icon svg { width: 26px; height: 26px; }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-100);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .login-subtitle { font-size: 14px; color: var(--text-500); }
+
+    .login-form {
+      background: rgba(12,17,28,0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 28px;
+    }
+    .login-form:hover { border-color: rgba(255,255,255,0.08); }
+
+    .field { margin-bottom: 16px; }
+    .field-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .field-label label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-400);
+    }
+    .field-label a {
+      font-size: 12px;
+      color: var(--cobra-400);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .field-label a:hover { color: var(--cobra-300); }
+
+    .field-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.02);
+      color: var(--text-200);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field-input::placeholder { color: var(--text-600); }
+    .field-input:focus {
+      border-color: var(--cobra-500);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.08);
+    }
+
+    .login-submit {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      background: linear-gradient(135deg, var(--cobra-600), var(--cobra-500));
+      color: white;
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.3), 0 4px 12px rgba(139,92,246,0.25);
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      margin-top: 8px;
+    }
+    .login-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.4), 0 8px 24px rgba(139,92,246,0.35);
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-500);
+    }
+    .login-footer a { color: var(--cobra-400); font-weight: 600; }
+    .login-footer a:hover { color: var(--cobra-300); }
+
+    /* ════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1200px) {
+      .span-3, .span-4 { grid-column: span 6; }
+      .span-5, .span-7, .span-8 { grid-column: span 12; }
+      .hero-sparkline { display: none; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-area { margin-left: 0; }
+      .canvas { padding: 20px 16px; }
+      .bento { grid-template-columns: 1fr; }
+      .span-3, .span-4, .span-5, .span-6, .span-7, .span-8, .span-12 { grid-column: span 1; }
+      .hero-balance { font-size: 36px; }
+      .hero-stats { flex-wrap: wrap; gap: 16px; }
+      .metric-row { grid-template-columns: 1fr 1fr; }
+      .gauge-wrap { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Living background -->
+  <div class="mesh-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="noise-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       APP SHELL
+       ═══════════════════════════════════════════════════════════════ -->
+  <div class="app-shell">
+
+    <!-- ── SIDEBAR (Icon Rail) ── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo" title="FundedCobra">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C8.5 3 6 5.5 6 8.5c0 2 1 3.5 2.5 4.5L7 20h10l-1.5-7C17 12 18 10.5 18 8.5 18 5.5 15.5 3 12 3z" fill="white" opacity="0.9"/>
+          <circle cx="9.5" cy="8" r="1" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="14.5" cy="8" r="1" fill="rgba(0,0,0,0.25)"/>
+        </svg>
+      </div>
+
+      <nav class="nav-rail">
+        <div class="nav-icon active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span class="tooltip">Dashboard</span>
+        </div>
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="tooltip">Accounts</span>
+          <span class="badge-dot"></span>
+        </div>
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="tooltip">Buy Account</span>
+        </div>
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+          <span class="tooltip">Payouts</span>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="tooltip">KYC</span>
+        </div>
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          <span class="tooltip">Rules</span>
+        </div>
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="tooltip">Affiliates</span>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="tooltip">Support</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="tooltip">Settings</span>
+        </div>
+        <div class="sidebar-avatar">AK</div>
+      </div>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="main-area">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <div class="breadcrumb">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span>Dashboard</span>
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <button class="top-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <button class="top-btn" style="position: relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span style="position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--fang-500); border-radius: 50%; border: 2px solid var(--void-1);"></span>
+          </button>
+          <button class="cta-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Buy Account
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="canvas">
+
+        <!-- ═══ HERO BALANCE ═══ -->
+        <div class="hero-card fade-up d1">
+          <div class="hero-top">
+            <div>
+              <div class="hero-greeting">Good evening,</div>
+              <div class="hero-name">Ahmed <em>Khan</em></div>
+              <div class="hero-balance-label">
+                <span class="live-dot"></span>
+                Portfolio Balance
+              </div>
+              <div class="hero-balance">
+                <span class="dollar">$</span>152,400<span class="cents">.00</span>
+              </div>
+              <div class="hero-change">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                +$12,180 (+8.2%) this month
+              </div>
+            </div>
+            <div class="hero-sparkline">
+              <canvas id="heroChart" width="300" height="140"></canvas>
+            </div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-label">Today's P&L</div>
+              <div class="hero-stat-value green">+$1,284.50</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-label">Active Accounts</div>
+              <div class="hero-stat-value">3</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-label">Total Trades</div>
+              <div class="hero-stat-value">287</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-label">Win Rate</div>
+              <div class="hero-stat-value brand">68.4%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ BENTO GRID — Row 1 ═══ -->
+        <div class="bento">
+          <!-- Trades Today -->
+          <div class="bento-card span-3 fade-up d2">
+            <div class="glow" style="background: var(--venom-500); top: -40px; right: -40px;"></div>
+            <div class="mini-stat-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="mini-stat-value">12</div>
+            <div class="mini-stat-label">Trades Today</div>
+            <div class="mini-stat-sub positive">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+              +4 from yesterday
+            </div>
+            <div class="sparkline-wrap">
+              <canvas class="sparkline-canvas" id="spark1"></canvas>
+            </div>
+          </div>
+
+          <!-- Avg Profit -->
+          <div class="bento-card span-3 fade-up d3">
+            <div class="glow" style="background: var(--cobra-500); top: -40px; right: -40px;"></div>
+            <div class="mini-stat-icon brand">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="mini-stat-value">$42<span style="font-size:16px;color:var(--text-500);">.38</span></div>
+            <div class="mini-stat-label">Avg. Profit / Trade</div>
+            <div class="mini-stat-sub positive">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+              +5.1% this week
+            </div>
+            <div class="sparkline-wrap">
+              <canvas class="sparkline-canvas" id="spark2"></canvas>
+            </div>
+          </div>
+
+          <!-- Drawdown Gauges -->
+          <div class="bento-card span-6 fade-up d4">
+            <div class="card-head">
+              <div>
+                <div class="card-eyebrow">Account #503291</div>
+                <div class="card-title" style="margin-bottom: 0;">Risk Protection</div>
+              </div>
+              <div class="status-pill active"><span class="status-dot green"></span> Safe</div>
+            </div>
+            <div class="gauge-wrap">
+              <div style="text-align: center;">
+                <div class="gauge">
+                  <svg viewBox="0 0 110 110">
+                    <circle class="track" cx="55" cy="55" r="48"/>
+                    <circle class="fill-green" cx="55" cy="55" r="48" stroke-dasharray="301.6" stroke-dashoffset="54"/>
+                  </svg>
+                  <div class="gauge-center">
+                    <div class="gauge-value" style="color: var(--venom-400);">82%</div>
+                    <div class="gauge-label">Safe Zone</div>
+                  </div>
+                </div>
+                <div style="margin-top: 8px;">
+                  <div style="font-size: 11px; font-weight: 600; color: var(--text-500);">Daily Guard</div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-200); margin-top: 2px;">$48,600</div>
+                  <div style="font-size: 11px; color: var(--venom-400); font-weight: 600; margin-top: 2px;">+$4,540 room</div>
+                </div>
+              </div>
+              <div style="width: 1px; height: 100px; background: var(--glass-border);"></div>
+              <div style="text-align: center;">
+                <div class="gauge">
+                  <svg viewBox="0 0 110 110">
+                    <circle class="track" cx="55" cy="55" r="48"/>
+                    <circle class="fill-brand" cx="55" cy="55" r="48" stroke-dasharray="301.6" stroke-dashoffset="24"/>
+                  </svg>
+                  <div class="gauge-center">
+                    <div class="gauge-value" style="color: var(--cobra-400);">92%</div>
+                    <div class="gauge-label">Protected</div>
+                  </div>
+                </div>
+                <div style="margin-top: 8px;">
+                  <div style="font-size: 11px; font-weight: 600; color: var(--text-500);">Max Safety</div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--text-200); margin-top: 2px;">$44,000</div>
+                  <div style="font-size: 11px; color: var(--cobra-400); font-weight: 600; margin-top: 2px;">+$9,140 room</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ BENTO GRID — Row 2: Table + Accounts ═══ -->
+        <div class="bento">
+          <!-- Recent Trades Table -->
+          <div class="bento-card span-8 fade-up d5" style="padding: 0;">
+            <div class="card-head" style="padding: 16px 20px; margin-bottom: 0;">
+              <div class="card-title" style="margin-bottom: 0;">Recent Trades</div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-500); font-weight: 600;">
+                  <span class="live-dot" style="width:5px;height:5px;"></span> Live
+                </div>
+                <button class="ghost-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  Export
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Type</th>
+                    <th>Volume</th>
+                    <th>Open</th>
+                    <th>Close</th>
+                    <th>Profit</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="symbol-cell">
+                        <div class="symbol-icon forex">EU</div>
+                        <div>
+                          <div class="symbol-name">EURUSD</div>
+                          <div class="symbol-ticket">#89421</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="type-pill buy">BUY</span></td>
+                    <td class="mono">0.50</td>
+                    <td class="mono">1.08245</td>
+                    <td class="mono">1.08502</td>
+                    <td class="profit-cell win">+$128.50</td>
+                    <td style="color: var(--text-500); font-size: 12px;">2m ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="symbol-cell">
+                        <div class="symbol-icon forex">GJ</div>
+                        <div>
+                          <div class="symbol-name">GBPJPY</div>
+                          <div class="symbol-ticket">#89418</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="type-pill buy">BUY</span></td>
+                    <td class="mono">1.00</td>
+                    <td class="mono">191.450</td>
+                    <td class="mono">191.691</td>
+                    <td class="profit-cell win">+$241.00</td>
+                    <td style="color: var(--text-500); font-size: 12px;">18m ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="symbol-cell">
+                        <div class="symbol-icon gold">XU</div>
+                        <div>
+                          <div class="symbol-name">XAUUSD</div>
+                          <div class="symbol-ticket">#89414</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="type-pill sell">SELL</span></td>
+                    <td class="mono">0.25</td>
+                    <td class="mono">2341.50</td>
+                    <td class="mono">2344.19</td>
+                    <td class="profit-cell loss">-$67.20</td>
+                    <td style="color: var(--text-500); font-size: 12px;">1h ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="symbol-cell">
+                        <div class="symbol-icon forex">UJ</div>
+                        <div>
+                          <div class="symbol-name">USDJPY</div>
+                          <div class="symbol-ticket">#89410</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="type-pill sell">SELL</span></td>
+                    <td class="mono">0.75</td>
+                    <td class="mono">154.320</td>
+                    <td class="mono">154.102</td>
+                    <td class="profit-cell win">+$163.50</td>
+                    <td style="color: var(--text-500); font-size: 12px;">2h ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="symbol-cell">
+                        <div class="symbol-icon forex">GU</div>
+                        <div>
+                          <div class="symbol-name">GBPUSD</div>
+                          <div class="symbol-ticket">#89406</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="type-pill buy">BUY</span></td>
+                    <td class="mono">0.50</td>
+                    <td class="mono">1.29410</td>
+                    <td class="mono">1.29682</td>
+                    <td class="profit-cell win">+$136.00</td>
+                    <td style="color: var(--text-500); font-size: 12px;">3h ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Accounts List -->
+          <div class="bento-card span-4 fade-up d6">
+            <div class="card-head">
+              <div class="card-title" style="margin-bottom: 0;">Accounts</div>
+              <button class="ghost-btn" style="padding: 4px 8px; font-size: 11px;">View All</button>
+            </div>
+
+            <div class="account-row">
+              <div class="account-left">
+                <div class="account-icon active">#1</div>
+                <div>
+                  <div class="account-id">#503291</div>
+                  <div class="account-pkg">$50K Standard</div>
+                </div>
+              </div>
+              <div class="account-right">
+                <div class="account-balance">$52,820</div>
+                <div class="account-pnl positive">+$2,820</div>
+              </div>
+            </div>
+
+            <div class="account-row">
+              <div class="account-left">
+                <div class="account-icon active">#2</div>
+                <div>
+                  <div class="account-id">#504182</div>
+                  <div class="account-pkg">$100K Funded</div>
+                </div>
+              </div>
+              <div class="account-right">
+                <div class="account-balance">$103,440</div>
+                <div class="account-pnl positive">+$3,440</div>
+              </div>
+            </div>
+
+            <div class="account-row">
+              <div class="account-left">
+                <div class="account-icon breached">#3</div>
+                <div>
+                  <div class="account-id">#501094</div>
+                  <div class="account-pkg">$25K Challenge</div>
+                </div>
+              </div>
+              <div class="account-right">
+                <div class="account-balance">$21,380</div>
+                <div class="account-pnl negative">-$3,620</div>
+              </div>
+            </div>
+
+            <!-- Quick stats under accounts -->
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 11px; color: var(--text-500);">Available for Payout</span>
+                <span style="font-size: 12px; font-weight: 700; color: var(--venom-400);">$4,260</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar green" style="width: 68%;"></div>
+              </div>
+              <div style="font-size: 10px; color: var(--text-600); margin-top: 6px;">68% of profit target reached</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!--     LOGIN PAGE PREVIEW                                  -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <hr class="section-divider">
+
+        <div class="demo-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          Login Page Preview
+        </div>
+
+        <div class="login-section fade-up d7">
+          <div class="login-glow"></div>
+          <div class="login-box">
+            <div class="login-brand">
+              <div class="login-logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 3C8.5 3 6 5.5 6 8.5c0 2 1 3.5 2.5 4.5L7 20h10l-1.5-7C17 12 18 10.5 18 8.5 18 5.5 15.5 3 12 3z" fill="white" opacity="0.9"/>
+                  <circle cx="9.5" cy="8" r="1" fill="rgba(0,0,0,0.25)"/>
+                  <circle cx="14.5" cy="8" r="1" fill="rgba(0,0,0,0.25)"/>
+                </svg>
+              </div>
+              <div class="login-title">Welcome back</div>
+              <div class="login-subtitle">Sign in to your FundedCobra account</div>
+            </div>
+
+            <div class="login-form">
+              <div class="field">
+                <div class="field-label"><label>Email</label></div>
+                <input class="field-input" type="email" placeholder="you@example.com">
+              </div>
+              <div class="field">
+                <div class="field-label">
+                  <label>Password</label>
+                  <a href="#">Forgot?</a>
+                </div>
+                <input class="field-input" type="password" placeholder="••••••••">
+              </div>
+              <button class="login-submit">Sign In</button>
+            </div>
+
+            <div class="login-footer">
+              Don't have an account? <a href="#">Create one</a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /canvas -->
+    </main>
+  </div><!-- /app-shell -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CANVAS CHARTS — hand-drawn sparklines
+       ═══════════════════════════════════════════════════════════════ -->
+  <script>
+    function drawSparkline(canvasId, data, color, fillColor) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const range = max - min || 1;
+      const step = w / (data.length - 1);
+      const pad = 4;
+
+      // Fill area
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      data.forEach((v, i) => {
+        const x = i * step;
+        const y = pad + ((max - v) / range) * (h - pad * 2);
+        if (i === 0) ctx.lineTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, fillColor);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Line
+      ctx.beginPath();
+      data.forEach((v, i) => {
+        const x = i * step;
+        const y = pad + ((max - v) / range) * (h - pad * 2);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // End dot
+      const lastX = (data.length - 1) * step;
+      const lastY = pad + ((max - data[data.length - 1]) / range) * (h - pad * 2);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 6, 0, Math.PI * 2);
+      ctx.fillStyle = color.replace(')', ',0.2)').replace('rgb', 'rgba');
+      ctx.fill();
+    }
+
+    // Hero chart — larger, more dramatic
+    function drawHeroChart() {
+      const canvas = document.getElementById('heroChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = 300 * dpr;
+      canvas.height = 140 * dpr;
+      ctx.scale(dpr, dpr);
+
+      const data = [120, 124, 122, 128, 126, 132, 130, 134, 131, 138, 135, 140, 138, 142, 145, 143, 148, 146, 150, 152];
+      const w = 300, h = 140;
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const range = max - min;
+      const step = w / (data.length - 1);
+      const pad = 12;
+
+      // Smooth curve helper
+      function getControlPoints(data, i, step, max, min, range, pad, h) {
+        const cur = { x: i * step, y: pad + ((max - data[i]) / range) * (h - pad * 2) };
+        const prev = i > 0 ? { x: (i-1) * step, y: pad + ((max - data[i-1]) / range) * (h - pad * 2) } : cur;
+        const next = i < data.length - 1 ? { x: (i+1) * step, y: pad + ((max - data[i+1]) / range) * (h - pad * 2) } : cur;
+        const tension = 0.3;
+        return {
+          cp1: { x: cur.x + (cur.x - prev.x) * tension, y: cur.y + (cur.y - prev.y) * tension },
+          cp2: { x: next.x - (next.x - cur.x) * tension, y: next.y - (next.y - cur.y) * tension }
+        };
+      }
+
+      // Fill
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      data.forEach((v, i) => {
+        const x = i * step;
+        const y = pad + ((max - v) / range) * (h - pad * 2);
+        if (i === 0) { ctx.lineTo(x, y); }
+        else { ctx.lineTo(x, y); }
+      });
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, 'rgba(139,92,246,0.15)');
+      grad.addColorStop(0.5, 'rgba(16,185,129,0.05)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Line with gradient
+      ctx.beginPath();
+      data.forEach((v, i) => {
+        const x = i * step;
+        const y = pad + ((max - v) / range) * (h - pad * 2);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      const lineGrad = ctx.createLinearGradient(0, 0, w, 0);
+      lineGrad.addColorStop(0, 'rgb(139,92,246)');
+      lineGrad.addColorStop(1, 'rgb(16,185,129)');
+      ctx.strokeStyle = lineGrad;
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // End glow
+      const lastX = (data.length - 1) * step;
+      const lastY = pad + ((max - data[data.length - 1]) / range) * (h - pad * 2);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgb(16,185,129)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 10, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(16,185,129,0.15)';
+      ctx.fill();
+    }
+
+    // Init charts
+    window.addEventListener('load', () => {
+      drawHeroChart();
+      drawSparkline('spark1', [3,5,4,7,6,8,9,7,10,8,11,12], 'rgb(16,185,129)', 'rgba(16,185,129,0.1)');
+      drawSparkline('spark2', [28,32,30,35,38,36,40,38,42,40,44,42], 'rgb(139,92,246)', 'rgba(139,92,246,0.1)');
+    });
+    window.addEventListener('resize', () => {
+      drawHeroChart();
+      drawSparkline('spark1', [3,5,4,7,6,8,9,7,10,8,11,12], 'rgb(16,185,129)', 'rgba(16,185,129,0.1)');
+      drawSparkline('spark2', [28,32,30,35,38,36,40,38,42,40,44,42], 'rgb(139,92,246)', 'rgba(139,92,246,0.1)');
+    });
+  </script>
+
+</body>
+</html>

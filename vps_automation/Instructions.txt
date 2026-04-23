@@ -1,0 +1,35 @@
+--- FundedCobra VPS Automation: Official Guide ---
+
+Welcome to your professional Prop Firm Trading Factory. 
+Everything is now organized in C:\FundedCobra.
+
+1. INITIAL SETUP (One-Time)
+   - Open PowerShell and run: C:\FundedCobra\vps_automation\setup\01_master_setup.ps1
+   - This will build all 25 slots for you.
+
+2. MASTER CONFIGURATION
+   - Edit: C:\FundedCobra\vps_automation\config_master.json
+   - Add your Master SMTP App Password and your website URLs here.
+
+3. ADDING STOCK ACCOUNTS
+   - Put your available Exness accounts in: C:\FundedCobra\Inbox\accounts_stock.txt
+   - Format: Login,Password,Server (one per line).
+
+4. STARTING THE AUTOMATION
+   - Run: C:\FundedCobra\vps_automation\FundedCobra_Agent.py
+   - Keep this window open! It is "The Brain" that watches for new sales.
+
+5. HOW A SALE WORKS
+   - When a sale happens (simulated by adding a buyer's email to C:\FundedCobra\Inbox\orders.txt), the Agent will:
+     a) Pick the email.
+     b) Pick an account from stock.
+     c) Activate Slot_01.
+     d) Configure SMTP and URLs.
+     e) Launch MT5 instantly.
+
+6. EMERGENCY TOOLS
+   - Use: C:\FundedCobra\vps_automation\Emergency_Tools.ps1
+   - Use this to check RAM, kill all MT5s, or update your Bot version across all slots.
+
+---
+Built with Precision by Antigravity.

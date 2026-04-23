@@ -1,0 +1,1 @@
+Get-Process terminal64 -ErrorAction SilentlyContinue | Select-Object @{Name="Slot";Expression={$_.Path.Split('\')[-2]}}, @{Name="RAM (MB)";Expression={[math]::Round($_.WorkingSet / 1MB, 2)}} | Sort-Object "RAM (MB)" -Descending | Format-Table -AutoSize

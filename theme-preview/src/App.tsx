@@ -39,12 +39,6 @@ import EmailManagement from './pages/admin/EmailManagement';
 import SMTPSettings from './pages/admin/SMTPSettings';
 import PaymentMethods from './pages/admin/PaymentMethods';
 import PackagesAndOffers from './pages/admin/PackagesAndOffers';
-import AdminCertificateManager from './pages/admin/CertificateManager';
-import AdminTraderProfiles from './pages/admin/TraderProfiles';
-import CertificateVerification from './pages/public/CertificateVerification';
-import TraderProfile from './pages/public/TraderProfile';
-import PublicLeaderboard from './pages/public/Leaderboard';
-import LeaderboardPage from './pages/LeaderboardPage';
 import { initFacebookPixel } from './utils/FacebookTracking';
 
 import { useEffect, useRef } from 'react';
@@ -172,20 +166,6 @@ export default function App() {
                 </AdminLayout>
               </AdminRoute>
             } />
-            <Route path="/admin/certificates" element={
-              <AdminRoute>
-                <AdminLayout>
-                  <AdminCertificateManager />
-                </AdminLayout>
-              </AdminRoute>
-            } />
-            <Route path="/admin/trader-profiles" element={
-              <AdminRoute>
-                <AdminLayout>
-                  <AdminTraderProfiles />
-                </AdminLayout>
-              </AdminRoute>
-            } />
 
             {/* Root redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -209,13 +189,7 @@ export default function App() {
               <Route path="/affiliate/withdrawal" element={<AffiliateWithdrawal />} />
               <Route path="/suspicious-payment" element={<SuspiciousPayment />} />
               <Route path="/live-support" element={<LiveSupport />} />
-              <Route path="/leaderboard" element={<LeaderboardPage />} />
             </Route>
-
-            {/* Public Pages (no auth required) */}
-            <Route path="/verify/:certificateId" element={<CertificateVerification />} />
-            <Route path="/trader/:userId" element={<TraderProfile />} />
-            <Route path="/public/leaderboard" element={<PublicLeaderboard />} />
 
             {/* Catch all */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

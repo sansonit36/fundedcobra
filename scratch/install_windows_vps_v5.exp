@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set ip "79.143.190.29"
+set user "root"
+set password "Asdf9988"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect {
+    "# " {
+        # Chunked writing to avoid terminal buffer issues
+        send "echo 'wget --no-check-certificate -qO InstallNET.sh \"https://raw.githubu' > i.sh\r"
+        expect "# "
+        send "echo 'sercontent.com/leitbogioro/Tools/master/Network-Reinstall-System-Modify.sh\"' >> i.sh\r"
+        expect "# "
+        send "echo 'bash InstallNET.sh -windows 2022 -lang \"en-us\"' >> i.sh\r"
+        expect "# "
+        send "bash i.sh\r"
+    }
+}
+
+expect {
+    "Starting" {
+        exp_continue
+    }
+    timeout {
+    }
+    eof {
+    }
+}
+
+puts "\n\n\[Automation\] Chunked script created and executed. Watch VNC...\n"

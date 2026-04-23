@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set ip "79.143.190.29"
+set user "root"
+set password "Asdf9988"
+# Shorter command to avoid buffer issues, then running it
+set cmd "wget --no-check-certificate -qO i.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Network-Reinstall-System-Modify.sh' && bash i.sh -windows 2022 -lang 'en-us'\r"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect {
+    "# " {
+        # Using -h to send characters more slowly like a human
+        set send_human {.1 .1 1 .05 2}
+        send -h "$cmd"
+    }
+}
+
+expect {
+    "Starting" {
+        exp_continue
+    }
+    timeout {
+        # Normal for a reboot
+    }
+    eof {
+        # Normal for a reboot
+    }
+}
+
+puts "\n\n\[Automation\] Command sent slowly. Please check VNC console now.\n"

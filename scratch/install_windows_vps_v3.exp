@@ -1,0 +1,35 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set ip "79.143.190.29"
+set user "root"
+set password "Asdf9988"
+
+# Command: wget --no-check-certificate -qO i.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Network-Reinstall-System-Modify.sh' && bash i.sh -windows 2022 -lang 'en-us'
+# Base64 encoded version of that command:
+set b64_cmd "d2dldCAtLW5vLWNoZWNrLWNlcnRpZmljYXRlIC1xTyBpLnNoICdodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbGVpdGJvZ2lvcm8vVG9vbHMvbWFzdGVyL05ldHdvcmstUmVpbnN0YWxsLVN5c3RlbS1Nb2RpZnkuc2gnICYmIGJhc2ggaS5zaCAtd2luZG93cyAyMDIyIC1sYW5nICdlbi11cyc="
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect {
+    "# " {
+        send "echo $b64_cmd | base64 -d | bash\r"
+    }
+}
+
+expect {
+    "Starting" {
+        exp_continue
+    }
+    timeout {
+    }
+    eof {
+    }
+}
+
+puts "\n\n\[Automation\] Base64 command sent. Checking VNC...\n"

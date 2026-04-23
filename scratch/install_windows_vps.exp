@@ -1,0 +1,36 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+set ip "79.143.190.29"
+set user "root"
+set password "Asdf9988"
+set cmd "wget --no-check-certificate -qO InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Network-Reinstall-System-Modify.sh' && chmod a+x InstallNET.sh && ./InstallNET.sh -windows 2022 -lang 'en-us'"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect {
+    "# " {
+        send "$cmd\r"
+    }
+}
+
+# The script takes a moment to initialize before it kills the SSH connection
+# We'll wait until we see it starting or for a timeout
+expect {
+    "Starting" {
+        exp_continue
+    }
+    timeout {
+        # This is expected as the server will reboot and kill SSH
+    }
+    eof {
+        # This is expected when the server reboots
+    }
+}
+
+puts "\n\n\[Automation\] The Windows installation script has been triggered. The SSH connection has been closed because the server is now formatting the disk and installing Windows.\n"

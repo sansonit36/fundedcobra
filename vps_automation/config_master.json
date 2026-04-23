@@ -1,0 +1,20 @@
+{
+  "smtp": {
+    "host": "smtp.gmail.com:587",
+    "login": "support@fundedcobra.com",
+    "pass": "REPLACE_WITH_APP_PASSWORD",
+    "from": "FundedCobra Support <support@fundedcobra.com>"
+  },
+  "terminal_settings": {
+    "allowed_urls": "https://fundedcobra.com",
+    "default_symbol": "EURUSD",
+    "default_period": "H1",
+    "ea_name": "MTBot.ex5"
+  },
+  "paths": {
+    "root": "C:\\FundedCobra",
+    "terminals": "C:\\FundedCobra\\Terminals",
+    "inbox": "C:\\FundedCobra\\Inbox",
+    "logs": "C:\\FundedCobra\\Logs"
+  }
+}

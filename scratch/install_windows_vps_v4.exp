@@ -1,0 +1,35 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+set ip "79.143.190.29"
+set user "root"
+set password "Asdf9988"
+
+spawn ssh -o StrictHostKeyChecking=no $user@$ip
+expect {
+    "password:" {
+        send "$password\r"
+    }
+}
+
+expect {
+    "# " {
+        send "cat << 'EOF' > i.sh\n"
+        send "wget --no-check-certificate -qO InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Network-Reinstall-System-Modify.sh'\n"
+        send "bash InstallNET.sh -windows 2022 -lang 'en-us'\n"
+        send "EOF\n"
+        send "bash i.sh\r"
+    }
+}
+
+expect {
+    "Starting" {
+        exp_continue
+    }
+    timeout {
+    }
+    eof {
+    }
+}
+
+puts "\n\n\[Automation\] Script created and executed on VPS. Watch VNC...\n"

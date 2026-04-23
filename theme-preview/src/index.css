@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply antialiased text-base;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Improve touch targets */
+  button, 
+  [role="button"],
+  input,
+  select,
+  a {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Responsive text sizes */
+  h1 { @apply text-2xl md:text-3xl lg:text-4xl; }
+  h2 { @apply text-xl md:text-2xl lg:text-3xl; }
+  h3 { @apply text-lg md:text-xl lg:text-2xl; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.14); }
+}
+
+@layer components {
+  /* ─── Flat card — replaces old card-gradient ─── */
+  .card-gradient {
+    background: #111118;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card-gradient:hover {
+    border-color: rgba(255,255,255,0.10);
+  }
+
+  .card-gradient-success {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.12);
+  }
+
+  .card-gradient-warning {
+    background: rgba(245,158,11,0.06);
+    border: 1px solid rgba(245,158,11,0.12);
+  }
+
+  .card-gradient-danger {
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.12);
+  }
+  
+  /* ─── Glass → Solid ─── */
+  .glass-effect {
+    backdrop-filter: blur(16px) saturate(1.2);
+    background: rgba(12,12,18,0.85);
+  }
+  
+  .glass-effect-dark {
+    background: #0c0c12;
+  }
+
+  /* ─── Container ─── */
+  .container-responsive {
+    @apply w-full px-4 mx-auto;
+    max-width: 100%;
+    
+    @screen sm { max-width: 640px; }
+    @screen md { max-width: 768px; }
+    @screen lg { max-width: 1024px; }
+    @screen xl { max-width: 1280px; }
+  }
+
+  /* Grid */
+  .grid-responsive {
+    @apply grid gap-4 w-full;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  /* Mobile menu */
+  .mobile-menu {
+    @apply fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out;
+  }
+  .mobile-menu.open { @apply translate-x-0; }
+  .mobile-menu.closed { @apply -translate-x-full; }
+
+  /* Table wrapper */
+  .table-responsive-wrapper {
+    @apply w-full overflow-x-auto -mx-4 px-4;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Images */
+  .img-responsive { @apply max-w-full h-auto object-cover; }
+
+  /* ─── Buttons — cleaner, solid ─── */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl transition-all duration-200;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* ─── Inputs — dark, subtle ─── */
+  .form-input {
+    @apply w-full px-4 py-2.5 rounded-xl text-white placeholder-gray-600;
+    background: #16161e;
+    border: 1px solid rgba(255,255,255,0.07);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 44px;
+  }
+  .form-input:focus {
+    border-color: rgba(139,92,246,0.4);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.06);
+  }
+
+  /* Modal */
+  .modal-responsive {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8;
+  }
+
+  /* Spacing */
+  .spacing-responsive {
+    @apply p-4 sm:p-6 md:p-8 lg:p-10;
+  }
+}
+
+/* Shimmer animation for discount banner */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* ─── Fade-in animation for page load ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  opacity: 0;
+}
+
+/* ─── Pulsing dot ─── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
