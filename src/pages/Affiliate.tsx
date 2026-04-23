@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, TrendingUp, Gift, Copy, ArrowRight, ChevronRight, ExternalLink, List, Wallet } from 'lucide-react';
+import { Users, TrendingUp, Gift, Copy, ChevronRight, ExternalLink, List, Wallet, Check, Link2, Star, Crown, Medal, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -10,73 +10,49 @@ interface AffiliateTier {
   requiredReferrals: number;
   benefits: string[];
   color: string;
+  accent: string;
+  icon: React.ReactNode;
 }
 
+// ⚠️ MUST match affiliate_tiers DB table exactly
 const affiliateTiers: AffiliateTier[] = [
   {
     name: 'Bronze',
-    commission: 10,
+    commission: 5,
     requiredReferrals: 0,
-    benefits: [
-      'Basic commission rate',
-      'Access to affiliate dashboard',
-      'Monthly payouts',
-      'Marketing materials'
-    ],
-    color: 'from-amber-600 to-amber-700'
+    benefits: ['Commission on every sale', 'Affiliate dashboard access', 'Monthly payouts'],
+    color: 'border-amber-700/40 bg-amber-700/5',
+    accent: 'text-amber-500',
+    icon: <Shield className="w-5 h-5 text-amber-500" />,
   },
   {
     name: 'Silver',
-    commission: 15,
-    requiredReferrals: 5,
-    benefits: [
-      'Increased commission rate',
-      'Priority support',
-      'Custom tracking links',
-      'Weekly payouts',
-      'Exclusive promotions'
-    ],
-    color: 'from-gray-400 to-gray-500'
+    commission: 8,
+    requiredReferrals: 10,
+    benefits: ['Higher commission rate', 'Priority support', 'Weekly payouts', 'Custom tracking links'],
+    color: 'border-gray-400/30 bg-gray-400/5',
+    accent: 'text-gray-300',
+    icon: <Medal className="w-5 h-5 text-gray-300" />,
   },
   {
     name: 'Gold',
-    commission: 20,
-    requiredReferrals: 15,
-    benefits: [
-      'Premium commission rate',
-      'VIP support',
-      'Custom landing pages',
-      'Bi-weekly payouts',
-      'Early access to new features',
-      'Special event invitations'
-    ],
-    color: 'from-yellow-500 to-yellow-600'
+    commission: 10,
+    requiredReferrals: 25,
+    benefits: ['Premium commission rate', 'VIP support', 'Bi-weekly payouts', 'Early feature access'],
+    color: 'border-yellow-500/30 bg-yellow-500/5',
+    accent: 'text-yellow-400',
+    icon: <Star className="w-5 h-5 text-yellow-400" />,
   },
   {
     name: 'Diamond',
-    commission: 25,
-    requiredReferrals: 30,
-    benefits: [
-      'Maximum commission rate',
-      'Dedicated account manager',
-      'Custom marketing campaigns',
-      'Instant payouts',
-      'Revenue share bonuses',
-      'Exclusive workshops',
-      'Co-branded opportunities'
-    ],
-    color: 'from-primary-400 to-primary-500'
+    commission: 12,
+    requiredReferrals: 50,
+    benefits: ['Max commission rate', 'Dedicated account manager', 'Instant payouts', 'Co-branding opportunities'],
+    color: 'border-[#bd4dd6]/30 bg-[#bd4dd6]/5',
+    accent: 'text-[#bd4dd6]',
+    icon: <Crown className="w-5 h-5 text-[#bd4dd6]" />,
   }
 ];
-
-const mockStats = {
-  referrals: 12,
-  earnings: 3450.75,
-  currentTier: 'Gold',
-  nextTier: 'Diamond',
-  referralsToNextTier: 18,
-  affiliateLink: `${import.meta.env.VITE_SITE_URL}/ref/USER123`
-};
 
 export default function Affiliate() {
   const { user } = useAuth();
@@ -88,21 +64,18 @@ export default function Affiliate() {
     activeReferrals: 0,
     earnings: 0,
     currentTier: 'Bronze',
-    currentCommission: 10,
+    currentCommission: 5,
     nextTier: 'Silver',
-    referralsToNextTier: 5,
+    referralsToNextTier: 10,
     affiliateLink: ''
   });
 
   useEffect(() => {
-    if (user) {
-      loadAffiliateData();
-    }
+    if (user) loadAffiliateData();
   }, [user]);
 
   const loadAffiliateData = async () => {
     try {
-      // Get user's referral code
       const { data: profile } = await supabase
         .from('profiles')
         .select('referral_code')
@@ -111,55 +84,34 @@ export default function Affiliate() {
 
       let referralCode = profile?.referral_code;
 
-      // Generate referral code if doesn't exist
       if (!referralCode) {
         const { data: newCode } = await supabase.rpc('generate_referral_code');
         referralCode = newCode;
-
-        // Update profile with new code
-        await supabase
-          .from('profiles')
-          .update({ referral_code: referralCode })
-          .eq('id', user?.id);
+        await supabase.from('profiles').update({ referral_code: referralCode }).eq('id', user?.id);
       }
 
-      // Get total signup count
-      const { data: rawReferrals, count } = await supabase
+      const { count } = await supabase
         .from('affiliate_referrals')
         .select('*', { count: 'exact' })
         .eq('referrer_id', user?.id);
 
       const totalSignups = count || 0;
 
-      // Get exact active tracer count (those who purchased)
-      const { data: activeCountData } = await supabase.rpc('get_active_referral_count', {
-        p_user_id: user?.id
-      });
+      const { data: activeCountData } = await supabase.rpc('get_active_referral_count', { p_user_id: user?.id });
       const activeTraderCount = activeCountData || 0;
 
-      // Get current tier
-      const { data: tierData } = await supabase.rpc('get_affiliate_tier', {
-        p_user_id: user?.id
-      });
+      const { data: tierData } = await supabase.rpc('get_affiliate_tier', { p_user_id: user?.id });
+      const currentTier = tierData?.[0] || { tier_name: 'Bronze', commission_rate: 5 };
 
-      const currentTier = tierData?.[0] || { tier_name: 'Bronze', commission_rate: 10 };
-
-      // Get earnings
-      const { data: earningsData } = await supabase.rpc('get_affiliate_earnings', {
-        p_user_id: user?.id
-      });
-
+      const { data: earningsData } = await supabase.rpc('get_affiliate_earnings', { p_user_id: user?.id });
       const totalEarnings = earningsData?.[0]?.total_earnings || 0;
 
-      // Calculate referrals needed for next tier
       let nextTier = 'Max Tier';
       let referralsToNextTier = 0;
-
       const currentTierIndex = affiliateTiers.findIndex(t => t.name === currentTier.tier_name);
       if (currentTierIndex < affiliateTiers.length - 1) {
         const nextUserTier = affiliateTiers[currentTierIndex + 1];
         nextTier = nextUserTier.name;
-        // The gap to next tier relies on active traders, not signups
         referralsToNextTier = Math.max(0, nextUserTier.requiredReferrals - activeTraderCount);
       }
 
@@ -186,229 +138,178 @@ export default function Affiliate() {
     setTimeout(() => setShowCopied(false), 2000);
   };
 
+  const currentTierObj = affiliateTiers.find(t => t.name === stats.currentTier);
+  const nextTierObj = affiliateTiers.find(t => t.name === stats.nextTier);
+  const progressPct = stats.referralsToNextTier > 0
+    ? (stats.activeReferrals / (stats.activeReferrals + stats.referralsToNextTier)) * 100
+    : 100;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#bd4dd6]"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Affiliate Program</h1>
-        <div className="flex space-x-3">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Affiliate Program</h1>
+          <p className="text-gray-400 text-sm mt-1">Earn commissions by referring traders to FundedCobra.</p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => navigate('/affiliate/referrals')}
-            className="flex items-center px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-medium rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1e1e1e] border border-[#2A2A2A] hover:border-[#404040] text-white text-sm font-medium rounded-lg transition-colors"
           >
-            <List className="w-4 h-4 mr-2" />
-            My Referrals
+            <List className="w-4 h-4" /> My Referrals
           </button>
           <button
             onClick={() => navigate('/affiliate/withdrawal')}
-            className="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1e1e1e] border border-[#2A2A2A] hover:border-[#404040] text-white text-sm font-medium rounded-lg transition-colors"
           >
-            <Wallet className="w-4 h-4 mr-2" />
-            Withdraw
+            <Wallet className="w-4 h-4" /> Withdraw
           </button>
           <button
             onClick={copyToClipboard}
-            className="flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#bd4dd6] hover:bg-[#aa44c0] text-white text-sm font-bold rounded-lg transition-colors shadow-lg shadow-[#bd4dd6]/20"
           >
-            {showCopied ? (
-              'Copied!'
-            ) : (
-              <>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy Link
-              </>
-            )}
+            {showCopied ? <><Check className="w-4 h-4" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy Link</>}
           </button>
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary-500/10 flex items-center justify-center">
-              <Users className="w-6 h-6 text-primary-400" />
-            </div>
-          </div>
-          <p className="text-sm font-medium text-gray-400 mb-1">Total Referrals</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-2xl font-bold text-white">{stats.referrals}</h3>
-            <span className="text-sm text-gray-400">users</span>
-          </div>
+      {/* Referral Link Box */}
+      <div className="bg-[#1e1e1e] rounded-2xl border border-[#2A2A2A] p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-[#bd4dd6]/10 flex items-center justify-center flex-shrink-0">
+          <Link2 className="w-5 h-5 text-[#bd4dd6]" />
         </div>
-
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-green-400" />
-            </div>
-          </div>
-          <p className="text-sm font-medium text-gray-400 mb-1">Total Earnings</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-2xl font-bold text-white">${stats.earnings.toLocaleString()}</h3>
-          </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wider">Your Referral Link</p>
+          <p className="text-white text-sm font-mono truncate">{stats.affiliateLink || 'Generating your link...'}</p>
         </div>
-
-        <div className="card-gradient rounded-2xl p-6 border border-white/5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center">
-              <Gift className="w-6 h-6 text-purple-400" />
-            </div>
-          </div>
-          <p className="text-sm font-medium text-gray-400 mb-1">Current Tier</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-2xl font-bold text-white">{stats.currentTier}</h3>
-          </div>
-        </div>
+        <button
+          onClick={copyToClipboard}
+          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-[#bd4dd6]/10 hover:bg-[#bd4dd6]/20 text-[#bd4dd6] text-sm font-bold rounded-lg transition-colors border border-[#bd4dd6]/20"
+        >
+          {showCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          {showCopied ? 'Copied' : 'Copy'}
+        </button>
       </div>
 
-      {/* Progress to Next Tier */}
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
-        <h3 className="text-lg font-bold text-white mb-4">Progress to {stats.nextTier}</h3>
-        <div className="relative pt-1">
-          <div className="flex mb-2 items-center justify-between">
-            <div>
-              <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-primary-500/20 text-primary-400">
-                {stats.activeReferrals} / {stats.activeReferrals + stats.referralsToNextTier} Active Traders (Purchased)
-              </span>
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Signups', value: stats.referrals, sub: 'via your link', icon: Users, color: 'text-[#bd4dd6]', bg: 'bg-[#bd4dd6]/10' },
+          { label: 'Active Traders', value: stats.activeReferrals, sub: 'purchased accounts', icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-500/10' },
+          { label: 'Total Earned', value: `$${stats.earnings.toLocaleString()}`, sub: 'all time', icon: Gift, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+          { label: 'Commission Rate', value: `${stats.currentCommission}%`, sub: `${stats.currentTier} tier`, icon: Star, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+        ].map(({ label, value, sub, icon: Icon, color, bg }) => (
+          <div key={label} className="bg-[#1e1e1e] rounded-xl border border-[#2A2A2A] p-4">
+            <div className={`w-9 h-9 rounded-lg ${bg} flex items-center justify-center mb-3`}>
+              <Icon className={`w-4 h-4 ${color}`} />
             </div>
-            <div className="text-right">
-              <span className="text-xs font-semibold inline-block text-gray-400">
-                {stats.referralsToNextTier} more to {stats.nextTier}
-              </span>
-            </div>
-          </div>
-          <div className="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-white/5">
-            <div
-              style={{ width: `${stats.referralsToNextTier > 0 ? (stats.activeReferrals / (stats.activeReferrals + stats.referralsToNextTier)) * 100 : 100}%` }}
-              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500"
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Affiliate Tiers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {affiliateTiers.map((tier) => (
-          <div
-            key={tier.name}
-            className={`card-gradient rounded-2xl p-6 border border-white/5 relative overflow-hidden`}
-          >
-            {/* Background Gradient */}
-            <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${tier.color}`}></div>
-            
-            {/* Content */}
-            <div className="relative">
-              <h3 className="text-xl font-bold text-white mb-2">{tier.name}</h3>
-              <div className="text-3xl font-bold text-white mb-4">
-                {tier.commission}%
-                <span className="text-sm font-normal text-gray-400 ml-1">commission</span>
-              </div>
-              
-              <div className="mb-4">
-                <div className="text-sm text-gray-400 mb-2">Requirements:</div>
-                <div className="flex items-center text-white">
-                  <Users className="w-4 h-4 mr-2 text-primary-400" />
-                  {tier.requiredReferrals}+ referrals
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-sm text-gray-400 mb-2">Benefits:</div>
-                {tier.benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start text-gray-300">
-                    <ChevronRight className="w-4 h-4 mr-1 mt-1 text-primary-400 shrink-0" />
-                    <span className="text-sm">{benefit}</span>
-                  </div>
-                ))}
-              </div>
-
-              {stats.currentTier === tier.name && (
-                <div className="absolute top-4 right-4">
-                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-primary-500/20 text-primary-400">
-                    Current Tier
-                  </div>
-                </div>
-              )}
-            </div>
+            <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">{label}</p>
+            <p className={`text-xl font-bold ${color} mt-1`}>{value}</p>
+            <p className="text-xs text-gray-600 mt-0.5">{sub}</p>
           </div>
         ))}
       </div>
 
-      {/* How It Works */}
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
-        <h3 className="text-xl font-bold text-white mb-6">How It Works</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start space-x-4">
-            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
-              1
-            </div>
+      {/* Progress to Next Tier */}
+      <div className="bg-[#1e1e1e] rounded-2xl border border-[#2A2A2A] p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            {currentTierObj?.icon}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-2">Share Your Link</h4>
-              <p className="text-gray-400">Share your unique affiliate link with potential traders</p>
+              <p className="text-white font-bold text-sm">{stats.currentTier} Tier</p>
+              <p className="text-xs text-gray-500">{stats.currentCommission}% commission</p>
             </div>
           </div>
-          <div className="flex items-start space-x-4">
-            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
-              2
+          {stats.nextTier !== 'Max Tier' && nextTierObj && (
+            <div className="text-right">
+              <p className={`font-bold text-sm ${nextTierObj.accent}`}>{stats.nextTier}</p>
+              <p className="text-xs text-gray-500">{stats.referralsToNextTier} active traders needed</p>
             </div>
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">Earn Commissions</h4>
-              <p className="text-gray-400">Earn commissions when your referrals purchase accounts</p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-4">
-            <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 font-bold">
-              3
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-2">Get Paid</h4>
-              <p className="text-gray-400">Receive your earnings through your preferred payment method</p>
-            </div>
-          </div>
+          )}
+          {stats.nextTier === 'Max Tier' && (
+            <span className="text-xs font-bold text-[#bd4dd6] bg-[#bd4dd6]/10 px-3 py-1 rounded-full border border-[#bd4dd6]/20">Max Tier Reached 🎉</span>
+          )}
+        </div>
+        <div className="h-2 rounded-full bg-[#161616] border border-[#2A2A2A] overflow-hidden">
+          <div
+            style={{ width: `${progressPct}%` }}
+            className="h-full rounded-full bg-gradient-to-r from-[#bd4dd6] to-purple-400 transition-all duration-700"
+          />
+        </div>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-gray-500">{stats.activeReferrals} active traders</span>
+          {stats.nextTier !== 'Max Tier' && nextTierObj && (
+            <span className="text-xs text-gray-500">{nextTierObj.requiredReferrals} needed for {stats.nextTier}</span>
+          )}
         </div>
       </div>
 
-      {/* Marketing Resources */}
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-white">Marketing Resources</h3>
-          <a
-            href="#"
-            className="flex items-center text-primary-400 hover:text-primary-300 transition-colors"
-          >
-            View all resources
-            <ExternalLink className="w-4 h-4 ml-1" />
-          </a>
+      {/* Commission Tiers */}
+      <div>
+        <h2 className="text-lg font-bold text-white mb-4">Commission Tiers</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {affiliateTiers.map((tier) => {
+            const isActive = stats.currentTier === tier.name;
+            return (
+              <div
+                key={tier.name}
+                className={`relative rounded-2xl border p-5 transition-all ${tier.color} ${isActive ? 'ring-2 ring-[#bd4dd6]/40' : ''}`}
+              >
+                {isActive && (
+                  <div className="absolute -top-2 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#bd4dd6] text-white">
+                    Your Tier
+                  </div>
+                )}
+                <div className="flex items-center gap-2 mb-3 mt-1">
+                  {tier.icon}
+                  <span className={`font-bold text-base ${tier.accent}`}>{tier.name}</span>
+                </div>
+                <div className={`text-3xl font-black ${tier.accent} mb-1`}>{tier.commission}%</div>
+                <p className="text-xs text-gray-500 mb-4">
+                  {tier.requiredReferrals === 0 ? 'No minimum' : `${tier.requiredReferrals}+ active traders`}
+                </p>
+                <div className="space-y-1.5">
+                  {tier.benefits.map((b, i) => (
+                    <div key={i} className="flex items-start gap-1.5">
+                      <ChevronRight className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${tier.accent}`} />
+                      <span className="text-xs text-gray-300">{b}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <a
-            href="#"
-            className="flex items-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
-          >
-            <div className="flex-1">
-              <h4 className="text-white font-medium mb-1">Banners & Logos</h4>
-              <p className="text-sm text-gray-400">Download our official marketing materials</p>
+      </div>
+
+      {/* How It Works */}
+      <div className="bg-[#1e1e1e] rounded-2xl border border-[#2A2A2A] p-5">
+        <h3 className="text-base font-bold text-white mb-5">How It Works</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { step: '1', title: 'Share Your Link', desc: 'Copy your unique referral URL and share it with your audience, friends, or trading community.' },
+            { step: '2', title: 'They Buy an Account', desc: 'When someone signs up using your link and purchases a funded account, we track it automatically.' },
+            { step: '3', title: 'You Get Paid', desc: 'Commissions are credited to your affiliate balance and can be withdrawn at any time.' },
+          ].map(({ step, title, desc }) => (
+            <div key={step} className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-[#bd4dd6]/20 flex items-center justify-center text-[#bd4dd6] font-black flex-shrink-0">
+                {step}
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-sm mb-1">{title}</h4>
+                <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
+              </div>
             </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-          </a>
-          <a
-            href="#"
-            className="flex items-center p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
-          >
-            <div className="flex-1">
-              <h4 className="text-white font-medium mb-1">Landing Pages</h4>
-              <p className="text-sm text-gray-400">Access our high-converting landing pages</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-          </a>
+          ))}
         </div>
       </div>
     </div>
