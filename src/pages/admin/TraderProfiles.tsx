@@ -203,6 +203,12 @@ export default function TraderProfiles() {
 
       if (updateError) throw updateError;
 
+      // Update trader_profiles
+      await supabase
+        .from('trader_profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', editingProfile.id);
+
       // Update local state temporarily
       setEditingProfile({ ...editingProfile, avatar_url: publicUrl });
       setSuccess('Avatar updated successfully!');

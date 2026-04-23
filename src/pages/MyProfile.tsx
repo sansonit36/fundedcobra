@@ -176,6 +176,12 @@ export default function MyProfile() {
 
       if (updateError) throw updateError;
 
+      // Also update trader_profiles (for public viewing without RLS issues)
+      await supabase
+        .from('trader_profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
       setAvatarUrl(publicUrl);
       setSuccess('Profile picture updated!');
     } catch (err: any) {
