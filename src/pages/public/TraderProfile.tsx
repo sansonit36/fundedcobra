@@ -9,7 +9,7 @@ import {
 } from '../../lib/certificates';
 import type { TraderProfile as TraderProfileType, PayoutCertificate, HighlightedTrade, LeaderboardEntry } from '../../lib/certificates';
 
-// Verified badge (FTMO style)
+// Verified badge (Clean FTMO style)
 function VerifiedBadge({ className = '' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,10 +146,10 @@ export default function TraderProfile() {
 
       {/* ========== NAVBAR ========== */}
       <header className="sticky top-0 z-50 bg-[#0E1117]/80 backdrop-blur-lg border-b border-white/[0.04]">
-        <div className="max-w-[1240px] mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-[1240px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <Link to="/" className="flex items-center group">
-            {/* Logo scaling up by 1.5x compared to before (h-10 = 40px) */}
-            <img src="/logo.png" alt="FundedCobra" className="h-10 object-contain transition-opacity group-hover:opacity-90" />
+            {/* Logo significantly larger */}
+            <img src="/logo.png" alt="FundedCobra" className="h-14 object-contain transition-opacity group-hover:opacity-90" />
           </Link>
           <nav>
             <a 
@@ -183,13 +183,13 @@ export default function TraderProfile() {
                     </div>
                   )}
                 </div>
-                <div className="pt-1.5 flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
+                <div className="pt-2 flex-1 min-w-0">
+                  <div className="flex items-center">
                     {/* H1 Hierarchy */}
-                    <h1 className="text-[22px] font-bold text-[#E6EDF3] tracking-tight truncate leading-none">
+                    <h1 className="text-[24px] font-bold text-[#E6EDF3] tracking-tight truncate mr-2">
                       {displayName}
                     </h1>
-                    <VerifiedBadge className="w-5 h-5 flex-shrink-0 translate-y-[-1px]" />
+                    <VerifiedBadge className="w-[18px] h-[18px] flex-shrink-0" />
                   </div>
                   <div className="mt-2.5">
                     <span className="inline-flex items-center text-xs font-medium text-[#8B949E]">
@@ -418,6 +418,52 @@ export default function TraderProfile() {
                 </div>
               </div>
             </section>
+
+            {/* Community Section (Recommendations) */}
+            {community.length > 0 && (
+              <section className="rounded-2xl bg-[#161B22] border border-white/[0.04]">
+                <div className="flex items-center justify-between px-8 pt-7 pb-5 border-b border-white/[0.04]">
+                  <h2 className="text-lg font-bold text-[#E6EDF3] tracking-tight">FundedCobra Community</h2>
+                  <Link
+                    to="/leaderboard"
+                    className="text-sm font-medium px-4 py-1.5 rounded-lg transition-colors bg-[#21262D] hover:bg-[#30363D] text-[#E6EDF3] border border-white/[0.05]"
+                  >
+                    View Leaderboard
+                  </Link>
+                </div>
+
+                <div className="px-8 py-8">
+                  <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+                    {community.map(trader => (
+                      <Link
+                        key={trader.id}
+                        to={trader.user_id ? `/trader/${trader.user_id}` : '#'}
+                        className="flex-shrink-0 w-[160px] block group"
+                      >
+                        <div className="rounded-xl p-5 text-center transition-all bg-[#0E1117] border border-white/[0.04] hover:border-white/10 group-hover:bg-[#12161E]">
+                          <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden border border-white/10 bg-[#21262D]">
+                            {trader.avatar_url ? (
+                              <img src={trader.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-lg font-bold text-[#8B949E]">
+                                {getInitials(trader.display_name)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[13px] font-bold text-[#E6EDF3] truncate px-1">{trader.display_name}</p>
+                          <p className="text-[11px] font-medium text-[#7D8590] mt-1.5 uppercase tracking-wider">
+                            Rewarded
+                          </p>
+                          <p className="text-[13px] font-bold text-[#3FB950] tabular-nums mt-0.5">
+                            {formatAmount(trader.total_payout)}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
 
           </div>
         </div>
