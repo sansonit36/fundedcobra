@@ -206,6 +206,24 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     return manualEntries || [];
   }
 
+  // Collect all user_ids to batch-fetch avatars
+  const allUserIds = [
+    ...(manualEntries || []).filter(e => e.user_id).map(e => e.user_id as string),
+    ...(profileEntries || []).map(p => p.id as string),
+  ];
+
+  // Fetch avatars from profiles table
+  const avatarMap: Record<string, string> = {};
+  if (allUserIds.length > 0) {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('id, avatar_url')
+      .in('id', allUserIds);
+    (profileData || []).forEach(p => {
+      if (p.avatar_url) avatarMap[p.id] = p.avatar_url;
+    });
+  }
+
   // Merge: convert profile entries to leaderboard format, avoid duplicates
   const manualUserIds = new Set((manualEntries || []).filter(e => e.user_id).map(e => e.user_id));
 
@@ -221,10 +239,17 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
       is_visible: true,
       created_at: '',
       updated_at: '',
-      certificate_count: p.total_certificates
+      certificate_count: p.total_certificates,
+      avatar_url: avatarMap[p.id],
     }));
 
-  const combined = [...(manualEntries || []), ...autoEntries];
+  // Attach avatars to manual entries too
+  const enrichedManual = (manualEntries || []).map(e => ({
+    ...e,
+    avatar_url: e.user_id ? (avatarMap[e.user_id] ?? e.avatar_url) : e.avatar_url,
+  }));
+
+  const combined = [...enrichedManual, ...autoEntries];
   combined.sort((a, b) => b.total_payout - a.total_payout);
 
   return combined;
