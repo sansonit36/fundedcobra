@@ -1197,7 +1197,7 @@ export default function BuyAccount() {
                 <ul className="space-y-2 text-sm text-gray-300">
                   <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" /><span>MT5 platform · 1:100 leverage</span></li>
                   <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" /><span>News trading & weekend holds allowed</span></li>
-                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" /><span>No EAs, HFT, martingale or grid trading</span></li>
+                  <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" /><span>No EAs, HFT, or hedging on the same pair</span></li>
                   <li className="flex items-start gap-2"><ChevronRight className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" /><span>Min. trade duration: 60 seconds</span></li>
                 </ul>
               </div>
