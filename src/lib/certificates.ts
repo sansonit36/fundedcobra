@@ -140,11 +140,26 @@ export async function getPublicTraderProfile(userId: string): Promise<TraderProf
       ...data,
       full_name: profileData.full_name || profileData.name,
       email: profileData.email,
-      avatar_url: profileData.avatar_url
+      avatar_url: data.avatar_url || profileData.avatar_url
     };
   }
 
   return data;
+}
+
+export async function getRecommendedTraders(): Promise<TraderProfile[]> {
+  const { data, error } = await supabase
+    .from('trader_profiles')
+    .select('*')
+    .eq('is_public', true)
+    .order('total_payouts', { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error('Error fetching recommended traders:', error);
+    return [];
+  }
+  return data || [];
 }
 
 export async function getHighlightedTrades(userId: string): Promise<HighlightedTrade[]> {

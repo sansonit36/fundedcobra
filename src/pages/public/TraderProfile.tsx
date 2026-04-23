@@ -1,30 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  User, Share2, Award, Calendar, TrendingUp, BarChart3, ChevronDown
+  User, Share2, Award, Calendar, TrendingUp, BarChart3, ChevronDown, BadgeCheck
 } from 'lucide-react';
 import {
   getPublicTraderProfile, getCertificatesByUser,
-  getHighlightedTrades, getLeaderboard
+  getHighlightedTrades, getRecommendedTraders
 } from '../../lib/certificates';
-import type { TraderProfile as TraderProfileType, PayoutCertificate, HighlightedTrade, LeaderboardEntry } from '../../lib/certificates';
+import type { TraderProfile as TraderProfileType, PayoutCertificate, HighlightedTrade } from '../../lib/certificates';
 
-// Verified badge (Clean FTMO style)
-function VerifiedBadge({ className = '' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M22.5 12c0-.85-.34-1.63-.9-2.24.42-.76.5-1.66.18-2.48a2.91 2.91 0 00-1.95-1.75c-.14-.82-.6-1.57-1.28-2.04a2.92 2.92 0 00-2.36-.38 3.19 3.19 0 00-2.24-.91h-.5a3.19 3.19 0 00-2.24.91 2.92 2.92 0 00-2.36.38c-.68.47-1.14 1.22-1.28 2.04a2.91 2.91 0 00-1.95 1.75 2.94 2.94 0 00.18 2.48A3.19 3.19 0 004.9 12V12.5c0 .85.34 1.63.9 2.24-.42.76-.5 1.66-.18 2.48a2.91 2.91 0 001.95 1.75c.14.82.6 1.57 1.28 2.04.68.47 1.51.6 2.36.38a3.19 3.19 0 002.24.91h.5a3.19 3.19 0 002.24-.91 2.92 2.92 0 002.36-.38c.68-.47 1.14-1.22 1.28-2.04a2.91 2.91 0 001.95-1.75 2.94 2.94 0 00-.18-2.48 3.19 3.19 0 00.9-2.24V12z" fill="#1D9BF0"/>
-      <path d="M10 16.5l-4-4 1.5-1.5 2.5 2.5 6-6 1.5 1.5-7.5 7.5z" fill="white"/>
-    </svg>
-  );
-}
+
 
 export default function TraderProfile() {
   const { userId } = useParams<{ userId: string }>();
   const [profile, setProfile] = useState<TraderProfileType | null>(null);
   const [certificates, setCertificates] = useState<PayoutCertificate[]>([]);
   const [trades, setTrades] = useState<HighlightedTrade[]>([]);
-  const [community, setCommunity] = useState<LeaderboardEntry[]>([]);
+  const [community, setCommunity] = useState<TraderProfileType[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showAllTrades, setShowAllTrades] = useState(false);
@@ -39,11 +31,11 @@ export default function TraderProfile() {
   const loadProfile = async () => {
     if (!userId) return;
     try {
-      const [profileData, certsData, tradesData, leaderboardData] = await Promise.all([
+      const [profileData, certsData, tradesData, recommendedData] = await Promise.all([
         getPublicTraderProfile(userId),
         getCertificatesByUser(userId),
         getHighlightedTrades(userId),
-        getLeaderboard()
+        getRecommendedTraders()
       ]);
 
       if (!profileData || !profileData.is_public) {
@@ -54,7 +46,7 @@ export default function TraderProfile() {
       setProfile(profileData);
       setCertificates(certsData);
       setTrades(tradesData);
-      setCommunity(leaderboardData.filter(e => e.user_id !== userId).slice(0, 10));
+      setCommunity(recommendedData.filter(e => e.id !== userId).slice(0, 10));
     } catch (err) {
       console.error('Error loading profile:', err);
       setNotFound(true);
@@ -189,7 +181,7 @@ export default function TraderProfile() {
                     <h1 className="text-[24px] font-bold text-[#E6EDF3] tracking-tight truncate mr-2">
                       {displayName}
                     </h1>
-                    <VerifiedBadge className="w-[18px] h-[18px] flex-shrink-0" />
+                    <BadgeCheck className="w-[20px] h-[20px] flex-shrink-0 text-[#1D9BF0] fill-white dark:fill-[#0E1117] relative top-[1px]" />
                   </div>
                   <div className="mt-2.5">
                     <span className="inline-flex items-center text-xs font-medium text-[#8B949E]">
@@ -437,7 +429,7 @@ export default function TraderProfile() {
                     {community.map(trader => (
                       <Link
                         key={trader.id}
-                        to={trader.user_id ? `/trader/${trader.user_id}` : '#'}
+                        to={`/trader/${trader.id}`}
                         className="flex-shrink-0 w-[160px] block group"
                       >
                         <div className="rounded-xl p-5 text-center transition-all bg-[#0E1117] border border-white/[0.04] hover:border-white/10 group-hover:bg-[#12161E]">
@@ -446,16 +438,16 @@ export default function TraderProfile() {
                               <img src={trader.avatar_url} alt="" className="w-full h-full object-cover" />
                             ) : (
                               <span className="text-lg font-bold text-[#8B949E]">
-                                {getInitials(trader.display_name)}
+                                {getInitials(trader.display_name || 'Trader')}
                               </span>
                             )}
                           </div>
-                          <p className="text-[13px] font-bold text-[#E6EDF3] truncate px-1">{trader.display_name}</p>
+                          <p className="text-[13px] font-bold text-[#E6EDF3] truncate px-1">{trader.display_name || 'Trader'}</p>
                           <p className="text-[11px] font-medium text-[#7D8590] mt-1.5 uppercase tracking-wider">
                             Rewarded
                           </p>
                           <p className="text-[13px] font-bold text-[#3FB950] tabular-nums mt-0.5">
-                            {formatAmount(trader.total_payout)}
+                            {formatAmount(trader.total_payouts)}
                           </p>
                         </div>
                       </Link>
