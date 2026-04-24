@@ -310,45 +310,35 @@ export default function BuyAccount() {
         {/* LEFT COLLUMN (8) */}
         <div className="lg:col-span-8 space-y-16">
           
-          {/* 1. Account Balance Grid (Enhanced Tiers) */}
-          <div className="space-y-6">
-            <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
-              <span className="w-8 h-[1px] bg-white/20"></span>
-              {selectedModel === 'instant' ? 'Capital Injection Tiers' : 'Evaluation Account Sizes'}
-            </h3>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-              {selectedModelPackages.map((pkg) => {
+          {/* 1. Account Balance Grid — Grouped by Tier */}
+          <div className="space-y-10">
+            {(() => {
+              const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+              const modelLabel = selectedModel === 'instant' ? 'Instant' : selectedModel === '1_step' ? '1-Step' : '2-Step';
+              const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
+              
+              const specialPkgs = selectedModelPackages.filter(p => p.balance < 10000);
+              const premiumPkgs = selectedModelPackages.filter(p => p.balance >= 10000);
+
+              const renderCard = (pkg: any) => {
                 const isSelected = selectedPackage?.id === pkg.id;
-                const isPremium = pkg.balance >= 10000 || selectedModel !== 'instant';
-                const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
-                
-                const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
                 const discountedPrice = pkg.price * (1 - categoryDiscount / 100);
-                
                 return (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg)}
                     className={`relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden ${
                       isSelected 
-                        ? `border-[${modelColor}] bg-white/5 shadow-[0_0_50px_rgba(189,77,214,0.15)]`
+                        ? 'bg-white/5 shadow-[0_0_50px_rgba(189,77,214,0.15)]'
                         : 'border-[#2A2A2A] bg-[#111] hover:border-white/20'
                     }`}
                     style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}08` } : {}}
                   >
-                    {/* Discount Badge (top-left, only if discount exists) */}
                     {categoryDiscount > 0 && (
                       <div className="absolute top-0 left-0 px-3 py-1 text-[8px] font-black uppercase tracking-widest rounded-br-xl bg-emerald-500 text-white">
                         {categoryDiscount}% OFF
                       </div>
                     )}
-                    {/* Tier Badge (top-right, model-colored) */}
-                    <div 
-                      className="absolute top-0 right-0 px-4 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl"
-                      style={isPremium ? { backgroundColor: modelColor, color: 'white' } : { backgroundColor: '#1f1f1f', color: '#666' }}
-                    >
-                      {isPremium ? 'Premium' : (selectedModel === 'instant' ? 'Instant' : 'Standard')}
-                    </div>
 
                     <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
                     <div className="text-4xl font-black text-white tracking-tighter mb-6">${pkg.balance.toLocaleString()}</div>
@@ -363,8 +353,45 @@ export default function BuyAccount() {
                     </div>
                   </button>
                 );
-              })}
-            </div>
+              };
+
+              return (
+                <>
+                  {/* Special Tier */}
+                  {specialPkgs.length > 0 && (
+                    <div className="space-y-5">
+                      <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                        <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                        Special {modelLabel} Accounts
+                      </h3>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                        {specialPkgs.map(renderCard)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Divider */}
+                  {specialPkgs.length > 0 && premiumPkgs.length > 0 && (
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent" style={{ backgroundImage: `linear-gradient(to right, transparent, ${modelColor}30, transparent)` }} />
+                    </div>
+                  )}
+
+                  {/* Premium Tier */}
+                  {premiumPkgs.length > 0 && (
+                    <div className="space-y-5">
+                      <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                        <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                        Premium {modelLabel} Accounts
+                      </h3>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                        {premiumPkgs.map(renderCard)}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           {/* 2. Phase-Tabbed Rule Card (Inspired by FundedSquad) */}
