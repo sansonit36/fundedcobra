@@ -86,7 +86,7 @@ export default function AccountRules() {
           has_minimum_trading_days: rule.has_minimum_trading_days,
           daily_payout_enabled: rule.daily_payout_enabled,
           weekly_payout_enabled: rule.weekly_payout_enabled,
-          bi_weekly_payout_enabled: (rule as any).bi_weekly_payout_enabled,
+          bi_weekly_payout_enabled: rule.bi_weekly_payout_enabled,
           minimum_withdrawal_amount: rule.minimum_withdrawal_amount,
           single_trade_limit_percent: rule.single_trade_limit_percent,
           daily_drawdown_percent: rule.daily_drawdown_percent,
@@ -500,10 +500,11 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                 localRule.daily_payout_enabled ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-500'
               }`}>
                 <input
-                  type="checkbox"
+                  type="radio"
+                  name={`payout-${rule.id}`}
                   className="hidden"
                   checked={localRule.daily_payout_enabled}
-                  onChange={(e) => setLocalRule({ ...localRule, daily_payout_enabled: e.target.checked })}
+                  onChange={() => setLocalRule({ ...localRule, daily_payout_enabled: true, weekly_payout_enabled: false, bi_weekly_payout_enabled: false })}
                 />
                 <span className="text-[10px] font-black uppercase">Daily Payouts</span>
               </label>
@@ -511,21 +512,23 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
                 localRule.weekly_payout_enabled ? 'bg-purple-500/20 border-purple-500/50 text-purple-400' : 'bg-white/5 border-white/10 text-gray-500'
               }`}>
                 <input
-                  type="checkbox"
+                  type="radio"
+                  name={`payout-${rule.id}`}
                   className="hidden"
                   checked={localRule.weekly_payout_enabled}
-                  onChange={(e) => setLocalRule({ ...localRule, weekly_payout_enabled: e.target.checked })}
+                  onChange={() => setLocalRule({ ...localRule, daily_payout_enabled: false, weekly_payout_enabled: true, bi_weekly_payout_enabled: false })}
                 />
                 <span className="text-[10px] font-black uppercase">Weekly Payouts</span>
               </label>
               <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
-                (localRule as any).bi_weekly_payout_enabled ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-white/5 border-white/10 text-gray-500'
+                localRule.bi_weekly_payout_enabled ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-white/5 border-white/10 text-gray-500'
               }`}>
                 <input
-                  type="checkbox"
+                  type="radio"
+                  name={`payout-${rule.id}`}
                   className="hidden"
-                  checked={(localRule as any).bi_weekly_payout_enabled}
-                  onChange={(e) => setLocalRule({ ...localRule, bi_weekly_payout_enabled: e.target.checked } as any)}
+                  checked={localRule.bi_weekly_payout_enabled}
+                  onChange={() => setLocalRule({ ...localRule, daily_payout_enabled: false, weekly_payout_enabled: false, bi_weekly_payout_enabled: true })}
                 />
                 <span className="text-[10px] font-black uppercase">Bi-Weekly Payouts</span>
               </label>
@@ -538,10 +541,10 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
               {rule.weekly_payout_enabled && (
                 <span className="px-3 py-1.5 rounded bg-purple-500/10 text-purple-400 text-[10px] font-black uppercase ring-1 ring-purple-500/20">Weekly Payouts</span>
               )}
-              {(rule as any).bi_weekly_payout_enabled && (
+              {rule.bi_weekly_payout_enabled && (
                 <span className="px-3 py-1.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase ring-1 ring-blue-500/20">Bi-Weekly Payouts</span>
               )}
-              {!rule.daily_payout_enabled && !rule.weekly_payout_enabled && !(rule as any).bi_weekly_payout_enabled && (
+              {!rule.daily_payout_enabled && !rule.weekly_payout_enabled && !rule.bi_weekly_payout_enabled && (
                 <span className="px-3 py-1.5 rounded bg-gray-500/10 text-gray-400 text-[10px] font-black uppercase ring-1 ring-gray-500/20">Standard Payouts</span>
               )}
             </>
