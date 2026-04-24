@@ -417,24 +417,29 @@ export default function BuyAccount() {
 
                     {/* Rules List */}
                     <div className="space-y-0">
-                      {[
-                        ...(phaseRules.profitTarget ? [{ label: 'Profit Target', value: phaseRules.profitTarget }] : []),
-                        { label: 'Daily Loss Limit', value: phaseRules.dailyDD },
-                        { label: 'Max Overall Drawdown', value: phaseRules.overallDD },
-                        { label: 'Minimum Trading Days', value: phaseRules.minDays },
-                        ...(activeTab === 'funded' ? [
-                          { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
-                        ] : []),
-                        { label: 'Refundable Fee', value: '100%' },
-                      ].map((item, i) => (
-                        <div key={i} className="flex justify-between items-center py-5 border-b border-white/5 last:border-0">
-                          <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: modelColor, opacity: 0.7 }} />
-                            <span className="text-sm text-gray-300 font-medium">{item.label}</span>
+                      {(() => {
+                        const fmtType = (t: string | undefined | null) => { const v = t || 'static'; return v.charAt(0).toUpperCase() + v.slice(1); };
+                        const dailyType = fmtType(activeTab === 'p1' ? r?.daily_drawdown_type_phase1 : activeTab === 'p2' ? r?.daily_drawdown_type_phase2 : r?.daily_drawdown_type_funded);
+                        const overallType = fmtType(activeTab === 'p1' ? r?.overall_drawdown_type_phase1 : activeTab === 'p2' ? r?.overall_drawdown_type_phase2 : r?.overall_drawdown_type_funded);
+                        return [
+                          ...(phaseRules.profitTarget ? [{ label: 'Profit Target', value: phaseRules.profitTarget }] : []),
+                          { label: `Daily Loss Limit (${dailyType})`, value: phaseRules.dailyDD },
+                          { label: `Max Overall Drawdown (${overallType})`, value: phaseRules.overallDD },
+                          { label: 'Minimum Trading Days', value: phaseRules.minDays },
+                          ...(activeTab === 'funded' ? [
+                            { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
+                          ] : []),
+                          { label: 'Refundable Fee', value: '100%' },
+                        ].map((item, i) => (
+                          <div key={i} className="flex justify-between items-center py-5 border-b border-white/5 last:border-0">
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: modelColor, opacity: 0.7 }} />
+                              <span className="text-sm text-gray-300 font-medium">{item.label}</span>
+                            </div>
+                            <span className="text-sm font-black text-white">{item.value}</span>
                           </div>
-                          <span className="text-sm font-black text-white">{item.value}</span>
-                        </div>
-                      ))}
+                        ));
+                      })()}
                     </div>
 
                     <div className="mt-8 p-5 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
