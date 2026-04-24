@@ -335,11 +335,18 @@ export default function BuyAccount() {
                     }`}
                     style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}08` } : {}}
                   >
-                    {/* Tier Badge */}
-                    <div className={`absolute top-0 right-0 px-4 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl ${
-                      isPremium ? 'bg-[#bd4dd6] text-white' : 'bg-gray-800 text-gray-400'
-                    }`}>
-                      {categoryDiscount > 0 ? `${categoryDiscount}% OFF` : (isPremium ? 'Premium' : 'Special')}
+                    {/* Discount Badge (top-left, only if discount exists) */}
+                    {categoryDiscount > 0 && (
+                      <div className="absolute top-0 left-0 px-3 py-1 text-[8px] font-black uppercase tracking-widest rounded-br-xl bg-emerald-500 text-white">
+                        {categoryDiscount}% OFF
+                      </div>
+                    )}
+                    {/* Tier Badge (top-right, model-colored) */}
+                    <div 
+                      className="absolute top-0 right-0 px-4 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl"
+                      style={isPremium ? { backgroundColor: modelColor, color: 'white' } : { backgroundColor: '#1f1f1f', color: '#666' }}
+                    >
+                      {isPremium ? 'Premium' : 'Standard'}
                     </div>
 
                     <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
