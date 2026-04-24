@@ -192,7 +192,7 @@ export default function PackagesAndOffers() {
 
         const { error } = await supabase
           .from('account_rules')
-          .upsert([masterRuleData], { onConflict: 'account_type,is_template' });
+          .upsert([masterRuleData], { onConflict: 'account_type' });
         
         if (error) throw error;
         setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated!`);
