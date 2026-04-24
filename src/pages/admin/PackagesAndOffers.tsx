@@ -220,11 +220,16 @@ export default function PackagesAndOffers() {
         packageId = insertedPackage.id;
       }
 
+      const phase1Target = parseFloat(packageForm.profit_target_phase1);
+      const phase2Target = parseFloat(packageForm.profit_target_phase2);
+      const withdrawalTarget = parseFloat(packageForm.withdrawal_target_percent);
+      const payoutSplitPercent = parseFloat(packageForm.payout_split_percent);
+
       const accountRuleData = {
         package_id: packageId,
         account_package_name: packageData.name,
         account_type: packageForm.account_type,
-        withdrawal_target_percent: phase1Target,
+        withdrawal_target_percent: withdrawalTarget,
         has_profit_target: packageForm.account_type !== 'instant',
         profit_target_percent: phase1Target,
         profit_target_phase1: phase1Target,
@@ -743,6 +748,20 @@ export default function PackagesAndOffers() {
                         />
                       </div>
                     )}
+
+                    {packageForm.account_type !== 'instant' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Funded Withdrawal Target %</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={packageForm.withdrawal_target_percent}
+                          onChange={(e) => setPackageForm({ ...packageForm, withdrawal_target_percent: e.target.value })}
+                          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
+                          required
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -842,9 +861,12 @@ export default function PackagesAndOffers() {
                   </label>
 
                   <div className="rounded-lg bg-black/25 border border-white/10 px-4 py-3 text-sm">
-                    <div className="text-gray-400">Summary</div>
+                    <div className="text-gray-400">Model Summary</div>
                     <div className="text-white mt-1 font-medium">
-                      {packageForm.name || 'Unnamed package'} • {modelLabels[packageForm.account_type]} • ${packageForm.price || '0'}
+                      {packageForm.name || 'Unnamed package'} • {modelLabels[packageForm.account_type]}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {packageForm.account_type === 'instant' ? `Withdrawal: ${packageForm.profit_target_phase1}%` : `Phase 1: ${packageForm.profit_target_phase1}% | Phase 2: ${packageForm.profit_target_phase2}%`} • {packageForm.payout_split_percent}% Split
                     </div>
                   </div>
                 </div>

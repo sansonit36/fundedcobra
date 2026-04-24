@@ -990,114 +990,139 @@ export default function BuyAccount() {
                 </div>
               </div>
 
-              {/* Step 3: Choose Size */}
-              <div>
-                <h3 className="text-xs font-black text-[#606060] mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <span className="text-[#bd4dd6]">04.</span> Choose Size
-                </h3>
+                <div>
+                  <h3 className="text-xs font-black text-[#606060] mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <span className="text-[#bd4dd6]">04.</span> Choose Size
+                  </h3>
 
-                {selectedModelPackages.length === 0 ? (
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-gray-400">
-                    No active packages available for this model yet.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {selectedModelPackages.map((pkg) => {
-                      const coupon = getDefaultCouponForPackage(pkg);
-                      const isSelected = selectedPackage?.id === pkg.id;
-                      return (
-                        <button
-                          key={pkg.id}
-                          onClick={() => setSelectedPackage(pkg)}
-                          className={`group relative p-6 rounded-2xl border-2 transition-all flex flex-col items-center justify-center overflow-hidden ${
-                            isSelected
-                              ? `${MODEL_META[selectedModel].accentBorder} border-opacity-70`
-                              : 'border-[#2A2A2A] bg-[#161616] hover:bg-[#1f1f1f] hover:border-[#404040]'
-                          }`}
-                        >
-                          <div className={`font-black text-2xl md:text-3xl tracking-tighter mb-1 transition-transform group-hover:scale-105 ${isSelected ? 'text-white' : 'text-gray-300'}`}>
-                            ${(pkg.balance / 1000).toFixed(1)}K
+                  {selectedModelPackages.length === 0 ? (
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-gray-400">
+                      No active packages available for this model yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-10">
+                      {/* Special Accounts (Small Instant) */}
+                      {selectedModel === 'instant' && selectedModelPackages.some(pkg => LEGACY_SMALL_INSTANT_NAMES.includes(pkg.name)) && (
+                        <div>
+                          <div className="flex items-center gap-3 mb-4">
+                            <h4 className="text-xs font-black text-[#bd4dd6] uppercase tracking-widest">Special Accounts</h4>
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-[#bd4dd6]/30 to-transparent"></div>
+                            <span className="text-[10px] text-gray-500 font-bold uppercase">10% Welcome Offer</span>
                           </div>
-                          <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Balance</div>
-
-                          <div className="w-full pt-4 border-t border-[#2A2A2A] flex flex-col items-center">
-                            {coupon.discount > 0 ? (
-                              <>
-                                <span className="text-[10px] text-gray-600 line-through mb-1">${pkg.price.toFixed(2)}</span>
-                                <span className="text-green-400 font-black text-lg">${(pkg.price * (1 - coupon.discount / 100)).toFixed(2)}</span>
-                              </>
-                            ) : (
-                              <span className="text-[#bd4dd6] font-black text-lg">${pkg.price.toFixed(2)}</span>
-                            )}
+                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                            {selectedModelPackages.filter(pkg => LEGACY_SMALL_INSTANT_NAMES.includes(pkg.name)).map((pkg) => {
+                               const isSelected = selectedPackage?.id === pkg.id;
+                               const coupon = getDefaultCouponForPackage(pkg);
+                               return (
+                                 <button
+                                   key={pkg.id}
+                                   onClick={() => setSelectedPackage(pkg)}
+                                   className={`group relative p-6 rounded-2xl border-2 transition-all flex flex-col items-center justify-center overflow-hidden ${
+                                     isSelected
+                                       ? `${MODEL_META[selectedModel].accentBorder} border-opacity-70`
+                                       : 'border-[#2A2A2A] bg-[#161616] hover:bg-[#1f1f1f] hover:border-[#404040]'
+                                   }`}
+                                 >
+                                   <div className={`font-black text-2xl lg:text-3xl tracking-tighter mb-1 transition-transform group-hover:scale-105 ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                                     ${(pkg.balance / 1000).toFixed(1).replace('.0', '')}K
+                                   </div>
+                                   <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Balance</div>
+                                   <div className="w-full pt-4 border-t border-[#2A2A2A] flex flex-col items-center">
+                                      {coupon.discount > 0 ? (
+                                        <>
+                                          <span className="text-[10px] text-gray-600 line-through mb-1">${pkg.price.toFixed(0)}</span>
+                                          <span className="text-green-400 font-black text-lg">${(pkg.price * (1 - coupon.discount / 100)).toFixed(0)}</span>
+                                        </>
+                                      ) : (
+                                        <span className="text-[#bd4dd6] font-black text-lg">${pkg.price.toFixed(0)}</span>
+                                      )}
+                                   </div>
+                                 </button>
+                               );
+                            })}
                           </div>
+                        </div>
+                      )}
 
-                          {isSelected && (
-                            <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-emerald-300" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                      {/* Premium Accounts */}
+                      <div>
+                        <div className="flex items-center gap-3 mb-4">
+                          <h4 className="text-xs font-black text-emerald-400 uppercase tracking-widest">
+                            {selectedModel === 'instant' ? 'Premium Funded' : 'Elite Evaluation'}
+                          </h4>
+                          <div className="h-[1px] flex-1 bg-gradient-to-r from-emerald-400/30 to-transparent"></div>
+                          {selectedModel === 'instant' && <span className="text-[10px] text-gray-500 font-bold uppercase">50% Growth Sale</span>}
+                        </div>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                          {selectedModelPackages
+                            .filter(pkg => selectedModel !== 'instant' || !LEGACY_SMALL_INSTANT_NAMES.includes(pkg.name))
+                            .map((pkg) => {
+                               const isSelected = selectedPackage?.id === pkg.id;
+                               const coupon = getDefaultCouponForPackage(pkg);
+                               return (
+                                 <button
+                                   key={pkg.id}
+                                   onClick={() => setSelectedPackage(pkg)}
+                                   className={`group relative p-6 rounded-2xl border-2 transition-all flex flex-col items-center justify-center overflow-hidden ${
+                                     isSelected
+                                       ? `${MODEL_META[selectedModel].accentBorder} border-opacity-70`
+                                       : 'border-[#2A2A2A] bg-[#161616] hover:bg-[#1f1f1f] hover:border-[#404040]'
+                                   }`}
+                                 >
+                                   <div className={`font-black text-2xl lg:text-3xl tracking-tighter mb-1 transition-transform group-hover:scale-105 ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                                     ${(pkg.balance / 1000).toFixed(0)}K
+                                   </div>
+                                   <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Balance</div>
+                                   <div className="w-full pt-4 border-t border-[#2A2A2A] flex flex-col items-center">
+                                      {coupon.discount > 0 ? (
+                                        <>
+                                          <span className="text-[10px] text-gray-600 line-through mb-1">${pkg.price.toFixed(0)}</span>
+                                          <span className="text-green-400 font-black text-lg">${(pkg.price * (1 - coupon.discount / 100)).toFixed(0)}</span>
+                                        </>
+                                      ) : (
+                                        <span className="text-[#bd4dd6] font-black text-lg">${pkg.price.toFixed(0)}</span>
+                                      )}
+                                   </div>
+                                 </button>
+                               );
+                            })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              {/* Step 4: Dynamic Comparison Matrix */}
+              {/* Step 4: Strategic Rules (Restored & Cleaned) */}
               {selectedPackage && (
-                <div className="rounded-3xl border border-white/10 bg-white/[0.03] overflow-hidden">
-                  <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-[#bd4dd6]/15 to-transparent">
-                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">Comparison Matrix</h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Live rules for {selectedPackage.name} ({MODEL_META[selectedModel].label})
-                    </p>
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black text-[#606060] uppercase tracking-[0.2em] flex items-center gap-2">
+                    <span className="text-[#bd4dd6]">05.</span> Protocol Rules
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
+                       <Shield className="w-5 h-5 mx-auto mb-2 text-[#bd4dd6]" />
+                       <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Max Drawdown</div>
+                       <div className="text-white font-black text-sm">{selectedPackageRules?.overall_drawdown_percent ?? 12}%</div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
+                       <Zap className="w-5 h-5 mx-auto mb-2 text-yellow-400" />
+                       <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Profit Target</div>
+                       <div className="text-white font-black text-sm">{selectedPackageRules?.profit_target_phase1 ?? 10}%</div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
+                       <CreditCard className="w-5 h-5 mx-auto mb-2 text-emerald-400" />
+                       <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Profit Split</div>
+                       <div className="text-white font-black text-sm">{selectedPackageRules?.payout_split_percent ?? 80}%</div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
+                       <Clock className="w-5 h-5 mx-auto mb-2 text-blue-400" />
+                       <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Min Days</div>
+                       <div className="text-white font-black text-sm">{selectedPackageRules?.minimum_trading_days ?? 0} Days</div>
+                    </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <tbody>
-                        <tr className="border-b border-white/10">
-                          <td className="px-6 py-3 text-gray-400">Price</td>
-                          <td className="px-6 py-3 text-right text-white font-semibold">${selectedPackage.price.toFixed(2)}</td>
-                        </tr>
-                        <tr className="border-b border-white/10">
-                          <td className="px-6 py-3 text-gray-400">Profit Target Phase 1</td>
-                          <td className="px-6 py-3 text-right text-white font-semibold">
-                            {selectedPackageRules?.profit_target_phase1 ?? '--'}%
-                          </td>
-                        </tr>
-                        {selectedModel === '2_step' && (
-                          <tr className="border-b border-white/10">
-                            <td className="px-6 py-3 text-gray-400">Profit Target Phase 2</td>
-                            <td className="px-6 py-3 text-right text-white font-semibold">
-                              {selectedPackageRules?.profit_target_phase2 ?? '--'}%
-                            </td>
-                          </tr>
-                        )}
-                        <tr className="border-b border-white/10">
-                          <td className="px-6 py-3 text-gray-400">Daily Drawdown</td>
-                          <td className="px-6 py-3 text-right text-red-300 font-semibold">
-                            {selectedPackageRules?.daily_drawdown_percent ?? '--'}%
-                          </td>
-                        </tr>
-                        <tr className="border-b border-white/10">
-                          <td className="px-6 py-3 text-gray-400">Overall Drawdown</td>
-                          <td className="px-6 py-3 text-right text-orange-300 font-semibold">
-                            {selectedPackageRules?.overall_drawdown_percent ?? '--'}%
-                          </td>
-                        </tr>
-                        <tr className="border-b border-white/10">
-                          <td className="px-6 py-3 text-gray-400">Minimum Trading Days</td>
-                          <td className="px-6 py-3 text-right text-white font-semibold">
-                            {selectedPackageRules?.minimum_trading_days ?? 0}
-                          </td>
-                        </tr>
-                        <tr className="border-b border-white/10">
-                          <td className="px-6 py-3 text-gray-400">Payout Split</td>
-                          <td className="px-6 py-3 text-right text-emerald-300 font-semibold">
-                            {selectedPackageRules?.payout_split_percent ?? 80}%
-                          </td>
-                        </tr>
-                        <tr className="border-b border-white/10">
+                </div>
+              )}
                           <td className="px-6 py-3 text-gray-400">News Trading</td>
                           <td className="px-6 py-3 text-right text-white font-semibold">
                             {selectedPackageRules?.news_trading_allowed ? 'Allowed' : 'Restricted'}
@@ -1188,14 +1213,16 @@ export default function BuyAccount() {
               <div className="space-y-8">
                 {/* Visual Representation of Selected Bag */}
                 <div className="bg-[#161616] rounded-3xl p-6 border border-[#2A2A2A] text-center">
-                   <div className="text-4xl font-black text-white tracking-tighter mb-1">${(selectedPackage.balance / 1000).toFixed(0)}K</div>
+                   <div className="text-4xl font-black text-white tracking-tighter mb-1">
+                     ${selectedPackage.balance.toLocaleString()}
+                   </div>
                    <div className="text-[10px] font-heavy text-[#bd4dd6] uppercase tracking-[0.2em]">{MODEL_META[getPackageModel(selectedPackage)].label}</div>
                 </div>
 
                 <div className="space-y-4">
                    <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Access Fee</span>
-                      <span className="text-white font-mono">${selectedPackage.price}</span>
+                      <span className="text-white font-mono">${selectedPackage.price.toFixed(0)}</span>
                    </div>
                    <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Platform</span>
@@ -1231,7 +1258,41 @@ export default function BuyAccount() {
                       </div>
                    </div>
 
-                   <button
+                  {/* Promo Code Input (Restored) */}
+                  <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 mb-6">
+                    <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Promotional Protocol</div>
+                    <div className="flex gap-2">
+                       <input 
+                         type="text" 
+                         value={couponCode}
+                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                         placeholder="ENTER PROMO CODE"
+                         className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono focus:border-[#bd4dd6] outline-none placeholder:text-gray-700"
+                       />
+                       <button 
+                         onClick={async () => {
+                           if (!couponCode) return;
+                           setError(null);
+                           const { data, error: rpcError } = await supabase.rpc('validate_coupon', { p_code: couponCode });
+                           if (rpcError) {
+                             setError('Security protocol error. Try again.');
+                             return;
+                           }
+                           if (data && data.is_valid) {
+                             setAppliedCoupon({ code: couponCode, discount: data.discount_percent });
+                             setSuccess('PROMO CODE ACTIVATED');
+                           } else {
+                             setError('INVALID SECURITY KEY');
+                           }
+                         }}
+                         className="px-6 py-3 bg-[#bd4dd6] text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-[#bd4dd6]/80 transition-all shadow-lg shadow-[#bd4dd6]/20"
+                       >
+                         Apply
+                       </button>
+                    </div>
+                  </div>
+
+                  <button
                     onClick={handlePurchase}
                     className="w-full group relative py-5 px-6 bg-gradient-to-r from-[#bd4dd6] to-[#9c3fc0] hover:scale-[1.02] active:scale-[0.98] text-white font-black rounded-2xl transition-all shadow-[0_10px_30px_rgba(189,77,214,0.3)] flex items-center justify-center gap-3"
                   >

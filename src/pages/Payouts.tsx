@@ -164,6 +164,20 @@ export default function Payouts() {
     const packageName = account.package_name || 'Unknown';
     const rules = isLegacyAccount ? null : accountRules[packageName];
 
+    // BLOCK EVALUATION ACCOUNTS FROM WITHDRAWING
+    const modelType = account.model_type || 'instant';
+    const currentPhase = account.current_phase || 1;
+    
+    let isFunded = false;
+    if (modelType === 'instant') isFunded = true;
+    else if (modelType === '1_step' && currentPhase >= 2) isFunded = true;
+    else if (modelType === '2_step' && currentPhase >= 3) isFunded = true;
+
+    if (!isFunded) {
+      setError(`Evaluation accounts are not eligible for payouts. You must reach the 'Funded' phase first.`);
+      return;
+    }
+
     // FIRST: Check Saturday requirement for legacy accounts (before any other validation)
     if (isLegacyAccount) {
       const dayOfWeek = new Date().getDay(); // 0=Sunday, 6=Saturday
@@ -184,8 +198,18 @@ export default function Payouts() {
       }
     }
 
-    // Calculate withdrawal target percentage (10% for legacy, 5% for new)
-    const withdrawalTargetPercent = isLegacyAccount ? 10 : (rules?.withdrawal_target_percent || 5);
+    // Calculate withdrawal target percentage
+    // For Funded Step accounts, we typically use a 1% "profit buffer" or 0%.
+    // For Instant accounts, we use the user-defined withdrawal target.
+    let withdrawalTargetPercent = 5;
+    if (isLegacyAccount) {
+      withdrawalTargetPercent = 10;
+    } else if (modelType !== 'instant') {
+      withdrawalTargetPercent = 1; // Funded accounts only need 1% profit to withdraw
+    } else {
+      withdrawalTargetPercent = rules?.withdrawal_target_percent || 5;
+    }
+
     const profitTarget = account.initial_equity * (withdrawalTargetPercent / 100);
     const currentProfit = account.running_equity - account.initial_equity;
 
@@ -195,8 +219,8 @@ export default function Payouts() {
       return;
     }
 
-    // Calculate payout amount based on 25% rule
-    const payoutPercent = account.has_25_percent_rule ? 25 : 50;
+    // Calculate payout amount based on dynamic profit split
+    const payoutPercent = account.has_25_percent_rule ? 25 : (rules?.payout_split_percent || 50);
     let requestAmount = currentProfit * (payoutPercent / 100);
 
     // Enforce maximum daily payout cap: 20% of initial equity

@@ -19,6 +19,8 @@ interface TradingAccount {
   user_name?: string;
   user_email?: string;
   package_name?: string;
+  model_type?: 'instant' | '1_step' | '2_step';
+  current_phase?: number;
 }
 
 interface ExtendedAccountData {
@@ -197,6 +199,77 @@ export default function TradingAccounts() {
     setShowViewModal(true);
   };
 
+  const handleUpdateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedAccount) return;
+
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('trading_accounts')
+        .update({
+          mt5_login: selectedAccount.mt5_login,
+          mt5_password: selectedAccount.mt5_password,
+          mt5_server: selectedAccount.mt5_server,
+          balance: selectedAccount.balance,
+          equity: selectedAccount.equity,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', selectedAccount.id);
+
+      if (error) throw error;
+      setShowViewModal(false);
+      loadAccounts();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handlePromotePhase = async (account: TradingAccount) => {
+    const nextPhase = (account.current_phase || 1) + 1;
+    const model = account.model_type || 'instant';
+    
+    let phaseLabel = `Phase ${nextPhase}`;
+    if (model === '1_step' && nextPhase === 2) phaseLabel = 'Funded';
+    if (model === '2_step' && nextPhase === 3) phaseLabel = 'Funded';
+
+    if (!confirm(`Are you sure you want to promote this trader to ${phaseLabel}?`)) return;
+
+    try {
+      setProcessing(true);
+      const { error } = await supabase
+        .from('trading_accounts')
+        .update({ 
+          current_phase: nextPhase,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', account.id);
+
+      if (error) throw error;
+      
+      // Optionally notify the user
+      await sendEmail({
+        to: account.user_email!,
+        template: 'account_phase_promotion',
+        data: {
+          name: account.user_name || 'Trader',
+          accountLogin: account.mt5_login,
+          newPhase: phaseLabel,
+          packageName: account.package_name || 'Account'
+        },
+        userId: account.user_id
+      });
+
+      loadAccounts();
+    } catch (err: any) {
+      alert('Failed to promote phase: ' + err.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleBreach = async () => {
     if (!selectedAccount) return;
     setProcessing(true);
@@ -354,6 +427,7 @@ export default function TradingAccounts() {
                 <th className="pb-3 text-left text-gray-400 font-medium">User</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Package</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">MT5 Login</th>
+                <th className="pb-3 text-left text-gray-400 font-medium">Model / Phase</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">MT5 Password</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Server</th>
                 <th className="pb-3 text-left text-gray-400 font-medium">Running Balance</th>
@@ -421,6 +495,23 @@ export default function TradingAccounts() {
                         >
                           <Copy className="w-4 h-4" />
                         </button>
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      <div className="flex flex-col gap-1">
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase w-fit ${
+                          account.model_type === '2_step' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                          account.model_type === '1_step' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 
+                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        }`}>
+                          {account.model_type || 'Instant'}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase">
+                          {account.model_type === 'instant' ? 'Funded' : 
+                           (account.model_type === '1_step' && account.current_phase === 2) || 
+                           (account.model_type === '2_step' && account.current_phase === 3) ? 'Funded' : 
+                           `Phase ${account.current_phase || 1}`}
+                        </span>
                       </div>
                     </td>
                     <td className="py-4">
@@ -515,13 +606,25 @@ export default function TradingAccounts() {
                     </td>
                     <td className="py-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => handleViewClick(account)}
-                          className="inline-flex items-center px-3 py-1 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors text-sm font-medium"
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
-                        </button>
+                          <button
+                            onClick={() => handleViewClick(account)}
+                            className="inline-flex items-center px-3 py-1 rounded-lg bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 transition-colors text-sm font-medium"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            View
+                          </button>
+                          
+                          {account.status === 'active' && account.model_type !== 'instant' && (
+                            <button
+                              onClick={() => handlePromotePhase(account)}
+                              disabled={(account.model_type === '1_step' && (account.current_phase || 1) >= 2) || (account.model_type === '2_step' && (account.current_phase || 1) >= 3)}
+                              className="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 disabled:opacity-30 disabled:hover:bg-emerald-500/10 transition-colors text-sm font-medium"
+                              title="Promote to Next Phase"
+                            >
+                              <TrendingUp className="w-4 h-4 mr-1" />
+                              Promote
+                            </button>
+                          )}
                         {account.status === 'active' && (
                           <button
                             onClick={() => handleBreachClick(account)}
