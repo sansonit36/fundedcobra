@@ -770,6 +770,3 @@ export default function PackagesAndOffers() {
     </div>
   );
 }
-    </div>
-  );
-}
