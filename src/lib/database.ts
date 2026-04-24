@@ -141,6 +141,13 @@ export interface AccountData {
   package_name?: string;
   created_rule_version?: string;
   has_25_percent_rule?: boolean;
+  model_type?: string;
+  current_phase?: number;
+  payout_split_percent?: number;
+  withdrawal_target_percent?: number;
+  minimum_withdrawal_amount?: number;
+  daily_payout_enabled?: boolean;
+  weekly_payout_enabled?: boolean;
 }
 
 // Profile Image Upload
@@ -186,7 +193,7 @@ export async function getTradingAccounts(userId: string): Promise<TradingAccount
 export async function getActiveAccounts(userId: string): Promise<AccountData[]> {
   const { data: accounts, error: accountsError} = await supabase
     .from('trading_accounts')
-    .select('id, mt5_login, package_name, created_rule_version, has_25_percent_rule')
+    .select('id, mt5_login, package_name, created_rule_version, has_25_percent_rule, model_type, current_phase')
     .eq('user_id', userId)
     .eq('status', 'active');
 
@@ -195,6 +202,17 @@ export async function getActiveAccounts(userId: string): Promise<AccountData[]> 
   if (!accounts || accounts.length === 0) {
     return [];
   }
+
+  // Fetch master template rules
+  const { data: masterRules, error: rulesError } = await supabase
+    .from('account_rules')
+    .select('account_type, withdrawal_target_percent, payout_split_percent, minimum_withdrawal_amount, daily_payout_enabled, weekly_payout_enabled')
+    .eq('is_template', true);
+
+  if (rulesError) throw rulesError;
+
+  const rulesByType: Record<string, any> = {};
+  (masterRules || []).forEach(r => { rulesByType[r.account_type] = r; });
 
   const { data: extendedData, error: extendedError } = await supabase
     .from('account_data_extended')
@@ -216,12 +234,20 @@ export async function getActiveAccounts(userId: string): Promise<AccountData[]> 
     const extended = extendedData?.find(ed => ed.mt5_id === acc.mt5_login);
     if (!extended) return null;
 
-    const profitTarget = extended.initial_equity * 0.10; // 10% profit target
+    const modelType = acc.model_type || 'instant';
+    const rule = rulesByType[modelType];
+    
+    // Use master template values, fallback to legacy defaults
+    const isLegacy = acc.created_rule_version === 'legacy';
+    const withdrawalTargetPercent = isLegacy ? 10 : (rule?.withdrawal_target_percent || 5);
+    const payoutSplitPercent = isLegacy ? 50 : (rule?.payout_split_percent || 80);
+
+    const profitTarget = extended.initial_equity * (withdrawalTargetPercent / 100);
     const currentProfit = extended.running_equity - extended.initial_equity;
     
-    // Use 25% if has_25_percent_rule is true, otherwise 50%
-    const payoutPercentage = acc.has_25_percent_rule ? 0.25 : 0.5;
-    const available = currentProfit >= profitTarget ? currentProfit * payoutPercentage : 0;
+    // Use 25% if has_25_percent_rule is true, otherwise use master template split
+    const effectiveSplit = acc.has_25_percent_rule ? 25 : payoutSplitPercent;
+    const available = currentProfit >= profitTarget ? currentProfit * (effectiveSplit / 100) : 0;
 
     // Subtract pending payout amounts
     const pendingAmount = (pendingPayouts || [])
@@ -238,7 +264,14 @@ export async function getActiveAccounts(userId: string): Promise<AccountData[]> 
       available_for_payout: availableAfterPending,
       package_name: acc.package_name,
       created_rule_version: acc.created_rule_version,
-      has_25_percent_rule: acc.has_25_percent_rule
+      has_25_percent_rule: acc.has_25_percent_rule,
+      model_type: modelType,
+      current_phase: acc.current_phase || 1,
+      payout_split_percent: effectiveSplit,
+      withdrawal_target_percent: withdrawalTargetPercent,
+      minimum_withdrawal_amount: rule?.minimum_withdrawal_amount || 50,
+      daily_payout_enabled: rule?.daily_payout_enabled ?? true,
+      weekly_payout_enabled: rule?.weekly_payout_enabled ?? true,
     } as AccountData;
   }).filter((acc): acc is AccountData => acc !== null);
 }

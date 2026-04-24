@@ -446,6 +446,48 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     </div>
                   );
                 })()}
+
+                {/* Account Rules Info Strip */}
+                {(() => {
+                  const mt = account.model_type || 'instant';
+                  const rule = masterRules[mt];
+                  if (!rule) return null;
+                  const mc = mt === 'instant' ? '#bd4dd6' : mt === '1_step' ? '#3B82F6' : '#10B981';
+                  const ml = mt === 'instant' ? 'Instant' : mt === '1_step' ? '1-Step' : '2-Step';
+                  return (
+                    <div className="mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Shield className="w-3.5 h-3.5 text-gray-500" />
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Account Rules</span>
+                        <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest" style={{ backgroundColor: `${mc}15`, color: mc }}>{ml}</span>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div>
+                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Profit Split</p>
+                          <p className="text-xs font-bold text-white">{rule.payout_split_percent || 80}%</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Withdrawal Target</p>
+                          <p className="text-xs font-bold text-white">{rule.withdrawal_target_percent || 5}%</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Min Withdrawal</p>
+                          <p className="text-xs font-bold text-white">${rule.minimum_withdrawal_amount || 50}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Schedule</p>
+                          <p className="text-xs font-bold text-white">
+                            {rule.daily_payout_enabled ? 'Daily' : rule.weekly_payout_enabled ? 'Weekly' : '—'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Min Days</p>
+                          <p className="text-xs font-bold text-white">{rule.minimum_trading_days || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
                 
                 {/* Breach Reason Section */}
                 {account.status === 'breached' && account.breach_reason && (

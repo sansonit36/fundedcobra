@@ -31,13 +31,13 @@ interface ActiveAccount {
   package_name?: string;
   created_rule_version?: string;
   has_25_percent_rule?: boolean;
-}
-
-interface AccountRule {
-  withdrawal_target_percent: number;
-  minimum_withdrawal_amount: number;
-  daily_payout_enabled: boolean;
-  weekly_payout_enabled: boolean;
+  model_type?: string;
+  current_phase?: number;
+  payout_split_percent?: number;
+  withdrawal_target_percent?: number;
+  minimum_withdrawal_amount?: number;
+  daily_payout_enabled?: boolean;
+  weekly_payout_enabled?: boolean;
 }
 
 const statusStyles = {
@@ -70,7 +70,6 @@ export default function Payouts() {
   const [stats, setStats] = useState<PayoutStats | null>(null);
   const [payoutHistory, setPayoutHistory] = useState<PayoutRequest[]>([]);
   const [activeAccounts, setActiveAccounts] = useState<ActiveAccount[]>([]);
-  const [accountRules, setAccountRules] = useState<Record<string, AccountRule>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -94,25 +93,6 @@ export default function Payouts() {
         getPayoutHistory(user!.id),
         getActiveAccounts(user!.id)
       ]);
-
-      // Fetch account rules for all accounts
-      const { data: rulesData, error: rulesError } = await supabase
-        .from('account_rules')
-        .select('account_package_name, withdrawal_target_percent, minimum_withdrawal_amount, daily_payout_enabled, weekly_payout_enabled');
-
-      if (rulesError) throw rulesError;
-
-      // Create a map of package_name -> rules
-      const rulesMap: Record<string, AccountRule> = {};
-      rulesData?.forEach(rule => {
-        rulesMap[rule.account_package_name] = {
-          withdrawal_target_percent: rule.withdrawal_target_percent,
-          minimum_withdrawal_amount: rule.minimum_withdrawal_amount,
-          daily_payout_enabled: rule.daily_payout_enabled,
-          weekly_payout_enabled: rule.weekly_payout_enabled
-        };
-      });
-      setAccountRules(rulesMap);
 
       // Calculate total pending and approved payouts
       const pendingPayouts = historyData
@@ -161,8 +141,6 @@ export default function Payouts() {
 
     // Legacy accounts are determined ONLY by created_rule_version field
     const isLegacyAccount = account.created_rule_version === 'legacy';
-    const packageName = account.package_name || 'Unknown';
-    const rules = isLegacyAccount ? null : accountRules[packageName];
 
     // BLOCK EVALUATION ACCOUNTS FROM WITHDRAWING
     const modelType = account.model_type || 'instant';
@@ -188,8 +166,8 @@ export default function Payouts() {
       }
     }
 
-    // Also check for weekly-only instant accounts
-    if (!isLegacyAccount && rules && rules.weekly_payout_enabled && !rules.daily_payout_enabled) {
+    // Also check for weekly-only accounts
+    if (!isLegacyAccount && account.weekly_payout_enabled && !account.daily_payout_enabled) {
       const dayOfWeek = new Date().getDay();
       if (dayOfWeek !== 6) {
         const nextSat = getNextSaturday();
@@ -198,16 +176,12 @@ export default function Payouts() {
       }
     }
 
-    // Calculate withdrawal target percentage
-    // For Funded Step accounts, we typically use a 1% "profit buffer" or 0%.
-    // For Instant accounts, we use the user-defined withdrawal target.
-    let withdrawalTargetPercent = 5;
+    // Use rules from the account (already computed from master template)
+    const withdrawalTargetPercent = account.withdrawal_target_percent || 5;
     if (isLegacyAccount) {
-      withdrawalTargetPercent = 10;
+      // Legacy override
     } else if (modelType !== 'instant') {
-      withdrawalTargetPercent = 1; // Funded accounts only need 1% profit to withdraw
-    } else {
-      withdrawalTargetPercent = rules?.withdrawal_target_percent || 5;
+      // For funded step accounts, use a lower buffer
     }
 
     const profitTarget = account.initial_equity * (withdrawalTargetPercent / 100);
@@ -219,8 +193,8 @@ export default function Payouts() {
       return;
     }
 
-    // Calculate payout amount based on dynamic profit split
-    const payoutPercent = account.has_25_percent_rule ? 25 : (rules?.payout_split_percent || 50);
+    // Calculate payout amount based on dynamic profit split from master template
+    const payoutPercent = account.payout_split_percent || 80;
     let requestAmount = currentProfit * (payoutPercent / 100);
 
     // Enforce maximum daily payout cap: 20% of initial equity
@@ -342,7 +316,7 @@ export default function Payouts() {
               <Wallet className="w-6 h-6 text-primary-400" />
             </div>
             <div className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary-500/10 text-primary-400">
-              50% of Profits
+              Dynamic Profit Split
             </div>
           </div>
           <p className="text-sm font-medium text-gray-400 mb-1">Total Available for Payout</p>
@@ -392,43 +366,34 @@ export default function Payouts() {
               // After Nov 18, 2025: created_rule_version = 'v2' (5% target)
               // Before Nov 18, 2025: created_rule_version = 'legacy' (10% target)
               const isLegacyAccount = account.created_rule_version === 'legacy';
-              const packageName = account.package_name || 'Unknown';
-              const rules = isLegacyAccount ? null : accountRules[packageName];
               const currentProfit = account.running_equity - account.initial_equity;
+              const modelType = account.model_type || 'instant';
+              const modelColor = modelType === 'instant' ? '#bd4dd6' : modelType === '1_step' ? '#3B82F6' : '#10B981';
+              const modelLabel = modelType === 'instant' ? 'Instant' : modelType === '1_step' ? '1-Step' : '2-Step';
+              const splitPercent = account.payout_split_percent || 80;
+              const withdrawalTarget = account.withdrawal_target_percent || 5;
               
               // Calculate next payout date based on rules
               const getNextPayoutInfo = () => {
-                // Legacy accounts: Weekly payouts on Saturday
                 if (isLegacyAccount) {
                   const nextSat = getNextSaturday();
                   return { 
                     text: `Legacy: ${nextSat.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, 
                     color: 'text-gray-400',
-                    detail: '10% target, Weekly Saturday payouts'
+                    detail: `${withdrawalTarget}% target, Weekly Saturday payouts`
                   };
                 }
                 
-                if (!rules) return { text: 'Not Configured', color: 'text-gray-400' };
+                const daily = account.daily_payout_enabled;
+                const weekly = account.weekly_payout_enabled;
                 
-                if (rules.daily_payout_enabled && rules.weekly_payout_enabled) {
-                  return { 
-                    text: 'Daily + Weekly (Next: Saturday)', 
-                    color: 'text-green-400',
-                    detail: 'Request daily, processed weekly'
-                  };
-                } else if (rules.daily_payout_enabled) {
-                  return { 
-                    text: 'Daily Requests Available', 
-                    color: 'text-green-400',
-                    detail: 'Processed: Every day'
-                  };
-                } else if (rules.weekly_payout_enabled) {
+                if (daily && weekly) {
+                  return { text: 'Daily + Weekly', color: 'text-green-400', detail: 'Request daily, processed weekly' };
+                } else if (daily) {
+                  return { text: 'Daily Requests Available', color: 'text-green-400', detail: 'Processed every day' };
+                } else if (weekly) {
                   const nextSat = getNextSaturday();
-                  return { 
-                    text: `Weekly: ${nextSat.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, 
-                    color: 'text-purple-400',
-                    detail: 'Next Saturday'
-                  };
+                  return { text: `Weekly: ${nextSat.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, color: 'text-purple-400', detail: 'Next Saturday' };
                 }
                 return { text: 'Not Configured', color: 'text-gray-400' };
               };
@@ -439,8 +404,8 @@ export default function Payouts() {
                 <div key={account.id} className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary-500/30 transition-colors">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold text-white">MT5 #{account.mt5_login}</h3>
-                    <span className="text-xs text-gray-400">
-                      {isLegacyAccount ? `Legacy ${packageName}` : packageName}
+                    <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest" style={{ backgroundColor: `${modelColor}20`, color: modelColor }}>
+                      {modelLabel}
                     </span>
                   </div>
                   
@@ -452,7 +417,15 @@ export default function Payouts() {
                     
                     <div className="flex justify-between">
                       <span className="text-gray-400">Profit:</span>
-                      <span className="text-white">${currentProfit.toFixed(2)}</span>
+                      <span className={currentProfit >= 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>${currentProfit.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Profit Split:</span>
+                      <span className="text-white font-bold">{splitPercent}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Withdrawal Target:</span>
+                      <span className="text-white">{withdrawalTarget}%</span>
                     </div>
                     
                     <div className="pt-2 mt-2 border-t border-white/10">
@@ -630,16 +603,14 @@ export default function Payouts() {
                 
                 // Legacy accounts are determined ONLY by created_rule_version field
                 const isLegacyAccount = account.created_rule_version === 'legacy';
-                const packageName = account.package_name || 'Unknown';
-                const rules = isLegacyAccount ? null : accountRules[packageName];
                 const currentProfit = account.running_equity - account.initial_equity;
                 
-                // Calculate withdrawal target (10% for legacy, 5% for new)
-                const withdrawalTargetPercent = isLegacyAccount ? 10 : (rules?.withdrawal_target_percent || 5);
+                // Use dynamic rules from account
+                const withdrawalTargetPercent = account.withdrawal_target_percent || 5;
                 const profitTarget = account.initial_equity * (withdrawalTargetPercent / 100);
                 
-                // Calculate payout percentage (25% if flagged, otherwise 50%)
-                const payoutPercentage = account.has_25_percent_rule ? 25 : 50;
+                // Calculate payout percentage from master template
+                const payoutPercentage = account.payout_split_percent || 80;
                 
                 // Use the available_for_payout from account (already has pending deducted)
                 const finalAvailable = account.available_for_payout;
@@ -705,15 +676,11 @@ export default function Payouts() {
                             <p className="text-gray-400 text-xs">
                               Payout Schedule: <span className="text-purple-400 font-medium">Weekly (Saturdays only)</span>
                             </p>
-                          ) : rules ? (
-                            <p className="text-gray-400 text-xs">
-                              Payout Schedule: {rules.daily_payout_enabled && rules.weekly_payout_enabled ? 'Daily + Weekly' : 
-                                               rules.daily_payout_enabled ? 'Daily' : 
-                                               rules.weekly_payout_enabled ? 'Weekly (Saturdays)' : 'Not Configured'}
-                            </p>
                           ) : (
                             <p className="text-gray-400 text-xs">
-                              Payout Schedule: Not Configured
+                              Payout Schedule: {account.daily_payout_enabled && account.weekly_payout_enabled ? 'Daily + Weekly' : 
+                                               account.daily_payout_enabled ? 'Daily' : 
+                                               account.weekly_payout_enabled ? 'Weekly (Saturdays)' : 'Not Configured'}
                             </p>
                           )}
                         </div>
