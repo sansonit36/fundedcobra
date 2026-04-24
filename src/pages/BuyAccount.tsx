@@ -267,11 +267,11 @@ export default function BuyAccount() {
   const selectedModelPackages = packages.filter(pkg => getPackageModel(pkg) === selectedModel);
   const selectedPackageRules = getRulesForPackage(selectedPackage);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-white font-black uppercase tracking-widest">Initialising Terminal...</div>;
+  if (loading) return <div className="flex items-center justify-center text-white uppercase tracking-widest py-40" style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 700 }}>Initialising Terminal...</div>;
 
   return (
     <>
-    <div className="min-h-screen pb-20 lg:pb-20 bg-[#0B0B0C] text-white" style={{ paddingBottom: selectedPackage ? '80px' : undefined }}>
+    <div className="pb-20 lg:pb-20 text-white" style={{ paddingBottom: selectedPackage ? '80px' : undefined, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {/* 🟢 TOASTS */}
       <div className="fixed top-8 right-8 z-[110] space-y-4 max-w-sm w-full">
         {success && <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-bold uppercase tracking-tight animate-in slide-in-from-right">{success}</div>}
@@ -304,7 +304,7 @@ export default function BuyAccount() {
       {/* URGENCY BAR */}
       <div className="relative overflow-hidden" style={{ background: 'linear-gradient(90deg, #dc2626 0%, #ef4444 30%, #f97316 70%, #dc2626 100%)' }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)' }} />
-        <div className="relative max-w-7xl mx-auto flex items-center justify-center gap-4 text-white text-sm font-semibold py-3 px-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className="relative max-w-7xl mx-auto flex items-center justify-center gap-4 text-white text-sm font-semibold py-3 px-4" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
           <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-white animate-pulse" /> LIVE</span>
           <span>Only <span className="bg-white/20 px-2 py-0.5 rounded-md font-black">{Math.floor(Math.random() * 8) + 3}</span> spots left</span>
           <span className="hidden md:inline opacity-40">|</span>
@@ -324,8 +324,8 @@ export default function BuyAccount() {
           <div className="absolute top-10 right-1/4 w-72 h-72 rounded-full blur-[100px] opacity-[0.07]" style={{ backgroundColor: '#3B82F6' }} />
         </div>
         <div className="relative text-center mb-10">
-          <h1 className="text-5xl lg:text-7xl tracking-tight mb-4 leading-[1.05]" style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>Get Funded <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">Today</span></h1>
-          <p className="text-gray-400 text-base max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
+          <h1 className="text-5xl lg:text-7xl tracking-tight mb-4 leading-[1.05]" style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Get Funded <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">Today</span></h1>
+          <p className="text-gray-400 text-base max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
         </div>
         
         {/* ACCOUNT TYPE TABS - Big and prominent */}
@@ -346,7 +346,7 @@ export default function BuyAccount() {
                   className={`px-8 py-4 rounded-xl text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
                     active ? 'text-white' : 'text-gray-500 hover:text-gray-300'
                   }`}
-                  style={active ? { background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 6px 30px ${color}50, 0 0 0 1px ${color}30` } : { fontFamily: 'Inter, sans-serif' }}
+                  style={active ? { background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 6px 30px ${color}50, 0 0 0 1px ${color}30` } : { fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 >
                   {MODEL_META[model].label}
                 </button>
@@ -375,8 +375,8 @@ export default function BuyAccount() {
                 <div key={idx} className="relative group rounded-xl p-[1px] transition-all duration-300" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))` }}>
                   <div className="rounded-xl p-5 text-center h-full" style={{ background: 'linear-gradient(180deg, #151515 0%, #0d0d0d 100%)' }}>
                     <item.Icon className="w-5 h-5 mx-auto mb-2 opacity-40" style={{ color: item.color }} />
-                    <div className="text-2xl font-bold" style={{ color: item.color, fontFamily: 'Space Grotesk, sans-serif' }}>{item.value}</div>
-                    <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>{item.label}</div>
+                    <div className="text-2xl font-bold" style={{ color: item.color, fontFamily: 'Outfit, sans-serif' }}>{item.value}</div>
+                    <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{item.label}</div>
                   </div>
                 </div>
               ))}
@@ -395,7 +395,7 @@ export default function BuyAccount() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #bd4dd6, #9333ea)' }}>1</div>
-              <h3 className="text-base font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Choose Your Account Size</h3>
+              <h3 className="text-base font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Outfit, sans-serif' }}>Choose Your Account Size</h3>
             </div>
             {(() => {
               const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
@@ -425,10 +425,10 @@ export default function BuyAccount() {
                     }
                   >
                     {isSelected && <div className="absolute -top-1.5 -right-1.5 rounded-full shadow-lg" style={{ background: modelColor }}><Check className="w-4 h-4 text-white p-0.5" /></div>}
-                    <div className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{balanceLabel}</div>
+                    <div className="text-xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
                     <div className="flex items-center justify-center gap-1.5 mt-2">
                       {categoryDiscount > 0 && <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>}
-                      <span className="text-base font-bold" style={{ color: modelColor, fontFamily: 'Inter, sans-serif' }}>${discountedPrice.toFixed(0)}</span>
+                      <span className="text-base font-bold" style={{ color: modelColor, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>${discountedPrice.toFixed(0)}</span>
                     </div>
                     {categoryDiscount > 0 && savings > 0 && (
                       <div className="text-[9px] font-semibold text-emerald-400 mt-1.5 bg-emerald-500/10 rounded-md px-2 py-0.5 inline-block border border-emerald-500/20">Save ${savings.toFixed(0)}</div>
@@ -487,7 +487,7 @@ export default function BuyAccount() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-lg transition-all" style={{ background: selectedPlatform && selectedServer ? 'linear-gradient(135deg, #10B981, #059669)' : '#2A2A2A' }}>2</div>
-              <h3 className="text-base font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Configure Your Setup</h3>
+              <h3 className="text-base font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Outfit, sans-serif' }}>Configure Your Setup</h3>
               {!selectedPlatform && <span className="text-[10px] text-red-400 font-bold animate-pulse">← Required</span>}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -676,7 +676,7 @@ export default function BuyAccount() {
         <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit space-y-4">
            <div className="rounded-2xl border border-white/[0.08] overflow-hidden shadow-2xl" style={{ background: 'linear-gradient(180deg, rgba(22,22,22,0.95) 0%, rgba(12,12,12,0.98) 100%)', backdropFilter: 'blur(20px)' }}>
               <div className="px-5 py-3.5 border-b border-white/[0.06] flex items-center justify-between" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))' }}>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Your Order</h3>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Outfit, sans-serif' }}>Your Order</h3>
                 {selectedPackage && <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Ready</span>}
               </div>
               
@@ -686,8 +686,8 @@ export default function BuyAccount() {
                     <div className="rounded-xl p-4 border border-white/[0.06]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.3) 100%)' }}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-2xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>${selectedPackage.balance.toLocaleString()}</div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981', fontFamily: 'Inter, sans-serif' }}>
+                          <div className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${selectedPackage.balance.toLocaleString()}</div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                             {MODEL_META[selectedModel].label}
                           </p>
                         </div>
@@ -718,13 +718,13 @@ export default function BuyAccount() {
                        <div className="pt-3 border-t border-white/5 flex justify-between items-center">
                           <span className="text-sm font-bold text-white">Total</span>
                           <div className="text-right">
-                            <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                            <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
                           </div>
                        </div>
                     </div>
 
                     {(!selectedPlatform || !selectedServer) && (
-                      <div className="text-[10px] text-yellow-500 font-semibold bg-yellow-500/5 p-2.5 rounded-xl border border-yellow-500/15 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      <div className="text-[10px] text-yellow-500 font-semibold bg-yellow-500/5 p-2.5 rounded-xl border border-yellow-500/15 text-center" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                         ⚠ Please select platform and server above to continue
                       </div>
                     )}
@@ -736,7 +736,7 @@ export default function BuyAccount() {
                         (!selectedPlatform || !selectedServer) ? 'opacity-30 cursor-not-allowed' : 'hover:brightness-110'
                       }`}
                       style={{
-                        fontFamily: 'Space Grotesk, sans-serif',
+                        fontFamily: 'Outfit, sans-serif',
                         background: `linear-gradient(135deg, ${selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981'}, ${selectedModel === 'instant' ? '#9333ea' : selectedModel === '1_step' ? '#2563eb' : '#059669'})`,
                         boxShadow: (!selectedPlatform || !selectedServer) ? 'none' : `0 4px 25px ${selectedModel === 'instant' ? '#bd4dd640' : selectedModel === '1_step' ? '#3B82F640' : '#10B98140'}`
                       }}
@@ -764,11 +764,11 @@ export default function BuyAccount() {
            <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'linear-gradient(180deg, rgba(22,22,22,0.9), rgba(12,12,12,0.95))' }}>
              <div className="flex items-center gap-2 mb-3">
                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
-               <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" style={{ fontFamily: 'Inter, sans-serif' }}>Recent Purchases</span>
+               <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Recent Purchases</span>
              </div>
              <div className="space-y-2.5">
                {['Ahmed K. funded $25K — 3 min ago', 'Samira R. funded $10K — 8 min ago', 'Trader X funded $50K — 14 min ago'].map((txt, i) => (
-                 <div key={i} className="text-[11px] text-gray-500 flex items-center gap-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+                 <div key={i} className="text-[11px] text-gray-500 flex items-center gap-2" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                    <CheckCircle className="w-3 h-3 text-emerald-500/40" />
                    {txt}
                  </div>
@@ -931,8 +931,8 @@ export default function BuyAccount() {
       <div className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden border-t border-white/10 px-4 py-3 safe-area-bottom" style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)' }}>
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            <div className="text-lg font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</div>
-            <div className="text-[11px] text-gray-400 truncate" style={{ fontFamily: 'Inter, sans-serif' }}>${selectedPackage.balance.toLocaleString()} {MODEL_META[selectedModel].label}</div>
+            <div className="text-lg font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</div>
+            <div className="text-[11px] text-gray-400 truncate" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>${selectedPackage.balance.toLocaleString()} {MODEL_META[selectedModel].label}</div>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-gray-500 font-mono">
             <Clock className="w-3.5 h-3.5" />
@@ -945,7 +945,7 @@ export default function BuyAccount() {
               (!selectedPlatform || !selectedServer) ? 'opacity-40 cursor-not-allowed' : 'active:scale-95'
             }`}
             style={{
-              fontFamily: 'Space Grotesk, sans-serif',
+              fontFamily: 'Outfit, sans-serif',
               background: `linear-gradient(135deg, ${selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981'}, ${selectedModel === 'instant' ? '#9333ea' : selectedModel === '1_step' ? '#2563eb' : '#059669'})`,
               boxShadow: (!selectedPlatform || !selectedServer) ? 'none' : `0 4px 20px ${selectedModel === 'instant' ? '#bd4dd640' : selectedModel === '1_step' ? '#3B82F640' : '#10B98140'}`
             }}
