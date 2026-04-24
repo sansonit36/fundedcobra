@@ -35,10 +35,10 @@ export default function Login() {
   return (
     <div style={{ minHeight: '100vh', background: '#060606', display: 'flex' }}>
       {/* LEFT: Brand Panel — desktop only */}
-      <div style={{
+      <div className="auth-brand-panel" style={{
         width: '45%', position: 'relative', overflow: 'hidden',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }} className="hidden lg:flex">
+        alignItems: 'center', justifyContent: 'center',
+      }}>
         {/* Gradient orbs */}
         <div style={{ position: 'absolute', inset: 0 }}>
           <div style={{ position: 'absolute', top: '20%', left: '20%', width: 500, height: 500, borderRadius: '50%', filter: 'blur(150px)', opacity: 0.2, background: '#bd4dd6' }} />
@@ -75,7 +75,7 @@ export default function Login() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 24px' }}>
         <div style={{ width: '100%', maxWidth: 420 }}>
           {/* Mobile logo */}
-          <div className="lg:hidden" style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
+          <div className="auth-mobile-logo" style={{ justifyContent: 'center', marginBottom: 32 }}>
             <img src="/logo.png" alt="FundedCobra" style={{ width: 64, height: 64, objectFit: 'contain' }} />
           </div>
 
@@ -163,6 +163,12 @@ export default function Login() {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         input::placeholder { color: #444 !important; }
         input:focus { border-color: rgba(189,77,214,0.4) !important; box-shadow: 0 0 0 3px rgba(189,77,214,0.1) !important; }
+        .auth-brand-panel { display: none; }
+        .auth-mobile-logo { display: flex; }
+        @media (min-width: 1024px) {
+          .auth-brand-panel { display: flex; }
+          .auth-mobile-logo { display: none; }
+        }
       `}</style>
     </div>
   );

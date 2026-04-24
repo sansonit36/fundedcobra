@@ -102,7 +102,7 @@ export default function Signup() {
   return (
     <div style={{ minHeight: '100vh', background: '#060606', display: 'flex' }}>
       {/* LEFT: Brand Panel */}
-      <div style={{ width: '45%', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="hidden lg:flex">
+      <div className="auth-brand-panel" style={{ width: '45%', position: 'relative', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0 }}>
           <div style={{ position: 'absolute', top: '25%', left: '20%', width: 500, height: 500, borderRadius: '50%', filter: 'blur(150px)', opacity: 0.2, background: '#bd4dd6' }} />
           <div style={{ position: 'absolute', bottom: '20%', right: '25%', width: 400, height: 400, borderRadius: '50%', filter: 'blur(120px)', opacity: 0.12, background: '#9333ea' }} />
@@ -134,7 +134,7 @@ export default function Signup() {
       {/* RIGHT: Form */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', overflowY: 'auto' }}>
         <div style={{ width: '100%', maxWidth: 420 }}>
-          <div className="lg:hidden" style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
+          <div className="auth-mobile-logo" style={{ justifyContent: 'center', marginBottom: 32 }}>
             <img src="/logo.png" alt="FundedCobra" style={{ width: 64, height: 64, objectFit: 'contain' }} />
           </div>
 
@@ -274,6 +274,12 @@ export default function Signup() {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         input::placeholder, select { color: #444 !important; }
         input:focus, select:focus { border-color: rgba(189,77,214,0.4) !important; box-shadow: 0 0 0 3px rgba(189,77,214,0.1) !important; }
+        .auth-brand-panel { display: none; }
+        .auth-mobile-logo { display: flex; }
+        @media (min-width: 1024px) {
+          .auth-brand-panel { display: flex; }
+          .auth-mobile-logo { display: none; }
+        }
       `}</style>
     </div>
   );
