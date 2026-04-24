@@ -686,8 +686,50 @@ export default function BuyAccount() {
                    </div>
                  );
                })}
-               <div className="p-8 rounded-[2rem] bg-red-500/5 border border-red-500/20 text-center uppercase tracking-widest">
-                  <p className="text-red-400 font-black text-xs">High-Frequency Trading & Arbitrage are Strictly Forbidden</p>
+               {/* Not Allowed */}
+               <div className="p-8 rounded-[2rem] bg-red-500/5 border border-red-500/20 space-y-4">
+                  <h4 className="text-red-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400" /> Not Allowed
+                  </h4>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Automated Bots / Expert Advisors (EAs)', note: 'All trading must be done manually by you.' },
+                      { label: 'High-Frequency Trading (HFT)', note: 'No rapid-fire orders placed by scripts.' },
+                      { label: 'Trades Held Under 60 Seconds', note: 'Every trade must stay open for at least 1 minute.' },
+                      { label: '3+ Consecutive Same-Direction Trades', note: "Don't keep placing the same buy or sell over and over." },
+                      { label: 'Hedging On The Same Pair', note: 'No simultaneous buy and sell on the same instrument.' },
+                    ].map((p, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-1 h-1 rounded-full bg-red-400 mt-2 flex-shrink-0" />
+                        <div>
+                          <p className="text-white text-xs font-bold">{p.label}</p>
+                          <p className="text-[10px] text-gray-500">{p.note}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+               </div>
+
+               {/* You Can */}
+               <div className="p-8 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/20 space-y-4">
+                  <h4 className="text-emerald-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> You Can
+                  </h4>
+                  <div className="space-y-2.5">
+                    {[
+                      'News trading — trade around economic events',
+                      'Weekend position holding — leave trades open over the weekend',
+                      'Trading multiple pairs simultaneously',
+                      'Both long (buy) and short (sell) positions',
+                      'Partial position closing',
+                      'Modifying stop loss after entry',
+                    ].map((p, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-1 h-1 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
+                        <p className="text-xs text-gray-300">{p}</p>
+                      </div>
+                    ))}
+                  </div>
                </div>
             </div>
           </div>
