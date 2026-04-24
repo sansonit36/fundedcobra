@@ -5,17 +5,30 @@ import { supabase } from '../../lib/supabase';
 interface AccountRule {
   id: string;
   account_package_name: string;
+  account_type: 'instant' | '1_step' | '2_step';
   withdrawal_target_percent: number;
+  profit_target_phase1: number;
+  profit_target_phase2: number | null;
+  daily_drawdown_phase1: number;
+  daily_drawdown_phase2: number | null;
+  overall_drawdown_phase1: number;
+  overall_drawdown_phase2: number | null;
+  minimum_trading_days_phase1: number;
+  minimum_trading_days_phase2: number | null;
   has_profit_target: boolean;
   profit_target_percent: number | null;
   minimum_trading_days: number;
   has_minimum_trading_days: boolean;
   daily_payout_enabled: boolean;
   weekly_payout_enabled: boolean;
+  bi_weekly_payout_enabled: boolean;
   minimum_withdrawal_amount: number;
   single_trade_limit_percent: number;
   daily_drawdown_percent: number;
   overall_drawdown_percent: number;
+  payout_split_percent: number;
+  drawdown_type: string;
+  drawdown_basis: string;
   rule_description: string;
   rule_version: string;
 }
@@ -59,16 +72,28 @@ export default function AccountRules() {
         .from('account_rules')
         .update({
           withdrawal_target_percent: rule.withdrawal_target_percent,
+          profit_target_phase1: rule.profit_target_phase1,
+          profit_target_phase2: rule.profit_target_phase2,
+          daily_drawdown_phase1: rule.daily_drawdown_phase1,
+          daily_drawdown_phase2: rule.daily_drawdown_phase2,
+          overall_drawdown_phase1: rule.overall_drawdown_phase1,
+          overall_drawdown_phase2: rule.overall_drawdown_phase2,
+          minimum_trading_days_phase1: rule.minimum_trading_days_phase1,
+          minimum_trading_days_phase2: rule.minimum_trading_days_phase2,
           has_profit_target: rule.has_profit_target,
           profit_target_percent: rule.profit_target_percent,
           minimum_trading_days: rule.minimum_trading_days,
           has_minimum_trading_days: rule.has_minimum_trading_days,
           daily_payout_enabled: rule.daily_payout_enabled,
           weekly_payout_enabled: rule.weekly_payout_enabled,
+          bi_weekly_payout_enabled: (rule as any).bi_weekly_payout_enabled,
           minimum_withdrawal_amount: rule.minimum_withdrawal_amount,
           single_trade_limit_percent: rule.single_trade_limit_percent,
           daily_drawdown_percent: rule.daily_drawdown_percent,
           overall_drawdown_percent: rule.overall_drawdown_percent,
+          payout_split_percent: rule.payout_split_percent,
+          drawdown_type: rule.drawdown_type,
+          drawdown_basis: rule.drawdown_basis,
           rule_description: rule.rule_description,
           updated_at: new Date().toISOString()
         })
@@ -285,89 +310,150 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Withdrawal Target */}
+        {/* Phase 1 Rules (Evaluation / 1-Step) */}
+        {rule.account_type !== 'instant' && (
+          <div className="lg:col-span-3 p-6 rounded-xl bg-primary-500/5 border border-primary-500/20 space-y-6">
+            <div className="flex items-center gap-3">
+               <div className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center text-primary-400 font-black text-xs">P1</div>
+               <h4 className="text-white font-black uppercase tracking-widest text-sm">Phase 1 Configuration</h4>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Profit Target %</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.profit_target_phase1} onChange={(e) => setLocalRule({ ...localRule, profit_target_phase1: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.profit_target_phase1}%</div>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Daily Drawdown %</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.daily_drawdown_phase1} onChange={(e) => setLocalRule({ ...localRule, daily_drawdown_phase1: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.daily_drawdown_phase1}%</div>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Overall Drawdown %</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.overall_drawdown_phase1} onChange={(e) => setLocalRule({ ...localRule, overall_drawdown_phase1: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.overall_drawdown_phase1}%</div>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Min. Days</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.minimum_trading_days_phase1} onChange={(e) => setLocalRule({ ...localRule, minimum_trading_days_phase1: parseInt(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.minimum_trading_days_phase1} Days</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Phase 2 Rules (2-Step Only) */}
+        {rule.account_type === '2_step' && (
+          <div className="lg:col-span-3 p-6 rounded-xl bg-blue-500/5 border border-blue-500/20 space-y-6">
+            <div className="flex items-center gap-3">
+               <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-black text-xs">P2</div>
+               <h4 className="text-white font-black uppercase tracking-widest text-sm">Phase 2 Configuration</h4>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Profit Target %</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.profit_target_phase2 || 0} onChange={(e) => setLocalRule({ ...localRule, profit_target_phase2: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.profit_target_phase2}%</div>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Daily Drawdown %</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.daily_drawdown_phase2 || 0} onChange={(e) => setLocalRule({ ...localRule, daily_drawdown_phase2: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.daily_drawdown_phase2}%</div>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Overall Drawdown %</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.overall_drawdown_phase2 || 0} onChange={(e) => setLocalRule({ ...localRule, overall_drawdown_phase2: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.overall_drawdown_phase2}%</div>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] text-gray-500 font-black uppercase">Min. Days</label>
+                {isEditing ? (
+                  <input type="number" value={localRule.minimum_trading_days_phase2 || 0} onChange={(e) => setLocalRule({ ...localRule, minimum_trading_days_phase2: parseInt(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+                ) : <div className="text-sm font-bold text-white">{rule.minimum_trading_days_phase2} Days</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Global/Funded Rules */}
+        <div className="lg:col-span-3 p-6 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-6">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-xs">F</div>
+             <h4 className="text-white font-black uppercase tracking-widest text-sm">{rule.account_type === 'instant' ? 'Live Account Rules' : 'Funded Stage Configuration'}</h4>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] text-gray-500 font-black uppercase">Profit Split %</label>
+              {isEditing ? (
+                <input type="number" value={localRule.payout_split_percent} onChange={(e) => setLocalRule({ ...localRule, payout_split_percent: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+              ) : <div className="text-sm font-bold text-white">{rule.payout_split_percent}%</div>}
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] text-gray-500 font-black uppercase">Trailing Daily Loss %</label>
+              {isEditing ? (
+                <input type="number" value={localRule.daily_drawdown_percent} onChange={(e) => setLocalRule({ ...localRule, daily_drawdown_percent: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+              ) : <div className="text-sm font-bold text-white">{rule.daily_drawdown_percent}%</div>}
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] text-gray-500 font-black uppercase">Overall Drawdown %</label>
+              {isEditing ? (
+                <input type="number" value={localRule.overall_drawdown_percent} onChange={(e) => setLocalRule({ ...localRule, overall_drawdown_percent: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+              ) : <div className="text-sm font-bold text-white">{rule.overall_drawdown_percent}%</div>}
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] text-gray-500 font-black uppercase">Withdrawal Target %</label>
+              {isEditing ? (
+                <input type="number" value={localRule.withdrawal_target_percent} onChange={(e) => setLocalRule({ ...localRule, withdrawal_target_percent: parseFloat(e.target.value) })} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-white" />
+              ) : <div className="text-sm font-bold text-white">{rule.withdrawal_target_percent}%</div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Drawdown Configuration Row */}
         <div className="p-4 rounded-lg bg-white/5">
           <label className="block text-sm font-medium text-gray-400 mb-2">
-            Withdrawal Target %
+            Drawdown Type
           </label>
           {isEditing ? (
-            <input
-              type="number"
-              value={localRule.withdrawal_target_percent}
-              onChange={(e) => setLocalRule({ ...localRule, withdrawal_target_percent: parseFloat(e.target.value) })}
+            <select
+              value={localRule.drawdown_type}
+              onChange={(e) => setLocalRule({ ...localRule, drawdown_type: e.target.value })}
               className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
-              step="0.1"
-            />
+            >
+              <option value="static" className="bg-gray-900">Static</option>
+              <option value="trailing" className="bg-gray-900">Trailing</option>
+            </select>
           ) : (
-            <div className="text-lg font-bold text-white">{rule.withdrawal_target_percent}%</div>
+            <div className="text-lg font-bold text-white uppercase">{rule.drawdown_type || 'Static'}</div>
           )}
         </div>
 
-        {/* Minimum Withdrawal */}
+        {/* Drawdown Basis */}
         <div className="p-4 rounded-lg bg-white/5">
           <label className="block text-sm font-medium text-gray-400 mb-2">
-            Minimum Withdrawal $
+            Drawdown Basis
           </label>
           {isEditing ? (
-            <input
-              type="number"
-              value={localRule.minimum_withdrawal_amount}
-              onChange={(e) => setLocalRule({ ...localRule, minimum_withdrawal_amount: parseFloat(e.target.value) })}
+            <select
+              value={localRule.drawdown_basis}
+              onChange={(e) => setLocalRule({ ...localRule, drawdown_basis: e.target.value })}
               className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
-            />
+            >
+              <option value="balance" className="bg-gray-900">Balance</option>
+              <option value="equity" className="bg-gray-900">Equity</option>
+            </select>
           ) : (
-            <div className="text-lg font-bold text-white">${rule.minimum_withdrawal_amount}</div>
-          )}
-        </div>
-
-        {/* Single Trade Limit */}
-        <div className="p-4 rounded-lg bg-white/5">
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Single Trade Limit %
-          </label>
-          {isEditing ? (
-            <input
-              type="number"
-              value={localRule.single_trade_limit_percent}
-              onChange={(e) => setLocalRule({ ...localRule, single_trade_limit_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
-            />
-          ) : (
-            <div className="text-lg font-bold text-white">{rule.single_trade_limit_percent}%</div>
-          )}
-        </div>
-
-        {/* Daily Drawdown */}
-        <div className="p-4 rounded-lg bg-white/5">
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Daily Drawdown %
-          </label>
-          {isEditing ? (
-            <input
-              type="number"
-              value={localRule.daily_drawdown_percent}
-              onChange={(e) => setLocalRule({ ...localRule, daily_drawdown_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
-            />
-          ) : (
-            <div className="text-lg font-bold text-white">{rule.daily_drawdown_percent}%</div>
-          )}
-        </div>
-
-        {/* Overall Drawdown */}
-        <div className="p-4 rounded-lg bg-white/5">
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Overall Drawdown %
-          </label>
-          {isEditing ? (
-            <input
-              type="number"
-              value={localRule.overall_drawdown_percent}
-              onChange={(e) => setLocalRule({ ...localRule, overall_drawdown_percent: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary-500/50"
-            />
-          ) : (
-            <div className="text-lg font-bold text-white">{rule.overall_drawdown_percent}%</div>
+            <div className="text-lg font-bold text-white uppercase">{rule.drawdown_basis || 'Balance'}</div>
           )}
         </div>
 
@@ -405,41 +491,58 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
       </div>
 
       {/* Payout Settings */}
-      <div className="mt-4 p-4 rounded-lg bg-white/5">
-        <h4 className="text-sm font-medium text-gray-400 mb-3">Payout Settings</h4>
-        <div className="flex flex-wrap gap-4">
+      <div className="mt-6 p-4 rounded-xl bg-black/20 border border-white/5">
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Payout Settings</p>
+        <div className="flex flex-wrap gap-2">
           {isEditing ? (
             <>
-              <label className="flex items-center space-x-2">
+              <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
+                localRule.daily_payout_enabled ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-500'
+              }`}>
                 <input
                   type="checkbox"
+                  className="hidden"
                   checked={localRule.daily_payout_enabled}
                   onChange={(e) => setLocalRule({ ...localRule, daily_payout_enabled: e.target.checked })}
-                  className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                 />
-                <span className="text-white">Daily Payouts</span>
+                <span className="text-[10px] font-black uppercase">Daily Payouts</span>
               </label>
-              <label className="flex items-center space-x-2">
+              <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
+                localRule.weekly_payout_enabled ? 'bg-purple-500/20 border-purple-500/50 text-purple-400' : 'bg-white/5 border-white/10 text-gray-500'
+              }`}>
                 <input
                   type="checkbox"
+                  className="hidden"
                   checked={localRule.weekly_payout_enabled}
                   onChange={(e) => setLocalRule({ ...localRule, weekly_payout_enabled: e.target.checked })}
-                  className="rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                 />
-                <span className="text-white">Weekly Payouts</span>
+                <span className="text-[10px] font-black uppercase">Weekly Payouts</span>
+              </label>
+              <label className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
+                (localRule as any).bi_weekly_payout_enabled ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-white/5 border-white/10 text-gray-500'
+              }`}>
+                <input
+                  type="checkbox"
+                  className="hidden"
+                  checked={(localRule as any).bi_weekly_payout_enabled}
+                  onChange={(e) => setLocalRule({ ...localRule, bi_weekly_payout_enabled: e.target.checked } as any)}
+                />
+                <span className="text-[10px] font-black uppercase">Bi-Weekly Payouts</span>
               </label>
             </>
           ) : (
             <>
               {rule.daily_payout_enabled && (
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-500/10 text-green-400">
-                  Daily Payouts
-                </span>
+                <span className="px-3 py-1.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-black uppercase ring-1 ring-emerald-500/20">Daily Payouts</span>
               )}
               {rule.weekly_payout_enabled && (
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary-500/10 text-primary-400">
-                  Weekly Payouts
-                </span>
+                <span className="px-3 py-1.5 rounded bg-purple-500/10 text-purple-400 text-[10px] font-black uppercase ring-1 ring-purple-500/20">Weekly Payouts</span>
+              )}
+              {(rule as any).bi_weekly_payout_enabled && (
+                <span className="px-3 py-1.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase ring-1 ring-blue-500/20">Bi-Weekly Payouts</span>
+              )}
+              {!rule.daily_payout_enabled && !rule.weekly_payout_enabled && !(rule as any).bi_weekly_payout_enabled && (
+                <span className="px-3 py-1.5 rounded bg-gray-500/10 text-gray-400 text-[10px] font-black uppercase ring-1 ring-gray-500/20">Standard Payouts</span>
               )}
             </>
           )}

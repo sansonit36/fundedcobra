@@ -34,12 +34,29 @@ export interface AccountRuleConfig {
   account_type: 'instant' | '1_step' | '2_step';
   profit_target_phase1: number;
   profit_target_phase2: number | null;
-  daily_drawdown_percent: number;
-  overall_drawdown_percent: number;
+  withdrawal_target_percent: number;
+  daily_drawdown_phase1: number;
+  daily_drawdown_phase2: number | null;
+  overall_drawdown_phase1: number;
+  overall_drawdown_phase2: number | null;
+  daily_drawdown_type_phase1: 'static' | 'trailing';
+  daily_drawdown_type_phase2: 'static' | 'trailing' | null;
+  daily_drawdown_type_funded: 'static' | 'trailing';
+  overall_drawdown_type_phase1: 'static' | 'trailing';
+  overall_drawdown_type_phase2: 'static' | 'trailing' | null;
+  overall_drawdown_type_funded: 'static' | 'trailing';
   minimum_trading_days: number;
+  minimum_trading_days_phase1: number;
+  minimum_trading_days_phase2: number | null;
   news_trading_allowed: boolean;
   weekend_holding_allowed: boolean;
   payout_split_percent: number;
+  daily_payout_enabled: boolean;
+  weekly_payout_enabled: boolean;
+  bi_weekly_payout_enabled: boolean;
+  drawdown_type: string;
+  drawdown_basis: string;
+  is_template: boolean;
 }
 
 export interface AccountRequest {
@@ -246,12 +263,31 @@ export async function getAccountRulesForPackages(): Promise<AccountRuleConfig[]>
       account_type,
       profit_target_phase1,
       profit_target_phase2,
+      withdrawal_target_percent,
       daily_drawdown_percent,
       overall_drawdown_percent,
+      daily_drawdown_phase1,
+      daily_drawdown_phase2,
+      overall_drawdown_phase1,
+      overall_drawdown_phase2,
+      daily_drawdown_type_phase1,
+      daily_drawdown_type_phase2,
+      daily_drawdown_type_funded,
+      overall_drawdown_type_phase1,
+      overall_drawdown_type_phase2,
+      overall_drawdown_type_funded,
       minimum_trading_days,
+      minimum_trading_days_phase1,
+      minimum_trading_days_phase2,
       news_trading_allowed,
       weekend_holding_allowed,
       payout_split_percent,
+      daily_payout_enabled,
+      weekly_payout_enabled,
+      bi_weekly_payout_enabled,
+      drawdown_type,
+      drawdown_basis,
+      is_template,
       rule_version
     `)
     .neq('rule_version', 'legacy')
