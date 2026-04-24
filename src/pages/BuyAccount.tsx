@@ -89,8 +89,9 @@ export default function BuyAccount() {
 
   const getRulesForPackage = (pkg?: AccountPackage | null) => {
     if (!pkg) return null;
-    // First try package-specific rule, then fall back to category master template
-    return rulesByPackageName[pkg.name] || categoryRules[getPackageModel(pkg)] || null;
+    // Master template is the source of truth — individual package rules are legacy fallback
+    const model = getPackageModel(pkg);
+    return categoryRules[model] || rulesByPackageName[pkg.name] || null;
   };
 
   const getModelPackages = (model: AccountModelType) => {

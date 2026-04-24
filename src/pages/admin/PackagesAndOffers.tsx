@@ -219,7 +219,37 @@ export default function PackagesAndOffers() {
           if (insertError) throw insertError;
         }
 
-        setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated!`);
+        // CASCADE: Sync all individual package rules of this type with master values
+        const cascadeData: any = {
+          profit_target_phase1: parseFloat(packageForm.profit_target_phase1),
+          profit_target_phase2: parseFloat(packageForm.profit_target_phase2 || '0'),
+          profit_target_percent: parseFloat(packageForm.profit_target_phase1),
+          daily_drawdown_phase1: parseFloat(packageForm.daily_drawdown_phase1),
+          daily_drawdown_phase2: parseFloat(packageForm.daily_drawdown_phase2 || '0'),
+          daily_drawdown_funded: parseFloat(packageForm.daily_drawdown_funded),
+          daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded),
+          overall_drawdown_phase1: parseFloat(packageForm.overall_drawdown_phase1),
+          overall_drawdown_phase2: parseFloat(packageForm.overall_drawdown_phase2 || '0'),
+          overall_drawdown_funded: parseFloat(packageForm.overall_drawdown_funded),
+          overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded),
+          withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
+          daily_drawdown_type_phase1: packageForm.daily_drawdown_type_phase1,
+          daily_drawdown_type_funded: packageForm.daily_drawdown_type_funded,
+          overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
+          overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
+          minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
+          minimum_trading_days: parseInt(packageForm.minimum_trading_days_phase1),
+          payout_split_percent: parseFloat(packageForm.payout_split_percent),
+        };
+
+        await supabase
+          .from('account_rules')
+          .update(cascadeData)
+          .eq('account_type', editingCategoryType)
+          .eq('is_template', false)
+          .neq('rule_version', 'legacy');
+
+        setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated & Synced to all sizes!`);
         setShowPackageModal(false);
         setEditingCategoryType(null);
         loadData();
