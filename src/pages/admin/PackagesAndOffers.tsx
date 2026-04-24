@@ -334,7 +334,10 @@ export default function PackagesAndOffers() {
       {/* 1. MASTER ACCOUNT TYPES (CATEGORIES) */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Product Categories & Master Rules</h2>
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <Package className="w-5 h-5 mr-3 text-primary-400" />
+            Product Categories (Master Rules)
+          </h2>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -343,55 +346,65 @@ export default function PackagesAndOffers() {
             const typePackages = packages.filter(p => p.account_type === type);
             
             return (
-              <div key={type} className="group relative">
-                <div className={`p-8 rounded-[32px] border-2 transition-all duration-500 bg-black/40 backdrop-blur-xl ${
-                  type === 'instant' ? 'border-purple-500/20 hover:border-purple-500/60 shadow-purple-500/5' :
-                  type === '1_step' ? 'border-blue-500/20 hover:border-blue-500/60 shadow-blue-500/5' :
-                  'border-emerald-500/20 hover:border-emerald-500/60 shadow-emerald-500/5'
-                }`}>
-                  <div className="flex justify-between items-start mb-8">
-                    <div className="space-y-2">
-                       <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">{modelLabels[type]} Accounts</h3>
-                       <div className="flex gap-2">
-                         <span className="text-[10px] font-black px-2 py-1 bg-white/5 rounded-full border border-white/10 uppercase tracking-widest text-gray-400">
-                           {typePackages.length} Sizes Defined
-                         </span>
-                       </div>
-                    </div>
-                    <button 
-                      onClick={() => openMasterRuleEditor(type)}
-                      className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all text-white shadow-xl"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
+              <div key={type} className="card-gradient rounded-xl border border-white/5 overflow-hidden">
+                <div className="p-5 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                   <div className="flex items-center gap-3">
+                     <div className={`w-2 h-2 rounded-full ${
+                       type === 'instant' ? 'bg-purple-500' : type === '1_step' ? 'bg-blue-500' : 'bg-emerald-500'
+                     }`} />
+                     <h3 className="text-lg font-bold text-white">{modelLabels[type]} Accounts</h3>
+                   </div>
+                   <button 
+                     onClick={() => openMasterRuleEditor(type)}
+                     title="Edit Category Rules"
+                     className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-all border border-white/10"
+                   >
+                     <Edit2 className="w-4 h-4" />
+                   </button>
+                </div>
 
-                  <div className="grid grid-cols-3 gap-3 mb-8">
-                    <div className="text-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                       <Zap className="w-4 h-4 mx-auto mb-1 text-yellow-400" />
-                       <div className="text-[10px] font-black text-gray-500 uppercase">Target</div>
-                       <div className="text-sm font-black text-white">{master?.profit_target_phase1 ?? '--'}%</div>
+                <div className="p-6 space-y-6">
+                  {/* Category Summary */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-black/20 border border-white/5">
+                       <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">P1 Target</div>
+                       <div className="text-white font-bold">{master?.profit_target_phase1 ?? '--'}%</div>
                     </div>
-                    <div className="text-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                       <ShieldAlert className="w-4 h-4 mx-auto mb-1 text-red-400" />
-                       <div className="text-[10px] font-black text-gray-500 uppercase">Daily</div>
-                       <div className="text-sm font-black text-white">{master?.daily_drawdown_funded ?? '--'}%</div>
-                    </div>
-                    <div className="text-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                       <Target className="w-4 h-4 mx-auto mb-1 text-blue-400" />
-                       <div className="text-[10px] font-black text-gray-500 uppercase">Overall</div>
-                       <div className="text-sm font-black text-white">{master?.overall_drawdown_funded ?? '--'}%</div>
+                    <div className="p-3 rounded-lg bg-black/20 border border-white/5">
+                       <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Drawdown</div>
+                       <div className="text-white font-bold">{master?.daily_drawdown_funded ?? '--'}% / {master?.overall_drawdown_funded ?? '--'}%</div>
                     </div>
                   </div>
 
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
-                    {typePackages.length > 0 ? typePackages.map(pkg => (
-                      <div key={pkg.id} className="flex justify-between items-center p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 transition-all group/item">
-                         <div className="space-y-0.5">
-                            <div className="text-sm font-black text-white">${(pkg.balance / 1000).toLocaleString()}K Size</div>
-                            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">${pkg.price} USD</div>
-                         </div>
-                         <div className="flex gap-2">
+                  {/* Sizes List */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center mb-2">
+                       <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Account Sizes</span>
+                       <button 
+                         onClick={() => {
+                           setEditingPackage(null);
+                           resetPackageForm();
+                           setPackageForm(prev => ({ 
+                             ...prev, 
+                             account_type: type, 
+                             name: `${modelLabels[type]} $${(10000).toLocaleString()}` 
+                           }));
+                           setPackageBuilderStep(1);
+                           setShowPackageModal(true);
+                         }}
+                         className="flex items-center gap-1 text-[10px] font-bold text-primary-400 hover:text-primary-300 transition-colors uppercase tracking-widest"
+                       >
+                         <Plus className="w-3 h-3" /> Add Size
+                       </button>
+                    </div>
+                    
+                    <div className="space-y-2 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                      {typePackages.map(pkg => (
+                        <div key={pkg.id} className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-all group">
+                           <div>
+                              <div className="text-sm font-medium text-white">${pkg.balance.toLocaleString()} Account</div>
+                              <div className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">${pkg.price} USD</div>
+                           </div>
                            <button 
                              onClick={() => {
                                setEditingPackage(pkg);
@@ -408,17 +421,18 @@ export default function PackagesAndOffers() {
                                setPackageBuilderStep(1);
                                setShowPackageModal(true);
                              }}
-                             className="p-2 opacity-0 group-hover/item:opacity-100 bg-white/5 rounded-lg text-blue-400 hover:bg-blue-400/10 transition-all"
+                             className="p-1.5 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white transition-opacity"
                            >
-                             <Edit2 className="w-3 h-3" />
+                              <Edit2 className="w-3.5 h-3.5" />
                            </button>
-                         </div>
-                      </div>
-                    )) : (
-                      <div className="text-center py-8 text-[10px] font-black text-gray-600 uppercase tracking-widest bg-black/20 rounded-2xl border border-white/5">
-                        No Sizes Created Yet
-                      </div>
-                    )}
+                        </div>
+                      ))}
+                      {typePackages.length === 0 && (
+                        <div className="text-center py-6 text-[10px] font-bold text-gray-600 uppercase tracking-widest border-2 border-dashed border-white/5 rounded-lg">
+                          No sizes defined
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
