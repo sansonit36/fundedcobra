@@ -72,6 +72,7 @@ export default function BuyAccount() {
   const [selectedServer, setSelectedServer] = useState('Exness');
   const [selectedModel, setSelectedModel] = useState<AccountModelType>('instant');
   const [rulesByPackageName, setRulesByPackageName] = useState<Record<string, AccountRuleConfig>>({});
+  const [categoryRules, setCategoryRules] = useState<Record<string, AccountRuleConfig>>({});
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [discountExpired, setDiscountExpired] = useState(false);
   const [isIndianUser, setIsIndianUser] = useState(false);
@@ -87,7 +88,8 @@ export default function BuyAccount() {
 
   const getRulesForPackage = (pkg?: AccountPackage | null) => {
     if (!pkg) return null;
-    return rulesByPackageName[pkg.name] || null;
+    // First try package-specific rule, then fall back to category master template
+    return rulesByPackageName[pkg.name] || categoryRules[getPackageModel(pkg)] || null;
   };
 
   const getModelPackages = (model: AccountModelType) => {
@@ -124,9 +126,19 @@ export default function BuyAccount() {
         ]);
         const nextPackages = (dbPackages as AccountPackage[]).filter(pkg => pkg.is_active !== false);
         const nextRulesByPackageName: Record<string, AccountRuleConfig> = {};
-        dbRules.forEach((rule) => { nextRulesByPackageName[rule.account_package_name] = rule; });
+        const nextCategoryRules: Record<string, AccountRuleConfig> = {};
+        
+        dbRules.forEach((rule) => { 
+          if (rule.is_template) {
+            nextCategoryRules[rule.account_type] = rule;
+          } else {
+            nextRulesByPackageName[rule.account_package_name] = rule;
+          }
+        });
+
         setPackages(nextPackages);
         setRulesByPackageName(nextRulesByPackageName);
+        setCategoryRules(nextCategoryRules);
       } catch (err) {
         setError('Failed to load account packages');
       } finally {
@@ -165,8 +177,10 @@ export default function BuyAccount() {
   }, [selectedPackage]);
 
   const calculateFinalPrice = (price: number) => {
-    if (!appliedCoupon) return price;
-    return price * (1 - appliedCoupon.discount / 100);
+    const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
+    const baseDiscountedPrice = price * (1 - categoryDiscount / 100);
+    if (!appliedCoupon) return baseDiscountedPrice;
+    return baseDiscountedPrice * (1 - appliedCoupon.discount / 100);
   };
 
   const handlePurchase = () => {
@@ -305,6 +319,9 @@ export default function BuyAccount() {
                 const isPremium = pkg.balance >= 10000 || selectedModel !== 'instant';
                 const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
                 
+                const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
+                const discountedPrice = pkg.price * (1 - categoryDiscount / 100);
+                
                 return (
                   <button
                     key={pkg.id}
@@ -320,13 +337,18 @@ export default function BuyAccount() {
                     <div className={`absolute top-0 right-0 px-4 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl ${
                       isPremium ? 'bg-[#bd4dd6] text-white' : 'bg-gray-800 text-gray-400'
                     }`}>
-                      {isPremium ? 'Premium' : 'Special'}
+                      {categoryDiscount > 0 ? `${categoryDiscount}% OFF` : (isPremium ? 'Premium' : 'Special')}
                     </div>
 
                     <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
                     <div className="text-4xl font-black text-white tracking-tighter mb-6">${pkg.balance.toLocaleString()}</div>
                     <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                       <span className="text-sm font-black underline underline-offset-4">${pkg.price.toFixed(0)}</span>
+                       <div className="flex flex-col">
+                          {categoryDiscount > 0 && (
+                            <span className="text-[10px] text-gray-500 line-through tracking-tighter">${pkg.price.toFixed(0)}</span>
+                          )}
+                          <span className="text-sm font-black underline underline-offset-4">${discountedPrice.toFixed(0)}</span>
+                       </div>
                        {isSelected && <CheckCircle className="w-6 h-6" style={{ color: modelColor }} />}
                     </div>
                   </button>
@@ -427,6 +449,12 @@ export default function BuyAccount() {
                         <span>Terminal Fee</span>
                         <span className="text-white font-mono">${selectedPackage.price.toFixed(0)}</span>
                      </div>
+                     {categoryRules[selectedModel]?.discount_percent > 0 && (
+                       <div className="flex justify-between items-center text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+                          <span>Model Discount</span>
+                          <span className="font-mono">-{categoryRules[selectedModel].discount_percent}%</span>
+                       </div>
+                     )}
                      {appliedCoupon && (
                        <div className="flex justify-between items-center p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
                           <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">{appliedCoupon.code} ACTIVE</span>
@@ -549,8 +577,8 @@ export default function BuyAccount() {
                          <div className="w-2 h-2 rounded-full bg-[#bd4dd6]"></div> {MODEL_META[model].label} Protocol
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Trailing Loss</p><p className="font-black text-sm">{rules?.daily_drawdown_percent}% Daily</p></div>
-                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Static Loss</p><p className="font-black text-sm">{rules?.overall_drawdown_percent}% Overall</p></div>
+                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Trailing Loss</p><p className="font-black text-sm">{rules?.daily_drawdown_funded ?? rules?.daily_drawdown_percent ?? 5}% Daily</p></div>
+                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Static Loss</p><p className="font-black text-sm">{rules?.overall_drawdown_funded ?? rules?.overall_drawdown_percent ?? 12}% Overall</p></div>
                          <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Profit Share</p><p className="text-emerald-400 font-black text-sm">{rules?.payout_split_percent}%</p></div>
                          <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Cycle</p><p className="font-black text-sm uppercase">{rules?.daily_payout_enabled ? 'Daily' : 'Weekly'}</p></div>
                       </div>

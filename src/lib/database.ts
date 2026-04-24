@@ -51,12 +51,15 @@ export interface AccountRuleConfig {
   news_trading_allowed: boolean;
   weekend_holding_allowed: boolean;
   payout_split_percent: number;
+  discount_percent: number;
+  profit_target_percent: number;
   daily_payout_enabled: boolean;
   weekly_payout_enabled: boolean;
   bi_weekly_payout_enabled: boolean;
   drawdown_type: string;
   drawdown_basis: string;
   is_template: boolean;
+  rule_version: string;
 }
 
 export interface AccountRequest {
@@ -282,6 +285,8 @@ export async function getAccountRulesForPackages(): Promise<AccountRuleConfig[]>
       news_trading_allowed,
       weekend_holding_allowed,
       payout_split_percent,
+      discount_percent,
+      profit_target_percent,
       daily_payout_enabled,
       weekly_payout_enabled,
       bi_weekly_payout_enabled,

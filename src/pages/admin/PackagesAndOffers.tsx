@@ -167,22 +167,28 @@ export default function PackagesAndOffers() {
         const masterRuleData: any = {
           account_type: editingCategoryType,
           account_package_name: `${modelLabels[editingCategoryType]} Master`,
+          // Phase Specific (New)
           profit_target_phase1: parseFloat(packageForm.profit_target_phase1),
           profit_target_phase2: parseFloat(packageForm.profit_target_phase2 || '0'),
-          withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
           daily_drawdown_phase1: parseFloat(packageForm.daily_drawdown_phase1),
           daily_drawdown_phase2: parseFloat(packageForm.daily_drawdown_phase2 || '0'),
           daily_drawdown_funded: parseFloat(packageForm.daily_drawdown_funded),
-          daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded),
           overall_drawdown_phase1: parseFloat(packageForm.overall_drawdown_phase1),
           overall_drawdown_phase2: parseFloat(packageForm.overall_drawdown_phase2 || '0'),
           overall_drawdown_funded: parseFloat(packageForm.overall_drawdown_funded),
+          
+          // Legacy Sync (Required for Buy Account page)
+          profit_target_percent: parseFloat(packageForm.profit_target_phase1),
+          daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded),
           overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded),
+
+          withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
           daily_drawdown_type_phase1: packageForm.daily_drawdown_type_phase1,
           daily_drawdown_type_funded: packageForm.daily_drawdown_type_funded,
           overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
           overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
           minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
+          minimum_trading_days: parseInt(packageForm.minimum_trading_days_phase1),
           payout_split_percent: parseFloat(packageForm.payout_split_percent),
           minimum_withdrawal_amount: parseFloat(packageForm.minimum_withdrawal_amount),
           discount_percent: parseFloat(packageForm.discount_percent),
@@ -212,8 +218,7 @@ export default function PackagesAndOffers() {
             .insert([masterRuleData]);
           if (insertError) throw insertError;
         }
-        
-        if (error) throw error;
+
         setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated!`);
         setShowPackageModal(false);
         setEditingCategoryType(null);
@@ -255,6 +260,7 @@ export default function PackagesAndOffers() {
         account_type: packageForm.account_type,
         profit_target_phase1: parseFloat(packageForm.profit_target_phase1),
         profit_target_phase2: parseFloat(packageForm.profit_target_phase2),
+        profit_target_percent: parseFloat(packageForm.profit_target_phase1),
         withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
         daily_drawdown_phase1: parseFloat(packageForm.daily_drawdown_phase1),
         daily_drawdown_phase2: parseFloat(packageForm.daily_drawdown_phase2),
@@ -269,6 +275,8 @@ export default function PackagesAndOffers() {
         overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
         overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
         payout_split_percent: parseFloat(packageForm.payout_split_percent),
+        minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
+        minimum_trading_days: parseInt(packageForm.minimum_trading_days_phase1),
         rule_version: 'v2'
       };
 
@@ -320,6 +328,7 @@ export default function PackagesAndOffers() {
       minimum_trading_days_phase2: '0',
       minimum_withdrawal_amount: '20',
       payout_split_percent: '80',
+      discount_percent: '0',
       news_trading_allowed: true,
       weekend_holding_allowed: true,
       is_active: true,
@@ -338,13 +347,19 @@ export default function PackagesAndOffers() {
         profit_target_phase2: (master.profit_target_phase2 ?? 5).toString(),
         withdrawal_target_percent: (master.withdrawal_target_percent ?? 5).toString(),
         daily_drawdown_phase1: (master.daily_drawdown_phase1 ?? 5).toString(),
+        daily_drawdown_phase2: (master.daily_drawdown_phase2 ?? 5).toString(),
         daily_drawdown_funded: (master.daily_drawdown_funded ?? 5).toString(),
         overall_drawdown_phase1: (master.overall_drawdown_phase1 ?? 12).toString(),
+        overall_drawdown_phase2: (master.overall_drawdown_phase2 ?? 12).toString(),
         overall_drawdown_funded: (master.overall_drawdown_funded ?? 12).toString(),
-        daily_drawdown_type_phase1: master.daily_drawdown_type_phase1,
-        daily_drawdown_type_funded: master.daily_drawdown_type_funded,
-        overall_drawdown_type_phase1: master.overall_drawdown_type_phase1,
-        overall_drawdown_type_funded: master.overall_drawdown_type_funded,
+        daily_drawdown_type_phase1: master.daily_drawdown_type_phase1 || 'static',
+        daily_drawdown_type_phase2: master.daily_drawdown_type_phase2 || 'static',
+        daily_drawdown_type_funded: master.daily_drawdown_type_funded || 'static',
+        overall_drawdown_type_phase1: master.overall_drawdown_type_phase1 || 'static',
+        overall_drawdown_type_phase2: master.overall_drawdown_type_phase2 || 'static',
+        overall_drawdown_type_funded: master.overall_drawdown_type_funded || 'static',
+        minimum_trading_days_phase1: (master.minimum_trading_days_phase1 ?? 0).toString(),
+        minimum_trading_days_phase2: (master.minimum_trading_days_phase2 ?? 0).toString(),
         payout_split_percent: (master.payout_split_percent ?? 80).toString(),
         minimum_withdrawal_amount: (master.minimum_withdrawal_amount ?? 20).toString(),
         discount_percent: (master.discount_percent ?? 0).toString(),
