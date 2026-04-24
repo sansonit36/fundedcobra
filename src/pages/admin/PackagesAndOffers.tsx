@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Tag, ChevronLeft, ChevronRight, Zap, Target, ShieldAlert } from 'lucide-react';
+import { Plus, Edit2, Trash2, Tag, ChevronLeft, ChevronRight, Zap, Target, ShieldAlert, Package } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface AccountPackage {
