@@ -8,8 +8,12 @@ export interface TradingAccount {
   mt5_server: string;
   balance: number;
   equity: number;
+  starting_balance: number;
   status: 'active' | 'suspended' | 'breached';
   breach_reason?: string;
+  model_type: 'instant' | '1_step' | '2_step';
+  current_phase: number;
+  package_name?: string;
   created_at: string;
   updated_at: string;
 }

@@ -41,6 +41,7 @@ import EmailManagement from './pages/admin/EmailManagement';
 import SMTPSettings from './pages/admin/SMTPSettings';
 import PaymentMethods from './pages/admin/PaymentMethods';
 import PackagesAndOffers from './pages/admin/PackagesAndOffers';
+import EvaluationReviews from './pages/admin/EvaluationReviews';
 import AdminCertificateManager from './pages/admin/CertificateManager';
 import AdminTraderProfiles from './pages/admin/TraderProfiles';
 import CertificateVerification from './pages/public/CertificateVerification';
@@ -165,6 +166,13 @@ export default function App() {
               <AdminRoute>
                 <AdminLayout>
                   <AccountRules />
+                </AdminLayout>
+              </AdminRoute>
+            } />
+            <Route path="/admin/evaluation-reviews" element={
+              <AdminRoute>
+                <AdminLayout>
+                  <EvaluationReviews />
                 </AdminLayout>
               </AdminRoute>
             } />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History, Target } from 'lucide-react';
+import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History, Target, Send, Shield, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getTradingAccounts, getPendingAccounts, TradingAccount, AccountRequest } from '../lib/database';
 import { supabase } from '../lib/supabase';
@@ -38,11 +38,55 @@ const statusIcons = {
   suspicious: <Clock className="w-5 h-5 text-orange-400" />
 };
 
+interface EvalReview {
+  id: string;
+  account_id: string;
+  status: 'pending' | 'approved' | 'rejected';
+  admin_notes?: string;
+  created_at: string;
+}
+
 function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [showTrades, setShowTrades] = useState<Record<string, boolean>>({});
   const [extendedData, setExtendedData] = useState<Record<string, ExtendedAccountData>>({});
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<EvalReview[]>([]);
+  const [masterRules, setMasterRules] = useState<Record<string, any>>({});
+  const [submittingReview, setSubmittingReview] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Load master rules for phase targets
+    supabase.from('account_rules').select('*').eq('is_template', true)
+      .then(({ data }) => {
+        const map: Record<string, any> = {};
+        (data || []).forEach(r => { map[r.account_type] = r; });
+        setMasterRules(map);
+      });
+    // Load user's evaluation reviews
+    supabase.from('evaluation_reviews').select('*').order('created_at', { ascending: false })
+      .then(({ data }) => setReviews(data || []));
+  }, []);
+
+  const requestPhaseReview = async (account: TradingAccount, profitPercent: number, targetPercent: number) => {
+    setSubmittingReview(account.id);
+    try {
+      const { error } = await supabase.from('evaluation_reviews').insert({
+        account_id: account.id,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+        current_phase: account.current_phase,
+        target_profit: targetPercent,
+        actual_profit: profitPercent,
+        status: 'pending',
+      });
+      if (!error) {
+        // Refresh reviews
+        const { data } = await supabase.from('evaluation_reviews').select('*').order('created_at', { ascending: false });
+        setReviews(data || []);
+      }
+    } catch (e) { console.error(e); }
+    setSubmittingReview(null);
+  };
 
   useEffect(() => {
     loadExtendedData();
@@ -299,6 +343,109 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   </div>
                 </div>
                 {/* End Drawdown Limits Section */}
+
+                {/* Phase Progress (Step accounts only) */}
+                {account.model_type && account.model_type !== 'instant' && (() => {
+                  const rule = masterRules[account.model_type];
+                  if (!rule) return null;
+                  const maxPhase = account.model_type === '1_step' ? 2 : 3;
+                  const isFunded = account.current_phase >= maxPhase;
+                  const phaseTarget = account.current_phase === 1 ? rule.profit_target_phase1 : rule.profit_target_phase2;
+                  const startBal = account.starting_balance || account.balance;
+                  const currentEquity = extended?.running_equity || account.equity || account.balance;
+                  const profitPercent = startBal > 0 ? ((currentEquity - startBal) / startBal) * 100 : 0;
+                  const progress = phaseTarget > 0 ? Math.min(100, Math.max(0, (profitPercent / phaseTarget) * 100)) : 0;
+                  const targetMet = profitPercent >= (phaseTarget || 0);
+                  const modelColor = account.model_type === '1_step' ? '#3B82F6' : '#10B981';
+                  const modelLabel = account.model_type === '1_step' ? '1-Step' : '2-Step';
+                  const phaseLabel = isFunded ? 'Funded' : account.current_phase === 1 ? 'Phase 1 — Evaluation' : 'Phase 2 — Verification';
+                  
+                  // Check for existing review
+                  const existingReview = reviews.find(r => r.account_id === account.id && r.status === 'pending');
+                  const approvedReview = reviews.find(r => r.account_id === account.id && r.status === 'approved');
+                  const rejectedReview = reviews.find(r => r.account_id === account.id && r.status === 'rejected' && !reviews.some(r2 => r2.account_id === account.id && r2.status === 'pending'));
+
+                  return (
+                    <div className="mt-6 p-5 rounded-xl border" style={{ borderColor: `${modelColor}25`, background: `linear-gradient(135deg, ${modelColor}05, transparent)` }}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Zap className="w-4 h-4" style={{ color: modelColor }} />
+                          <h3 className="text-sm font-bold text-white">{modelLabel} Progress</h3>
+                        </div>
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest" style={{ backgroundColor: isFunded ? '#10B98120' : `${modelColor}20`, color: isFunded ? '#10B981' : modelColor }}>
+                          {phaseLabel}
+                        </span>
+                      </div>
+
+                      {!isFunded && (
+                        <>
+                          <div className="flex justify-between text-xs text-gray-400 mb-2">
+                            <span>Profit: <strong className={profitPercent >= 0 ? 'text-green-400' : 'text-red-400'}>{profitPercent.toFixed(2)}%</strong></span>
+                            <span>Target: <strong className="text-white">{phaseTarget}%</strong></span>
+                          </div>
+                          <div className="relative h-2.5 bg-white/5 rounded-full overflow-hidden mb-4">
+                            <div 
+                              className="absolute top-0 left-0 h-full rounded-full transition-all duration-700"
+                              style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${modelColor}, ${targetMet ? '#10B981' : modelColor}90)` }}
+                            />
+                          </div>
+
+                          {/* Review Status / Request Button */}
+                          {existingReview ? (
+                            <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                              <Clock className="w-4 h-4 text-yellow-400" />
+                              <span className="text-xs font-bold text-yellow-400 uppercase tracking-widest">Review Pending — Submitted {new Date(existingReview.created_at).toLocaleDateString()}</span>
+                            </div>
+                          ) : rejectedReview ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                                <AlertOctagon className="w-4 h-4 text-red-400" />
+                                <div>
+                                  <span className="text-xs font-bold text-red-400 uppercase tracking-widest">Review Rejected</span>
+                                  {rejectedReview.admin_notes && <p className="text-xs text-gray-400 mt-1">{rejectedReview.admin_notes}</p>}
+                                </div>
+                              </div>
+                              {targetMet && (
+                                <button
+                                  onClick={() => requestPhaseReview(account, profitPercent, phaseTarget)}
+                                  disabled={submittingReview === account.id}
+                                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all text-white"
+                                  style={{ backgroundColor: modelColor }}
+                                >
+                                  <Send className="w-3.5 h-3.5" /> Resubmit Review Request
+                                </button>
+                              )}
+                            </div>
+                          ) : targetMet ? (
+                            <button
+                              onClick={() => requestPhaseReview(account, profitPercent, phaseTarget)}
+                              disabled={submittingReview === account.id}
+                              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.01] active:scale-[0.99] text-white"
+                              style={{ backgroundColor: modelColor, boxShadow: `0 0 20px ${modelColor}30` }}
+                            >
+                              {submittingReview === account.id ? (
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              ) : (
+                                <><Send className="w-3.5 h-3.5" /> Request Phase Review</>
+                              )}
+                            </button>
+                          ) : (
+                            <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">
+                              Reach {phaseTarget}% profit to unlock phase review
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      {isFunded && (
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                          <CheckCircle className="w-4 h-4 text-emerald-400" />
+                          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Account Funded — Trade freely & request payouts</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
                 
                 {/* Breach Reason Section */}
                 {account.status === 'breached' && account.breach_reason && (
