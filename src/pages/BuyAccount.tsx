@@ -350,37 +350,55 @@ export default function BuyAccount() {
 
               return (
                 <>
-                  {/* Special Tier */}
-                  {specialPkgs.length > 0 && (
+                  {selectedModel === 'instant' ? (
+                    <>
+                      {/* Special Tier (Instant only) */}
+                      {specialPkgs.length > 0 && (
+                        <div className="space-y-5">
+                          <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                            <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                            Special {modelLabel} Accounts
+                            <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">10% OFF</span>
+                          </h3>
+                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                            {specialPkgs.map(renderCard)}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Divider */}
+                      {specialPkgs.length > 0 && premiumPkgs.length > 0 && (
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1 h-[1px]" style={{ backgroundImage: `linear-gradient(to right, transparent, ${modelColor}30, transparent)` }} />
+                        </div>
+                      )}
+
+                      {/* Premium Tier (Instant only) */}
+                      {premiumPkgs.length > 0 && (
+                        <div className="space-y-5">
+                          <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                            <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                            Premium {modelLabel} Accounts
+                            <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">50% OFF</span>
+                          </h3>
+                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                            {premiumPkgs.map(renderCard)}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    /* Step models — flat list, no tiers */
                     <div className="space-y-5">
                       <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
                         <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
-                        Special {modelLabel} Accounts
-                        <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">10% OFF</span>
+                        {modelLabel} Evaluation Sizes
+                        {categoryDiscount > 0 && (
+                          <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">{categoryDiscount}% OFF</span>
+                        )}
                       </h3>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-                        {specialPkgs.map(renderCard)}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Divider */}
-                  {specialPkgs.length > 0 && premiumPkgs.length > 0 && (
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent" style={{ backgroundImage: `linear-gradient(to right, transparent, ${modelColor}30, transparent)` }} />
-                    </div>
-                  )}
-
-                  {/* Premium Tier */}
-                  {premiumPkgs.length > 0 && (
-                    <div className="space-y-5">
-                      <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
-                        <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
-                        Premium {modelLabel} Accounts
-                        <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">50% OFF</span>
-                      </h3>
-                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
-                        {premiumPkgs.map(renderCard)}
+                        {selectedModelPackages.map(renderCard)}
                       </div>
                     </div>
                   )}
