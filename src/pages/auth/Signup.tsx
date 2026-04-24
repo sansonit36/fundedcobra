@@ -136,52 +136,38 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-[#060606] flex" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* LEFT: Brand Panel */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden items-center justify-center p-16">
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0">
           <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full blur-[150px] opacity-20 bg-[#10B981] animate-pulse" />
           <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full blur-[120px] opacity-15 bg-[#bd4dd6]" />
-          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full blur-[100px] opacity-10 bg-[#3B82F6]" />
         </div>
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         
-        <div className="relative z-10 max-w-md">
-          <img src="/logo.png" alt="FundedCobra" className="w-20 h-20 object-contain mb-10 drop-shadow-2xl" />
-          <h2 className="text-4xl text-white mb-4 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
+        <div className="relative z-10 flex flex-col items-center text-center px-10">
+          {/* Team hero image */}
+          <img src="/auth-team.png" alt="FundedCobra Team" className="w-full max-w-[480px] h-auto object-contain mb-8 drop-shadow-[0_20px_60px_rgba(189,77,214,0.25)]" />
+          
+          <h2 className="text-3xl text-white mb-3 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
             Your trading journey <span className="bg-gradient-to-r from-[#10B981] to-[#34d399] bg-clip-text text-transparent">starts here.</span>
           </h2>
-          <p className="text-gray-500 text-base leading-relaxed mb-12">
-            Create your free account in 30 seconds and get instant access to funding up to $200K. No experience required.
+          <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-sm">
+            Get instant access to funded accounts up to $200K. No experience required.
           </p>
           
           {/* Big trust numbers */}
-          <div className="grid grid-cols-3 gap-4 mb-10">
+          <div className="grid grid-cols-3 gap-6 mb-6 w-full max-w-sm">
             <div className="text-center">
               <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>47K+</div>
-              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Active Traders</div>
+              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Traders</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>$12M+</div>
-              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Capital Funded</div>
+              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Funded</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>98%</div>
-              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Payout Rate</div>
+              <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>120+</div>
+              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Countries</div>
             </div>
-          </div>
-
-          <div className="space-y-3">
-            {[
-              { icon: Zap, text: 'Instant account setup — trade in minutes', color: '#bd4dd6' },
-              { icon: Shield, text: 'Bank-grade encryption & data security', color: '#10B981' },
-              { icon: Users, text: 'Trusted by traders in 120+ countries', color: '#3B82F6' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 text-gray-500">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${item.color}10` }}>
-                  <item.icon className="w-4 h-4" style={{ color: item.color }} />
-                </div>
-                <span className="text-sm">{item.text}</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>

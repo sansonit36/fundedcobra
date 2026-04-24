@@ -34,23 +34,24 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[#060606] flex" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* LEFT: Brand Panel */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden items-center justify-center p-16">
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden items-center justify-center">
         {/* Animated gradient mesh */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-[150px] opacity-20 bg-[#bd4dd6] animate-pulse" />
           <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full blur-[120px] opacity-15 bg-[#3B82F6]" />
-          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full blur-[100px] opacity-10 bg-[#10B981]" />
         </div>
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         
-        <div className="relative z-10 max-w-md">
-          <img src="/logo.png" alt="FundedCobra" className="w-20 h-20 object-contain mb-10 drop-shadow-2xl" />
-          <h2 className="text-4xl text-white mb-4 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
+        <div className="relative z-10 flex flex-col items-center text-center px-12">
+          {/* Hero image */}
+          <img src="/auth-trader.png" alt="FundedCobra Trader" className="w-[380px] h-auto object-contain mb-8 drop-shadow-[0_20px_60px_rgba(189,77,214,0.3)]" />
+          
+          <h2 className="text-3xl text-white mb-3 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
             Trade with <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">our capital.</span>
           </h2>
-          <p className="text-gray-500 text-base leading-relaxed mb-12">
-            Join thousands of funded traders worldwide. Get instant access to capital up to $200K with industry-leading profit splits.
+          <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-sm">
+            Join thousands of funded traders worldwide. Instant access to capital up to $200K.
           </p>
           
           {/* Trust badges */}
