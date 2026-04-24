@@ -282,20 +282,22 @@ export default function BuyAccount() {
       )}
 
       {/* 🔴 HEADER */}
-      <div className="max-w-7xl mx-auto px-4 pt-16 pb-16 text-center">
-        <h1 className="text-5xl lg:text-8xl font-black tracking-tighter mb-8 leading-none">ELITE <span className="text-[#bd4dd6]">FUNDING</span></h1>
+      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10 text-center">
+        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter mb-6 leading-none">GET <span className="text-[#bd4dd6]">FUNDED</span></h1>
         
-        <div className="inline-flex p-2 bg-[#161616] rounded-[2.5rem] border border-[#2A2A2A]">
+        <div className="inline-flex p-1.5 bg-[#161616] rounded-xl border border-[#2A2A2A]">
            {['instant', '1_step', '2_step'].map((type) => {
              const model = type as AccountModelType;
              const active = selectedModel === model;
+             const color = model === 'instant' ? '#bd4dd6' : model === '1_step' ? '#3B82F6' : '#10B981';
              return (
                <button
                  key={type}
                  onClick={() => setSelectedModel(model)}
-                 className={`px-10 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
-                   active ? 'bg-white text-black shadow-2xl scale-105' : 'text-gray-500 hover:text-white'
+                 className={`px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
+                   active ? 'text-white shadow-lg' : 'text-gray-500 hover:text-white'
                  }`}
+                 style={active ? { backgroundColor: color } : {}}
                >
                  {MODEL_META[model].label}
                </button>
@@ -304,14 +306,14 @@ export default function BuyAccount() {
         </div>
       </div>
 
-      {/* 🔴 MAIN 70/30 GRID */}
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      {/* 🔴 MAIN GRID */}
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* LEFT COLLUMN (8) */}
-        <div className="lg:col-span-8 space-y-16">
+        {/* LEFT COLUMN (8) */}
+        <div className="lg:col-span-8 space-y-8">
           
-          {/* 1. Account Balance Grid — Grouped by Tier */}
-          <div className="space-y-10">
+          {/* 1. Account Balance Grid — Compact Cards */}
+          <div className="space-y-6">
             {(() => {
               const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
               const modelLabel = selectedModel === 'instant' ? 'Instant' : selectedModel === '1_step' ? '1-Step' : '2-Step';
@@ -327,22 +329,23 @@ export default function BuyAccount() {
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg)}
-                    className={`relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden ${
+                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 text-left group ${
                       isSelected 
-                        ? 'bg-white/5 shadow-[0_0_50px_rgba(189,77,214,0.15)]'
+                        ? 'bg-white/5 shadow-lg'
                         : 'border-[#2A2A2A] bg-[#111] hover:border-white/20'
                     }`}
                     style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}08` } : {}}
-                  >                    <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
-                    <div className="text-4xl font-black text-white tracking-tighter mb-6">${pkg.balance.toLocaleString()}</div>
-                    <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                       <div className="flex flex-col">
-                          {categoryDiscount > 0 && (
-                            <span className="text-[10px] text-gray-500 line-through tracking-tighter">${pkg.price.toFixed(0)}</span>
-                          )}
-                          <span className="text-sm font-black underline underline-offset-4">${discountedPrice.toFixed(0)}</span>
-                       </div>
-                       {isSelected && <CheckCircle className="w-6 h-6" style={{ color: modelColor }} />}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest group-hover:text-gray-300 transition-colors">Balance</span>
+                      {isSelected && <CheckCircle className="w-4 h-4" style={{ color: modelColor }} />}
+                    </div>
+                    <div className="text-xl font-black text-white tracking-tight mb-3">${pkg.balance.toLocaleString()}</div>
+                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                      {categoryDiscount > 0 && (
+                        <span className="text-[10px] text-gray-500 line-through">${pkg.price.toFixed(0)}</span>
+                      )}
+                      <span className="text-sm font-black" style={{ color: modelColor }}>${discountedPrice.toFixed(0)}</span>
                     </div>
                   </button>
                 );
@@ -352,52 +355,41 @@ export default function BuyAccount() {
                 <>
                   {selectedModel === 'instant' ? (
                     <>
-                      {/* Special Tier (Instant only) */}
+                      {/* Special Tier */}
                       {specialPkgs.length > 0 && (
-                        <div className="space-y-5">
-                          <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
-                            <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                        <div className="space-y-3">
+                          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
                             Special {modelLabel} Accounts
-                            <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">10% OFF</span>
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black border border-emerald-500/30">10% OFF</span>
                           </h3>
-                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                          <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
                             {specialPkgs.map(renderCard)}
                           </div>
                         </div>
                       )}
 
-                      {/* Divider */}
-                      {specialPkgs.length > 0 && premiumPkgs.length > 0 && (
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1 h-[1px]" style={{ backgroundImage: `linear-gradient(to right, transparent, ${modelColor}30, transparent)` }} />
-                        </div>
-                      )}
-
-                      {/* Premium Tier (Instant only) */}
+                      {/* Premium Tier */}
                       {premiumPkgs.length > 0 && (
-                        <div className="space-y-5">
-                          <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
-                            <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                        <div className="space-y-3">
+                          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
                             Premium {modelLabel} Accounts
-                            <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">50% OFF</span>
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black border border-emerald-500/30">50% OFF</span>
                           </h3>
-                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                          <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
                             {premiumPkgs.map(renderCard)}
                           </div>
                         </div>
                       )}
                     </>
                   ) : (
-                    /* Step models — flat list, no tiers */
-                    <div className="space-y-5">
-                      <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
-                        <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
+                    <div className="space-y-3">
+                      <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
                         {modelLabel} Evaluation Sizes
                         {categoryDiscount > 0 && (
-                          <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">{categoryDiscount}% OFF</span>
+                          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black border border-emerald-500/30">{categoryDiscount}% OFF</span>
                         )}
                       </h3>
-                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                      <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
                         {selectedModelPackages.map(renderCard)}
                       </div>
                     </div>
@@ -407,7 +399,69 @@ export default function BuyAccount() {
             })()}
           </div>
 
-          {/* 2. Phase-Tabbed Rule Card (Inspired by FundedSquad) */}
+          {/* 2. Platform & Server Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Trading Platform */}
+            <div className="bg-[#161616] rounded-xl border border-[#2A2A2A] p-5">
+              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Trading Platform</h4>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setSelectedPlatform('MT5')}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
+                    selectedPlatform === 'MT5' 
+                      ? 'border-[#bd4dd6] bg-[#bd4dd6]/5' 
+                      : 'border-[#2A2A2A] hover:border-white/20'
+                  }`}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-[10px] font-black">MT5</span>
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="text-sm font-bold text-white">MetaTrader 5</p>
+                    <p className="text-[10px] text-gray-500">Industry standard platform</p>
+                  </div>
+                  {selectedPlatform === 'MT5' && <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Server Selection */}
+            <div className="bg-[#161616] rounded-xl border border-[#2A2A2A] p-5">
+              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Server</h4>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setSelectedServer('Exness')}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
+                    selectedServer === 'Exness' 
+                      ? 'border-[#bd4dd6] bg-[#bd4dd6]/5' 
+                      : 'border-[#2A2A2A] hover:border-white/20'
+                  }`}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center flex-shrink-0">
+                    <span className="text-black text-[9px] font-black">EXN</span>
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="text-sm font-bold text-white">Exness</p>
+                    <p className="text-[10px] text-emerald-400 font-bold">● Available</p>
+                  </div>
+                  {selectedServer === 'Exness' && <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" />}
+                </button>
+
+                <div className="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-[#2A2A2A] opacity-50 cursor-not-allowed">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#bd4dd6] to-purple-900 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-[8px] font-black">FC</span>
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="text-sm font-bold text-white">FundedCobra</p>
+                    <p className="text-[10px] text-red-400 font-bold">● Server Full</p>
+                  </div>
+                  <Lock className="w-4 h-4 text-gray-600 flex-shrink-0" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Phase-Tabbed Rule Card */}
           {selectedPackage && (() => {
             const r = selectedPackageRules;
             const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
@@ -538,58 +592,79 @@ export default function BuyAccount() {
           })()}
         </div>
 
-        {/* RIGHT COLUMN (4) */}
+        {/* RIGHT COLUMN (4) - Checkout */}
         <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-           <div className="bg-[#161616] rounded-[3rem] p-10 border border-[#2A2A2A] shadow-2xl space-y-12">
-              <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] text-center">Receipt Summary</h3>
+           <div className="bg-[#161616] rounded-2xl border border-[#2A2A2A] shadow-xl overflow-hidden">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                <h3 className="text-xs font-black text-white uppercase tracking-widest">Order Summary</h3>
+              </div>
               
-              {selectedPackage ? (
-                <>
-                  <div className="bg-black/40 rounded-3xl p-8 border border-white/5 text-center">
-                     <div className="text-5xl font-black tracking-tighter mb-2">${selectedPackage.balance.toLocaleString()}</div>
-                     <p className="text-[10px] font-black text-[#bd4dd6] uppercase tracking-[0.2em]">{MODEL_META[selectedModel].label}</p>
-                  </div>
+              <div className="p-6 space-y-5">
+                {selectedPackage ? (
+                  <>
+                    {/* Selected Account */}
+                    <div className="bg-black/30 rounded-xl p-5 border border-white/5 text-center">
+                       <div className="text-3xl font-black tracking-tight text-white mb-1">${selectedPackage.balance.toLocaleString()}</div>
+                       <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}>
+                         {MODEL_META[selectedModel].label}
+                       </p>
+                    </div>
 
-                  <div className="space-y-6">
-                     <div className="flex justify-between items-center text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                        <span>Terminal Fee</span>
-                        <span className="text-white font-mono">${selectedPackage.price.toFixed(0)}</span>
-                     </div>
-                     {categoryRules[selectedModel]?.discount_percent > 0 && (
-                       <div className="flex justify-between items-center text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-                          <span>Model Discount</span>
-                          <span className="font-mono">-{categoryRules[selectedModel].discount_percent}%</span>
-                       </div>
-                     )}
-                     {appliedCoupon && (
-                       <div className="flex justify-between items-center p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                          <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">{appliedCoupon.code} ACTIVE</span>
-                          <span className="text-white font-mono font-bold">-{appliedCoupon.discount}%</span>
-                       </div>
-                     )}
-                     <div className="pt-8 border-t border-white/5 flex justify-between items-end">
-                        <span className="text-sm font-black text-gray-400 uppercase tracking-tighter">Total Due</span>
-                        <div className="text-right">
-                           <div className="text-5xl font-black text-white tracking-tighter mb-2">${calculateFinalPrice(selectedPackage.price).toFixed(0)}</div>
-                           <div className="text-[9px] text-gray-600 font-black uppercase tracking-widest">All Taxes Incl.</div>
-                        </div>
-                     </div>
-                  </div>
+                    {/* Config Summary */}
+                    <div className="flex gap-2">
+                      <div className="flex-1 bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
+                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Platform</p>
+                        <p className="text-xs font-black text-white">{selectedPlatform}</p>
+                      </div>
+                      <div className="flex-1 bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
+                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Server</p>
+                        <p className="text-xs font-black text-white">{selectedServer}</p>
+                      </div>
+                    </div>
 
-                  <button
-                    onClick={handlePurchase}
-                    className="w-full py-6 bg-white text-black hover:bg-gray-200 transition-all rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl active:scale-95 flex items-center justify-center gap-3"
-                  >
-                    <Lock className="w-5 h-5" /> Buy Challenge
-                  </button>
-                  <p className="text-center text-[9px] font-black text-gray-600 uppercase tracking-widest">Secure AES-256 Deployment Active</p>
-                </>
-              ) : (
-                <div className="py-20 text-center opacity-20">
-                   <Trophy className="w-12 h-12 mx-auto mb-4" />
-                   <p className="text-[10px] font-black uppercase tracking-widest">Initialize Selection</p>
-                </div>
-              )}
+                    {/* Price Breakdown */}
+                    <div className="space-y-3 pt-2">
+                       <div className="flex justify-between items-center text-xs">
+                          <span className="text-gray-400">Account Fee</span>
+                          <span className="text-white font-bold font-mono">${selectedPackage.price.toFixed(0)}</span>
+                       </div>
+                       {categoryRules[selectedModel]?.discount_percent > 0 && (
+                         <div className="flex justify-between items-center text-xs">
+                            <span className="text-emerald-400">Discount ({categoryRules[selectedModel].discount_percent}%)</span>
+                            <span className="text-emerald-400 font-bold font-mono">-${(selectedPackage.price * categoryRules[selectedModel].discount_percent / 100).toFixed(0)}</span>
+                         </div>
+                       )}
+                       {appliedCoupon && (
+                         <div className="flex justify-between items-center text-xs p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                            <span className="text-emerald-400 font-bold">{appliedCoupon.code}</span>
+                            <span className="text-emerald-400 font-bold font-mono">-{appliedCoupon.discount}%</span>
+                         </div>
+                       )}
+
+                       <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                          <span className="text-sm font-bold text-gray-300">Total Due</span>
+                          <span className="text-3xl font-black text-white tracking-tight">${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                       </div>
+                    </div>
+
+                    {/* CTA */}
+                    <button
+                      onClick={handlePurchase}
+                      className="w-full py-4 text-white hover:brightness-110 transition-all rounded-xl font-black text-sm uppercase tracking-widest shadow-lg active:scale-[0.98] flex items-center justify-center gap-2"
+                      style={{ backgroundColor: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}
+                    >
+                      <Lock className="w-4 h-4" /> Buy Now
+                    </button>
+                    <p className="text-center text-[9px] text-gray-600 font-bold">Secure encrypted checkout • Instant provisioning</p>
+                  </>
+                ) : (
+                  <div className="py-12 text-center opacity-30">
+                     <Shield className="w-10 h-10 mx-auto mb-3" />
+                     <p className="text-[10px] font-black uppercase tracking-widest">Select an account to continue</p>
+                  </div>
+                )}
+              </div>
            </div>
         </div>
       </div>
