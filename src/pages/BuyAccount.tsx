@@ -462,9 +462,7 @@ export default function BuyAccount() {
                     selectedPlatform === 'MT5' ? 'border-emerald-500 bg-emerald-500/5' : 'border-[#333] hover:border-white/20'
                   }`}
                 >
-                  <div className="w-9 h-9 rounded bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-[9px] font-black">MT5</span>
-                  </div>
+                  <img src="/mt5-logo.png" alt="MetaTrader 5" className="w-9 h-9 rounded object-contain flex-shrink-0 bg-white/5" />
                   <div className="text-left flex-1">
                     <p className="text-xs font-bold text-white">MetaTrader 5</p>
                     <p className="text-[10px] text-gray-500">Industry standard</p>
@@ -483,9 +481,7 @@ export default function BuyAccount() {
                       selectedServer === 'Exness' ? 'border-emerald-500 bg-emerald-500/5' : 'border-[#333] hover:border-white/20'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center flex-shrink-0">
-                      <span className="text-black text-[8px] font-black">EXN</span>
-                    </div>
+                    <img src="/exness-logo.jpeg" alt="Exness" className="w-9 h-9 rounded object-cover flex-shrink-0" />
                     <div className="text-left flex-1">
                       <p className="text-xs font-bold text-white">Exness</p>
                       <p className="text-[10px] text-emerald-400 font-bold">● Available</p>
