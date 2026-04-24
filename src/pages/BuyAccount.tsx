@@ -180,9 +180,10 @@ export default function BuyAccount() {
 
   const calculateFinalPrice = (price: number) => {
     const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
-    const baseDiscountedPrice = price * (1 - categoryDiscount / 100);
-    if (!appliedCoupon) return baseDiscountedPrice;
-    return baseDiscountedPrice * (1 - appliedCoupon.discount / 100);
+    const couponDiscount = appliedCoupon?.discount || 0;
+    // Additive: combine all discounts, cap at 100%
+    const totalDiscount = Math.min(categoryDiscount + couponDiscount, 100);
+    return price * (1 - totalDiscount / 100);
   };
 
   const handlePurchase = () => {
@@ -346,7 +347,7 @@ export default function BuyAccount() {
                       className="absolute top-0 right-0 px-4 py-1 text-[8px] font-black uppercase tracking-widest rounded-bl-xl"
                       style={isPremium ? { backgroundColor: modelColor, color: 'white' } : { backgroundColor: '#1f1f1f', color: '#666' }}
                     >
-                      {isPremium ? 'Premium' : 'Standard'}
+                      {isPremium ? 'Premium' : (selectedModel === 'instant' ? 'Instant' : 'Standard')}
                     </div>
 
                     <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
