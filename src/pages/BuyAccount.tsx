@@ -282,26 +282,32 @@ export default function BuyAccount() {
       )}
 
       {/* 🔥 URGENCY BAR */}
-      <div className="bg-gradient-to-r from-red-600/90 via-red-500/90 to-orange-500/90 py-2.5 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 text-white text-xs font-bold">
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(90deg, #dc2626 0%, #ef4444 30%, #f97316 70%, #dc2626 100%)' }}>
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)' }} />
+        <div className="relative max-w-7xl mx-auto flex items-center justify-center gap-3 text-white text-xs font-semibold py-2.5 px-4" style={{ fontFamily: 'Inter, sans-serif' }}>
           <span className="animate-pulse">🔴 LIVE</span>
-          <span>Only <span className="bg-white/20 px-1.5 py-0.5 rounded font-black">{Math.floor(Math.random() * 8) + 3}</span> spots remaining today</span>
-          <span className="hidden md:inline">•</span>
+          <span>Only <span className="bg-white/20 px-1.5 py-0.5 rounded-md font-black">{Math.floor(Math.random() * 8) + 3}</span> spots remaining today</span>
+          <span className="hidden md:inline opacity-40">•</span>
           <span className="hidden md:inline">Prices increase at midnight</span>
-          <span>•</span>
-          <span className="bg-white text-red-600 px-2 py-0.5 rounded font-black">UP TO 50% OFF</span>
+          <span className="opacity-40">•</span>
+          <span className="bg-white text-red-600 px-2.5 py-0.5 rounded-md font-black text-[11px] shadow-lg">UP TO 50% OFF</span>
         </div>
       </div>
 
       {/* 🔴 HEADER */}
-      <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl lg:text-5xl font-black tracking-tight mb-3 leading-none">Get Funded <span className="text-[#bd4dd6]">Today</span></h1>
-          <p className="text-gray-400 text-sm max-w-lg mx-auto">Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
+      <div className="relative max-w-7xl mx-auto px-4 pt-14 pb-8">
+        {/* Gradient mesh background glow */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-10" style={{ backgroundColor: '#bd4dd6' }} />
+          <div className="absolute top-10 right-1/4 w-72 h-72 rounded-full blur-[100px] opacity-[0.07]" style={{ backgroundColor: '#3B82F6' }} />
+        </div>
+        <div className="relative text-center mb-8">
+          <h1 className="text-4xl lg:text-6xl tracking-tight mb-4 leading-[1.1]" style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>Get Funded <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">Today</span></h1>
+          <p className="text-gray-400 text-sm max-w-md mx-auto leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
         </div>
         
-        <div className="flex justify-center">
-          <div className="inline-flex p-1 bg-[#161616] rounded-lg border border-[#2A2A2A]">
+        <div className="relative flex justify-center">
+          <div className="inline-flex p-1 rounded-xl border border-white/10" style={{ background: 'rgba(20,20,20,0.8)', backdropFilter: 'blur(20px)' }}>
             {['instant', '1_step', '2_step'].map((type) => {
               const model = type as AccountModelType;
               const active = selectedModel === model;
@@ -314,10 +320,10 @@ export default function BuyAccount() {
                     const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
                     setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
                   }}
-                  className={`px-5 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider transition-all ${
-                    active ? 'text-white shadow-lg' : 'text-gray-500 hover:text-white'
+                  className={`px-6 py-3 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all duration-300 ${
+                    active ? 'text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'
                   }`}
-                  style={active ? { backgroundColor: color } : {}}
+                  style={active ? { background: `linear-gradient(135deg, ${color}, ${color}dd)`, boxShadow: `0 4px 20px ${color}40` } : { fontFamily: 'Inter, sans-serif' }}
                 >
                   {MODEL_META[model].label}
                 </button>
@@ -333,25 +339,24 @@ export default function BuyAccount() {
         const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
         const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : '—';
         const maxDD = r?.overall_drawdown_percent || r?.overall_drawdown_phase1 || '—';
+        const featureItems = [
+          { value: `Up to ${r?.payout_split_percent || 80}%`, label: 'Profit Split', color: '#fff', icon: '💰' },
+          { value: payoutCycle, label: 'Payout Cycle', color: modelColor, icon: '⚡' },
+          { value: `${maxDD}%`, label: 'Max Drawdown', color: '#34d399', icon: '🛡️' },
+          { value: '1:100', label: 'Leverage', color: '#facc15', icon: '📈' },
+        ];
         return (
-          <div className="max-w-7xl mx-auto px-4 mb-6">
+          <div className="max-w-7xl mx-auto px-4 mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
-                <div className="text-xl font-black text-white">Up to {r?.payout_split_percent || 80}%</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Profit Split</div>
-              </div>
-              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
-                <div className="text-xl font-black" style={{color: modelColor}}>{payoutCycle}</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Payout Cycle</div>
-              </div>
-              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
-                <div className="text-xl font-black text-emerald-400">{maxDD}%</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Max Drawdown</div>
-              </div>
-              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
-                <div className="text-xl font-black text-yellow-400">1:100</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Leverage</div>
-              </div>
+              {featureItems.map((item, idx) => (
+                <div key={idx} className="relative group rounded-xl p-[1px] transition-all duration-300" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))` }}>
+                  <div className="rounded-xl p-4 text-center h-full" style={{ background: 'linear-gradient(180deg, #151515 0%, #0d0d0d 100%)' }}>
+                    <div className="text-base mb-0.5">{item.icon}</div>
+                    <div className="text-xl font-bold" style={{ color: item.color, fontFamily: 'Space Grotesk, sans-serif' }}>{item.value}</div>
+                    <div className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>{item.label}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         );
@@ -366,8 +371,8 @@ export default function BuyAccount() {
           {/* STEP 1: Choose Account Size */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-[#bd4dd6] flex items-center justify-center text-[10px] font-black text-white">1</div>
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">Choose Your Account Size</h3>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #bd4dd6, #9333ea)' }}>1</div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Choose Your Account Size</h3>
             </div>
             {(() => {
               const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
@@ -386,21 +391,24 @@ export default function BuyAccount() {
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg)}
-                    className={`relative p-3.5 rounded-xl border-2 transition-all duration-200 text-center group ${
+                    className={`relative p-4 rounded-xl border transition-all duration-300 text-center group ${
                       isSelected 
-                        ? 'shadow-xl scale-[1.03]'
-                        : 'border-[#2A2A2A] bg-gradient-to-b from-[#161616] to-[#0d0d0d] hover:border-white/25 hover:shadow-lg hover:scale-[1.01]'
+                        ? 'border-transparent scale-[1.04]'
+                        : 'border-white/[0.06] hover:border-white/15 hover:scale-[1.02]'
                     }`}
-                    style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}0a`, boxShadow: `0 0 25px ${modelColor}15` } : {}}
+                    style={isSelected 
+                      ? { background: `linear-gradient(180deg, ${modelColor}12 0%, ${modelColor}05 100%)`, borderColor: `${modelColor}60`, boxShadow: `0 0 30px ${modelColor}20, inset 0 1px 0 ${modelColor}20` } 
+                      : { background: 'linear-gradient(180deg, rgba(22,22,22,1) 0%, rgba(13,13,13,1) 100%)' }
+                    }
                   >
-                    {isSelected && <div className="absolute -top-1.5 -right-1.5 bg-[#0B0B0C] rounded-full p-0.5"><CheckCircle className="w-4 h-4" style={{ color: modelColor }} /></div>}
-                    <div className="text-lg font-black text-white tracking-tight">{balanceLabel}</div>
-                    <div className="flex items-center justify-center gap-1.5 mt-1.5">
+                    {isSelected && <div className="absolute -top-1.5 -right-1.5 rounded-full shadow-lg" style={{ background: modelColor }}><Check className="w-4 h-4 text-white p-0.5" /></div>}
+                    <div className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{balanceLabel}</div>
+                    <div className="flex items-center justify-center gap-1.5 mt-2">
                       {categoryDiscount > 0 && <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>}
-                      <span className="text-base font-black" style={{ color: modelColor }}>${discountedPrice.toFixed(0)}</span>
+                      <span className="text-base font-bold" style={{ color: modelColor, fontFamily: 'Inter, sans-serif' }}>${discountedPrice.toFixed(0)}</span>
                     </div>
                     {categoryDiscount > 0 && savings > 0 && (
-                      <div className="text-[9px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 rounded px-1.5 py-0.5 inline-block">Save ${savings.toFixed(0)}</div>
+                      <div className="text-[9px] font-semibold text-emerald-400 mt-1.5 bg-emerald-500/10 rounded-md px-2 py-0.5 inline-block border border-emerald-500/20">Save ${savings.toFixed(0)}</div>
                     )}
                   </button>
                 );
@@ -455,8 +463,8 @@ export default function BuyAccount() {
           {/* STEP 2: Platform & Server */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white" style={{ backgroundColor: selectedPlatform && selectedServer ? '#10B981' : '#2A2A2A' }}>2</div>
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">Configure Your Setup</h3>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black text-white shadow-lg transition-all" style={{ background: selectedPlatform && selectedServer ? 'linear-gradient(135deg, #10B981, #059669)' : '#2A2A2A' }}>2</div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Configure Your Setup</h3>
               {!selectedPlatform && <span className="text-[10px] text-red-400 font-bold animate-pulse">← Required</span>}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -643,26 +651,26 @@ export default function BuyAccount() {
 
         {/* RIGHT COLUMN (4) - Checkout */}
         <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit space-y-4">
-           <div className="bg-[#161616] rounded-xl border border-[#2A2A2A] shadow-xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
-                <h3 className="text-xs font-black text-white uppercase tracking-wider">Your Order</h3>
-                {selectedPackage && <span className="text-[10px] text-emerald-400 font-bold">✓ Ready</span>}
+           <div className="rounded-2xl border border-white/[0.08] overflow-hidden shadow-2xl" style={{ background: 'linear-gradient(180deg, rgba(22,22,22,0.95) 0%, rgba(12,12,12,0.98) 100%)', backdropFilter: 'blur(20px)' }}>
+              <div className="px-5 py-3.5 border-b border-white/[0.06] flex items-center justify-between" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))' }}>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Your Order</h3>
+                {selectedPackage && <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Ready</span>}
               </div>
               
               <div className="p-5 space-y-4">
                 {selectedPackage ? (
                   <>
-                    <div className="bg-black/30 rounded-lg p-4 border border-white/5">
+                    <div className="rounded-xl p-4 border border-white/[0.06]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.3) 100%)' }}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-2xl font-black text-white">${selectedPackage.balance.toLocaleString()}</div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}>
+                          <div className="text-2xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>${selectedPackage.balance.toLocaleString()}</div>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981', fontFamily: 'Inter, sans-serif' }}>
                             {MODEL_META[selectedModel].label}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500">{selectedPlatform || '—'}</div>
-                          <div className="text-xs text-gray-500">{selectedServer || '—'}</div>
+                        <div className="text-right space-y-0.5">
+                          <div className="text-[11px] text-gray-400 font-medium">{selectedPlatform || '—'}</div>
+                          <div className="text-[11px] text-gray-400 font-medium">{selectedServer || '—'}</div>
                         </div>
                       </div>
                     </div>
@@ -687,13 +695,13 @@ export default function BuyAccount() {
                        <div className="pt-3 border-t border-white/5 flex justify-between items-center">
                           <span className="text-sm font-bold text-white">Total</span>
                           <div className="text-right">
-                            <span className="text-2xl font-black text-white">${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                            <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
                           </div>
                        </div>
                     </div>
 
                     {(!selectedPlatform || !selectedServer) && (
-                      <div className="text-[10px] text-yellow-500 font-bold bg-yellow-500/5 p-2.5 rounded-lg border border-yellow-500/20 text-center">
+                      <div className="text-[10px] text-yellow-500 font-semibold bg-yellow-500/5 p-2.5 rounded-xl border border-yellow-500/15 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
                         ⚠ Please select platform and server above to continue
                       </div>
                     )}
@@ -701,10 +709,14 @@ export default function BuyAccount() {
                     <button
                       onClick={handlePurchase}
                       disabled={!selectedPlatform || !selectedServer}
-                      className={`w-full py-4 text-white font-black text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
-                        (!selectedPlatform || !selectedServer) ? 'opacity-40 cursor-not-allowed' : 'hover:brightness-110 shadow-lg'
+                      className={`w-full py-4 text-white font-bold text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.97] ${
+                        (!selectedPlatform || !selectedServer) ? 'opacity-30 cursor-not-allowed' : 'hover:brightness-110'
                       }`}
-                      style={{ backgroundColor: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}
+                      style={{
+                        fontFamily: 'Space Grotesk, sans-serif',
+                        background: `linear-gradient(135deg, ${selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981'}, ${selectedModel === 'instant' ? '#9333ea' : selectedModel === '1_step' ? '#2563eb' : '#059669'})`,
+                        boxShadow: (!selectedPlatform || !selectedServer) ? 'none' : `0 4px 25px ${selectedModel === 'instant' ? '#bd4dd640' : selectedModel === '1_step' ? '#3B82F640' : '#10B98140'}`
+                      }}
                     >
                       <Lock className="w-4 h-4" /> Get Funded Now
                     </button>
@@ -726,15 +738,15 @@ export default function BuyAccount() {
            </div>
 
            {/* Social Proof */}
-           <div className="bg-[#161616] rounded-lg border border-[#2A2A2A] p-4">
+           <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'linear-gradient(180deg, rgba(22,22,22,0.9), rgba(12,12,12,0.95))' }}>
              <div className="flex items-center gap-2 mb-3">
-               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-               <span className="text-[10px] font-bold text-gray-400 uppercase">Recent Purchases</span>
+               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
+               <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" style={{ fontFamily: 'Inter, sans-serif' }}>Recent Purchases</span>
              </div>
-             <div className="space-y-2">
+             <div className="space-y-2.5">
                {['Ahmed K. funded $25K — 3 min ago', 'Samira R. funded $10K — 8 min ago', 'Trader X funded $50K — 14 min ago'].map((txt, i) => (
-                 <div key={i} className="text-[10px] text-gray-500 flex items-center gap-2">
-                   <CheckCircle className="w-3 h-3 text-emerald-500/50" />
+                 <div key={i} className="text-[11px] text-gray-500 flex items-center gap-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+                   <CheckCircle className="w-3 h-3 text-emerald-500/40" />
                    {txt}
                  </div>
                ))}
