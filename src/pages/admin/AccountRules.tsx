@@ -68,47 +68,59 @@ export default function AccountRules() {
       setSaving(true);
       setError(null);
 
-      const { error: updateError } = await supabase
+      const updatePayload: Record<string, any> = {
+        withdrawal_target_percent: rule.withdrawal_target_percent,
+        profit_target_phase1: rule.profit_target_phase1,
+        profit_target_phase2: rule.profit_target_phase2,
+        daily_drawdown_phase1: rule.daily_drawdown_phase1,
+        daily_drawdown_phase2: rule.daily_drawdown_phase2,
+        overall_drawdown_phase1: rule.overall_drawdown_phase1,
+        overall_drawdown_phase2: rule.overall_drawdown_phase2,
+        minimum_trading_days_phase1: rule.minimum_trading_days_phase1,
+        minimum_trading_days_phase2: rule.minimum_trading_days_phase2,
+        has_profit_target: rule.has_profit_target,
+        profit_target_percent: rule.profit_target_percent,
+        minimum_trading_days: rule.minimum_trading_days,
+        has_minimum_trading_days: rule.has_minimum_trading_days,
+        daily_payout_enabled: rule.daily_payout_enabled,
+        weekly_payout_enabled: rule.weekly_payout_enabled,
+        bi_weekly_payout_enabled: rule.bi_weekly_payout_enabled,
+        minimum_withdrawal_amount: rule.minimum_withdrawal_amount,
+        single_trade_limit_percent: rule.single_trade_limit_percent,
+        daily_drawdown_percent: rule.daily_drawdown_percent,
+        overall_drawdown_percent: rule.overall_drawdown_percent,
+        payout_split_percent: rule.payout_split_percent,
+        drawdown_type: rule.drawdown_type,
+        drawdown_basis: rule.drawdown_basis,
+        rule_description: rule.rule_description,
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('[AccountRules] Saving rule:', rule.id, updatePayload);
+
+      const { data: updatedRows, error: updateError } = await supabase
         .from('account_rules')
-        .update({
-          withdrawal_target_percent: rule.withdrawal_target_percent,
-          profit_target_phase1: rule.profit_target_phase1,
-          profit_target_phase2: rule.profit_target_phase2,
-          daily_drawdown_phase1: rule.daily_drawdown_phase1,
-          daily_drawdown_phase2: rule.daily_drawdown_phase2,
-          overall_drawdown_phase1: rule.overall_drawdown_phase1,
-          overall_drawdown_phase2: rule.overall_drawdown_phase2,
-          minimum_trading_days_phase1: rule.minimum_trading_days_phase1,
-          minimum_trading_days_phase2: rule.minimum_trading_days_phase2,
-          has_profit_target: rule.has_profit_target,
-          profit_target_percent: rule.profit_target_percent,
-          minimum_trading_days: rule.minimum_trading_days,
-          has_minimum_trading_days: rule.has_minimum_trading_days,
-          daily_payout_enabled: rule.daily_payout_enabled,
-          weekly_payout_enabled: rule.weekly_payout_enabled,
-          bi_weekly_payout_enabled: rule.bi_weekly_payout_enabled,
-          minimum_withdrawal_amount: rule.minimum_withdrawal_amount,
-          single_trade_limit_percent: rule.single_trade_limit_percent,
-          daily_drawdown_percent: rule.daily_drawdown_percent,
-          overall_drawdown_percent: rule.overall_drawdown_percent,
-          payout_split_percent: rule.payout_split_percent,
-          drawdown_type: rule.drawdown_type,
-          drawdown_basis: rule.drawdown_basis,
-          rule_description: rule.rule_description,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', rule.id);
+        .update(updatePayload)
+        .eq('id', rule.id)
+        .select();
+
+      console.log('[AccountRules] Update result:', { updatedRows, updateError });
 
       if (updateError) throw updateError;
+
+      // Supabase silently returns 0 rows when RLS blocks the write
+      if (!updatedRows || updatedRows.length === 0) {
+        throw new Error('Update was blocked — your admin role may not have write permission. Check RLS policies.');
+      }
 
       setSuccess('Rules updated successfully');
       setEditingRule(null);
       await loadRules();
 
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving rule:', err);
-      setError('Failed to save rules');
+      setError(err?.message || 'Failed to save rules');
     } finally {
       setSaving(false);
     }
@@ -160,6 +172,37 @@ export default function AccountRules() {
         </div>
       )}
 
+      {/* Master Templates Section — These control the BuyAccount page */}
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Settings className="w-5 h-5 text-purple-400" />
+          <h2 className="text-xl font-bold text-white">Master Templates</h2>
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400">
+            Controls Buy Page
+          </span>
+        </div>
+        <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-4">
+          <p className="text-sm text-gray-400">
+            These master templates control the feature callouts, payout cycles, and rules displayed on the 
+            <strong className="text-purple-400"> Buy Account</strong> page for each account type. 
+            Changes here apply globally to all packages of that type.
+          </p>
+        </div>
+
+        {rules.filter(r => (r as any).is_template === true).map((rule) => (
+          <RuleCard
+            key={rule.id}
+            rule={rule}
+            isSpecial={false}
+            isTemplate={true}
+            onEdit={setEditingRule}
+            onSave={handleSaveRule}
+            saving={saving}
+            isEditing={editingRule?.id === rule.id}
+          />
+        ))}
+      </div>
+
       {/* Legacy Accounts Section */}
       {rules.filter(r => isLegacyRule(r)).length > 0 && (
         <div className="space-y-4">
@@ -209,7 +252,7 @@ export default function AccountRules() {
           </span>
         </div>
 
-        {rules.filter(r => isSpecialAccount(r.account_package_name) && !isLegacyRule(r)).map((rule) => (
+        {rules.filter(r => isSpecialAccount(r.account_package_name) && !isLegacyRule(r) && !(r as any).is_template).map((rule) => (
           <RuleCard
             key={rule.id}
             rule={rule}
@@ -229,7 +272,7 @@ export default function AccountRules() {
           <h2 className="text-xl font-bold text-white">Premium Instant Accounts</h2>
         </div>
 
-        {rules.filter(r => !isSpecialAccount(r.account_package_name) && !isLegacyRule(r)).map((rule) => (
+        {rules.filter(r => !isSpecialAccount(r.account_package_name) && !isLegacyRule(r) && !(r as any).is_template).map((rule) => (
           <RuleCard
             key={rule.id}
             rule={rule}
@@ -249,13 +292,14 @@ interface RuleCardProps {
   rule: AccountRule;
   isSpecial: boolean;
   isLegacy?: boolean;
+  isTemplate?: boolean;
   onEdit: (rule: AccountRule) => void;
   onSave: (rule: AccountRule) => void;
   saving: boolean;
   isEditing: boolean;
 }
 
-function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, isEditing }: RuleCardProps) {
+function RuleCard({ rule, isSpecial, isLegacy = false, isTemplate = false, onEdit, onSave, saving, isEditing }: RuleCardProps) {
   const [localRule, setLocalRule] = useState(rule);
 
   useEffect(() => {
@@ -265,11 +309,19 @@ function RuleCard({ rule, isSpecial, isLegacy = false, onEdit, onSave, saving, i
   return (
     <div className={`card-gradient rounded-2xl p-6 border ${
       isLegacy ? 'border-gray-500/20 opacity-75' : 
+      isTemplate ? 'border-purple-500/30 ring-1 ring-purple-500/10' :
       isSpecial ? 'border-yellow-500/20' : 'border-white/5'
     }`}>
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-bold text-white">{rule.account_package_name}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-white">{rule.account_package_name}</h3>
+            {isTemplate && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                TEMPLATE
+              </span>
+            )}
+          </div>
           {isLegacy && (
             <span className="inline-block mt-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400">
               Legacy • 10% Profit Target • 2 Days/Week
