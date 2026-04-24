@@ -219,47 +219,37 @@ export default function PackagesAndOffers() {
           if (insertError) throw insertError;
         }
 
-        // CASCADE: Sync all individual package rules of this type with master values
-        const cascadeData: any = {
-          profit_target_phase1: parseFloat(packageForm.profit_target_phase1),
-          profit_target_phase2: parseFloat(packageForm.profit_target_phase2 || '0'),
-          profit_target_percent: parseFloat(packageForm.profit_target_phase1),
-          daily_drawdown_phase1: parseFloat(packageForm.daily_drawdown_phase1),
-          daily_drawdown_phase2: parseFloat(packageForm.daily_drawdown_phase2 || '0'),
-          daily_drawdown_funded: parseFloat(packageForm.daily_drawdown_funded),
-          daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded),
-          overall_drawdown_phase1: parseFloat(packageForm.overall_drawdown_phase1),
-          overall_drawdown_phase2: parseFloat(packageForm.overall_drawdown_phase2 || '0'),
-          overall_drawdown_funded: parseFloat(packageForm.overall_drawdown_funded),
-          overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded),
-          withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
-          daily_drawdown_type_phase1: packageForm.daily_drawdown_type_phase1,
-          daily_drawdown_type_funded: packageForm.daily_drawdown_type_funded,
-          overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
-          overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
-          minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
-          minimum_trading_days: parseInt(packageForm.minimum_trading_days_phase1),
-          payout_split_percent: parseFloat(packageForm.payout_split_percent),
-        };
+        // Update legacy fields on all account_packages of this type
+        const { data: typePkgs } = await supabase
+          .from('account_packages')
+          .select('id, balance')
+          .eq('account_type', editingCategoryType);
 
-        await supabase
-          .from('account_rules')
-          .update(cascadeData)
-          .eq('account_type', editingCategoryType)
-          .eq('is_template', false)
-          .neq('rule_version', 'legacy');
+        if (typePkgs && typePkgs.length > 0) {
+          for (const pkg of typePkgs) {
+            await supabase.from('account_packages').update({
+              trading_days: parseInt(packageForm.minimum_trading_days_phase1),
+              profit_target: (pkg.balance * parseFloat(packageForm.profit_target_phase1)) / 100,
+              daily_loss_limit: (pkg.balance * parseFloat(packageForm.daily_drawdown_funded)) / 100,
+              overall_loss_limit: (pkg.balance * parseFloat(packageForm.overall_drawdown_funded)) / 100,
+            }).eq('id', pkg.id);
+          }
+        }
 
-        setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated & Synced to all sizes!`);
+        setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated!`);
         setShowPackageModal(false);
         setEditingCategoryType(null);
         loadData();
         return;
       }
 
-      // 2. SAVING INDIVIDUAL PACKAGE
+      // 2. SAVING INDIVIDUAL PACKAGE (inherits rules from master template)
       const balance = parseFloat(packageForm.balance);
       const price = parseFloat(packageForm.price);
       if (!balance || !price) throw new Error('Balance and Price are required');
+
+      // Get master template for this account type to populate legacy fields
+      const master = rules.find(r => r.account_type === packageForm.account_type && r.is_template);
 
       const packageData = {
         name: packageForm.name,
@@ -267,60 +257,19 @@ export default function PackagesAndOffers() {
         price,
         account_type: packageForm.account_type,
         is_active: packageForm.is_active,
-        trading_days: parseInt(packageForm.minimum_trading_days_phase1),
-        profit_target: (balance * parseFloat(packageForm.profit_target_phase1)) / 100,
-        daily_loss_limit: (balance * parseFloat(packageForm.daily_drawdown_funded)) / 100,
-        overall_loss_limit: (balance * parseFloat(packageForm.overall_drawdown_funded)) / 100,
+        // Legacy fields calculated from master template
+        trading_days: master?.minimum_trading_days_phase1 ?? 0,
+        profit_target: (balance * (master?.profit_target_phase1 ?? 10)) / 100,
+        daily_loss_limit: (balance * (master?.daily_drawdown_funded ?? 5)) / 100,
+        overall_loss_limit: (balance * (master?.overall_drawdown_funded ?? 12)) / 100,
       };
 
-      let pkgId = editingPackage?.id || '';
       if (editingPackage) {
         const { error } = await supabase.from('account_packages').update(packageData).eq('id', editingPackage.id);
         if (error) throw error;
       } else {
-        const { data: newPkg, error } = await supabase.from('account_packages').insert([packageData]).select().single();
+        const { error } = await supabase.from('account_packages').insert([packageData]).select().single();
         if (error) throw error;
-        pkgId = newPkg.id;
-      }
-
-      // Inherit rules for this package (Robust approach)
-      const ruleData: any = {
-        package_id: pkgId,
-        account_package_name: packageForm.name,
-        account_type: packageForm.account_type,
-        profit_target_phase1: parseFloat(packageForm.profit_target_phase1),
-        profit_target_phase2: parseFloat(packageForm.profit_target_phase2),
-        profit_target_percent: parseFloat(packageForm.profit_target_phase1),
-        withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
-        daily_drawdown_phase1: parseFloat(packageForm.daily_drawdown_phase1),
-        daily_drawdown_phase2: parseFloat(packageForm.daily_drawdown_phase2),
-        daily_drawdown_funded: parseFloat(packageForm.daily_drawdown_funded),
-        daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded),
-        overall_drawdown_phase1: parseFloat(packageForm.overall_drawdown_phase1),
-        overall_drawdown_phase2: parseFloat(packageForm.overall_drawdown_phase2),
-        overall_drawdown_funded: parseFloat(packageForm.overall_drawdown_funded),
-        overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded),
-        daily_drawdown_type_phase1: packageForm.daily_drawdown_type_phase1,
-        daily_drawdown_type_funded: packageForm.daily_drawdown_type_funded,
-        overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
-        overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
-        payout_split_percent: parseFloat(packageForm.payout_split_percent),
-        minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
-        minimum_trading_days: parseInt(packageForm.minimum_trading_days_phase1),
-        rule_version: 'v2'
-      };
-
-      // Check for existing rule by package_id
-      const { data: existingRule } = await supabase
-        .from('account_rules')
-        .select('id')
-        .eq('package_id', pkgId)
-        .maybeSingle();
-
-      if (existingRule) {
-        await supabase.from('account_rules').update(ruleData).eq('id', existingRule.id);
-      } else {
-        await supabase.from('account_rules').insert([ruleData]);
       }
 
       setSuccess('Package saved successfully!');
@@ -514,18 +463,13 @@ export default function PackagesAndOffers() {
                            <button 
                              onClick={() => {
                                setEditingPackage(pkg);
-                               const master = rules.find(r => r.account_type === pkg.account_type && r.is_template);
+                               setEditingCategoryType(null);
                                setPackageForm({
                                  ...packageForm,
                                  name: pkg.name,
                                  balance: pkg.balance.toString(),
                                  price: pkg.price.toString(),
                                  account_type: pkg.account_type,
-                                 profit_target_phase1: (master?.profit_target_phase1 ?? 10).toString(),
-                                 daily_drawdown_funded: (master?.daily_drawdown_funded ?? 5).toString(),
-                                 payout_split_percent: (master?.payout_split_percent ?? 80).toString(),
-                                 minimum_withdrawal_amount: (master?.minimum_withdrawal_amount ?? 20).toString(),
-                                 discount_percent: (master?.discount_percent ?? 0).toString(),
                                } as any);
                                setPackageBuilderStep(1);
                                setShowPackageModal(true);
@@ -813,7 +757,7 @@ export default function PackagesAndOffers() {
                             className="px-12 py-4 bg-primary-500 text-white font-black rounded-2xl uppercase text-[11px] shadow-[0_0_30px_rgba(189,77,214,0.3)] hover:scale-[1.03] active:scale-[0.98] transition-all tracking-[0.2em] relative overflow-hidden group/btn"
                           >
                             <span className="relative z-10">
-                              {editingCategoryType ? `Deploy ${modelLabels[editingCategoryType]} Master Config` : (packageBuilderStep === 1 ? 'Configure Phase Rules' : (editingPackage ? 'Finalize Updates' : 'Initialize Account'))}
+                              {editingCategoryType ? `Deploy ${modelLabels[editingCategoryType]} Master Config` : (editingPackage ? 'Update Account Size' : 'Create Account Size')}
                             </span>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
                           </button>
