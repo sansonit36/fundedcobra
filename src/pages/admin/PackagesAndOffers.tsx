@@ -160,9 +160,9 @@ export default function PackagesAndOffers() {
     setSuccess(null);
 
     try {
-      // 1. UPDATING MASTER CATEGORY RULES
+      // 1. UPDATING MASTER CATEGORY RULES (Robust approach: Fetch then Update/Insert)
       if (editingCategoryType) {
-        const masterRuleData = {
+        const masterRuleData: any = {
           account_type: editingCategoryType,
           account_package_name: `${modelLabels[editingCategoryType]} Master`,
           profit_target_phase1: parseFloat(packageForm.profit_target_phase1),
@@ -171,16 +171,14 @@ export default function PackagesAndOffers() {
           daily_drawdown_phase1: parseFloat(packageForm.daily_drawdown_phase1),
           daily_drawdown_phase2: parseFloat(packageForm.daily_drawdown_phase2 || '0'),
           daily_drawdown_funded: parseFloat(packageForm.daily_drawdown_funded),
-          daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded), // Classic field sync
+          daily_drawdown_percent: parseFloat(packageForm.daily_drawdown_funded),
           overall_drawdown_phase1: parseFloat(packageForm.overall_drawdown_phase1),
           overall_drawdown_phase2: parseFloat(packageForm.overall_drawdown_phase2 || '0'),
           overall_drawdown_funded: parseFloat(packageForm.overall_drawdown_funded),
-          overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded), // Classic field sync
+          overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded),
           daily_drawdown_type_phase1: packageForm.daily_drawdown_type_phase1,
-          daily_drawdown_type_phase2: packageForm.daily_drawdown_type_phase2,
           daily_drawdown_type_funded: packageForm.daily_drawdown_type_funded,
           overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
-          overall_drawdown_type_phase2: packageForm.overall_drawdown_type_phase2,
           overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
           minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
           payout_split_percent: parseFloat(packageForm.payout_split_percent),
@@ -190,9 +188,26 @@ export default function PackagesAndOffers() {
           rule_version: 'v2'
         };
 
-        const { error } = await supabase
+        // Check if template exists first
+        const { data: existingTemplate } = await supabase
           .from('account_rules')
-          .upsert([masterRuleData], { onConflict: 'account_type' });
+          .select('id')
+          .eq('account_type', editingCategoryType)
+          .eq('is_template', true)
+          .maybeSingle();
+
+        if (existingTemplate) {
+          const { error: updateError } = await supabase
+            .from('account_rules')
+            .update(masterRuleData)
+            .eq('id', existingTemplate.id);
+          if (updateError) throw updateError;
+        } else {
+          const { error: insertError } = await supabase
+            .from('account_rules')
+            .insert([masterRuleData]);
+          if (insertError) throw insertError;
+        }
         
         if (error) throw error;
         setSuccess(`${modelLabels[editingCategoryType]} Master Rules Updated!`);
@@ -229,8 +244,8 @@ export default function PackagesAndOffers() {
         pkgId = newPkg.id;
       }
 
-      // Inherit rules for this package
-      const ruleData = {
+      // Inherit rules for this package (Robust approach)
+      const ruleData: any = {
         package_id: pkgId,
         account_package_name: packageForm.name,
         account_type: packageForm.account_type,
@@ -253,7 +268,18 @@ export default function PackagesAndOffers() {
         rule_version: 'v2'
       };
 
-      await supabase.from('account_rules').upsert([ruleData], { onConflict: 'package_id' });
+      // Check for existing rule by package_id
+      const { data: existingRule } = await supabase
+        .from('account_rules')
+        .select('id')
+        .eq('package_id', pkgId)
+        .maybeSingle();
+
+      if (existingRule) {
+        await supabase.from('account_rules').update(ruleData).eq('id', existingRule.id);
+      } else {
+        await supabase.from('account_rules').insert([ruleData]);
+      }
 
       setSuccess('Package saved successfully!');
       setShowPackageModal(false);
