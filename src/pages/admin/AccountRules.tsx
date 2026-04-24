@@ -6,6 +6,7 @@ interface AccountRule {
   id: string;
   account_package_name: string;
   account_type: 'instant' | '1_step' | '2_step';
+  is_template?: boolean;
   withdrawal_target_percent: number;
   profit_target_phase1: number;
   profit_target_phase2: number | null;
@@ -29,6 +30,17 @@ interface AccountRule {
   payout_split_percent: number;
   drawdown_type: string;
   drawdown_basis: string;
+  // Phase-specific drawdown types
+  daily_drawdown_type_phase1?: string;
+  daily_drawdown_type_phase2?: string;
+  daily_drawdown_type_funded?: string;
+  overall_drawdown_type_phase1?: string;
+  overall_drawdown_type_phase2?: string;
+  overall_drawdown_type_funded?: string;
+  // Funded-stage drawdown values
+  daily_drawdown_funded?: number;
+  overall_drawdown_funded?: number;
+  discount_percent?: number;
   rule_description: string;
   rule_version: string;
 }
@@ -92,6 +104,17 @@ export default function AccountRules() {
         payout_split_percent: rule.payout_split_percent,
         drawdown_type: rule.drawdown_type,
         drawdown_basis: rule.drawdown_basis,
+        // Phase-specific drawdown types
+        daily_drawdown_type_phase1: rule.daily_drawdown_type_phase1 || 'static',
+        daily_drawdown_type_phase2: rule.daily_drawdown_type_phase2 || 'static',
+        daily_drawdown_type_funded: rule.daily_drawdown_type_funded || 'static',
+        overall_drawdown_type_phase1: rule.overall_drawdown_type_phase1 || 'static',
+        overall_drawdown_type_phase2: rule.overall_drawdown_type_phase2 || 'static',
+        overall_drawdown_type_funded: rule.overall_drawdown_type_funded || 'static',
+        // Funded drawdown values
+        daily_drawdown_funded: rule.daily_drawdown_funded,
+        overall_drawdown_funded: rule.overall_drawdown_funded,
+        discount_percent: rule.discount_percent ?? 0,
         rule_description: rule.rule_description,
         updated_at: new Date().toISOString()
       };
@@ -189,7 +212,7 @@ export default function AccountRules() {
           </p>
         </div>
 
-        {rules.filter(r => (r as any).is_template === true).map((rule) => (
+        {rules.filter(r => r.is_template === true).map((rule) => (
           <RuleCard
             key={rule.id}
             rule={rule}
@@ -252,7 +275,7 @@ export default function AccountRules() {
           </span>
         </div>
 
-        {rules.filter(r => isSpecialAccount(r.account_package_name) && !isLegacyRule(r) && !(r as any).is_template).map((rule) => (
+        {rules.filter(r => isSpecialAccount(r.account_package_name) && !isLegacyRule(r) && !r.is_template).map((rule) => (
           <RuleCard
             key={rule.id}
             rule={rule}
@@ -272,7 +295,7 @@ export default function AccountRules() {
           <h2 className="text-xl font-bold text-white">Premium Instant Accounts</h2>
         </div>
 
-        {rules.filter(r => !isSpecialAccount(r.account_package_name) && !isLegacyRule(r) && !(r as any).is_template).map((rule) => (
+        {rules.filter(r => !isSpecialAccount(r.account_package_name) && !isLegacyRule(r) && !r.is_template).map((rule) => (
           <RuleCard
             key={rule.id}
             rule={rule}
