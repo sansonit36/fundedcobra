@@ -183,11 +183,15 @@ export default function PackagesAndOffers() {
           overall_drawdown_percent: parseFloat(packageForm.overall_drawdown_funded),
 
           withdrawal_target_percent: parseFloat(packageForm.withdrawal_target_percent),
+          // ALL phase-specific drawdown types
           daily_drawdown_type_phase1: packageForm.daily_drawdown_type_phase1,
+          daily_drawdown_type_phase2: packageForm.daily_drawdown_type_phase2,
           daily_drawdown_type_funded: packageForm.daily_drawdown_type_funded,
           overall_drawdown_type_phase1: packageForm.overall_drawdown_type_phase1,
+          overall_drawdown_type_phase2: packageForm.overall_drawdown_type_phase2,
           overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
           minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
+          minimum_trading_days_phase2: parseInt(packageForm.minimum_trading_days_phase2 || '0'),
           minimum_trading_days: parseInt(packageForm.minimum_trading_days_phase1),
           payout_split_percent: parseFloat(packageForm.payout_split_percent),
           minimum_withdrawal_amount: parseFloat(packageForm.minimum_withdrawal_amount),
@@ -198,6 +202,8 @@ export default function PackagesAndOffers() {
           rule_version: 'v2'
         };
 
+        console.log('[PackagesAndOffers] Saving master rule:', masterRuleData);
+
         // Check if template exists first
         const { data: existingTemplate } = await supabase
           .from('account_rules')
@@ -207,11 +213,16 @@ export default function PackagesAndOffers() {
           .maybeSingle();
 
         if (existingTemplate) {
-          const { error: updateError } = await supabase
+          const { data: updatedRows, error: updateError } = await supabase
             .from('account_rules')
             .update(masterRuleData)
-            .eq('id', existingTemplate.id);
+            .eq('id', existingTemplate.id)
+            .select();
           if (updateError) throw updateError;
+          if (!updatedRows || updatedRows.length === 0) {
+            throw new Error('Update blocked by RLS — check admin permissions');
+          }
+          console.log('[PackagesAndOffers] Update result:', updatedRows);
         } else {
           const { error: insertError } = await supabase
             .from('account_rules')
