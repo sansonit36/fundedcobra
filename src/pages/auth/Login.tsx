@@ -57,11 +57,11 @@ export default function Login() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-gray-500">
               <Shield className="w-4 h-4 text-emerald-500/70" />
-              <span className="text-xs font-medium">SSL Secured</span>
+              <span className="text-xs font-medium">256-bit Encrypted</span>
             </div>
             <div className="flex items-center gap-2 text-gray-500">
               <Users className="w-4 h-4 text-[#bd4dd6]/70" />
-              <span className="text-xs font-medium">2,500+ Traders</span>
+              <span className="text-xs font-medium">47,000+ Traders</span>
             </div>
           </div>
         </div>

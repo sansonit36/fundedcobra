@@ -7,7 +7,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, name: string, referralCode?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string, referralCode?: string, country?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, name: string, referralCode?: string) => {
+  const signUp = async (email: string, password: string, name: string, referralCode?: string, country?: string) => {
     try {
       // First sign up the user
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -61,7 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             name,
             role: 'user',
-            referred_by_code: referralCode
+            referred_by_code: referralCode,
+            country: country
           }
         }
       });
@@ -76,6 +77,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
 
         if (signInError) throw signInError;
+
+        // Save country to profile (trigger doesn't handle this field)
+        if (country) {
+          await supabase.from('profiles').update({ country }).eq('id', signUpData.user.id);
+        }
       }
 
       return { error: null };

@@ -1,10 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, AlertCircle, Shield, Users, ArrowRight, Eye, EyeOff, Zap } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Shield, Users, ArrowRight, Eye, EyeOff, Zap, Globe } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { notifyAffiliateRegistration } from '../../affiliateApi';
 import { sendEmail, logEmailSent } from '../../lib/emailService';
+
+const COUNTRIES = [
+  "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan",
+  "Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia",
+  "Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon",
+  "Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia",
+  "Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominican Republic","DR Congo","Ecuador","Egypt",
+  "El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon",
+  "Gambia","Georgia","Germany","Ghana","Greece","Guatemala","Guinea","Guyana","Haiti","Honduras","Hungary",
+  "Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan",
+  "Kenya","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Lithuania","Luxembourg",
+  "Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova",
+  "Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands",
+  "New Zealand","Nicaragua","Niger","Nigeria","North Macedonia","Norway","Oman","Pakistan","Palestine","Panama",
+  "Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda",
+  "Saudi Arabia","Senegal","Serbia","Sierra Leone","Singapore","Slovakia","Slovenia","Somalia","South Africa",
+  "South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan",
+  "Tajikistan","Tanzania","Thailand","Togo","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Uganda",
+  "Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Venezuela","Vietnam",
+  "Yemen","Zambia","Zimbabwe"
+];
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -13,6 +34,8 @@ export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [country, setCountry] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -23,32 +46,18 @@ export default function Signup() {
     const urlRef = new URL(window.location.href).searchParams.get('ref');
     if (urlRef) {
       refParam.current = urlRef;
-      // Store in localStorage as backup
       localStorage.setItem('affiliate_ref', urlRef);
-      console.log('📎 Referral code detected:', urlRef);
     } else {
-      // Try to get from localStorage if URL doesn't have it
       const storedRef = localStorage.getItem('affiliate_ref');
-      if (storedRef) {
-        refParam.current = storedRef;
-        console.log('📎 Referral code from storage:', storedRef);
-      } else {
-        console.log('ℹ️ No referral code found');
-      }
+      if (storedRef) refParam.current = storedRef;
     }
   }, []);
 
   // Helper: notify legacy PHP affiliate system
   const syncAffiliatePHP = async (uid: string) => {
     try {
-      // Also call external PHP API for compatibility
-      await notifyAffiliateRegistration({
-        userId: uid,
-        name,
-        email
-      });
+      await notifyAffiliateRegistration({ userId: uid, name, email });
     } catch (err) {
-      // Don't block signup UX if affiliate notify fails
       console.warn('Affiliate register notify failed', err);
     }
   };
@@ -56,11 +65,7 @@ export default function Signup() {
   // Helper: send welcome email
   const sendWelcomeEmail = async (uid: string) => {
     try {
-      await sendEmail({
-        to: email,
-        template: 'welcome',
-        data: { name }
-      });
+      await sendEmail({ to: email, template: 'welcome', data: { name } });
       await logEmailSent(uid, 'welcome');
     } catch (err) {
       console.warn('Welcome email failed', err);
@@ -78,38 +83,44 @@ export default function Signup() {
       return;
     }
 
-    // 1) Create the auth user with the referral code embedded in metadata
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (!country) {
+      setError('Please select your country');
+      setLoading(false);
+      return;
+    }
+
     const refCode = refParam.current || localStorage.getItem('affiliate_ref') || undefined;
-    const { error: signErr } = await signUp(email, password, name, refCode);
+    const { error: signErr } = await signUp(email, password, name, refCode, country);
     if (signErr) {
       setError(signErr.message);
       setLoading(false);
       return;
     }
 
-    // 2) Try to get the user immediately (works when auto sign-in is enabled)
     const { data, error: getUserErr } = await supabase.auth.getUser();
     if (getUserErr) console.warn(getUserErr);
 
     const immediateUserId = data?.user?.id;
     if (immediateUserId) {
-      // 3) Notify affiliate system now
       syncAffiliatePHP(immediateUserId);
-      // 4) Send welcome email
       sendWelcomeEmail(immediateUserId);
     } else {
-      // 4) Handle projects that require email confirmation → wait for SIGNED_IN
       const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user?.id) {
           try {
             await syncAffiliatePHP(session.user.id);
             await sendWelcomeEmail(session.user.id);
           } finally {
-            sub.subscription.unsubscribe(); // cleanup listener
+            sub.subscription.unsubscribe();
           }
         }
       });
-      // Note: we still navigate; affiliate notify will run when SIGNED_IN fires
     }
 
     setLoading(false);
@@ -120,6 +131,7 @@ export default function Signup() {
   const passwordStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
   const strengthColors = ['', '#ef4444', '#f59e0b', '#10B981'];
   const strengthLabels = ['', 'Weak', 'Good', 'Strong'];
+  const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
 
   return (
     <div className="min-h-screen bg-[#060606] flex" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -141,11 +153,27 @@ export default function Signup() {
             Create your free account in 30 seconds and get instant access to funding up to $200K. No experience required.
           </p>
           
-          <div className="space-y-4">
+          {/* Big trust numbers */}
+          <div className="grid grid-cols-3 gap-4 mb-10">
+            <div className="text-center">
+              <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>47K+</div>
+              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Active Traders</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>$12M+</div>
+              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Capital Funded</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>98%</div>
+              <div className="text-[10px] text-gray-600 font-semibold uppercase tracking-wider mt-1">Payout Rate</div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
             {[
-              { icon: Zap, text: 'Instant account setup', color: '#bd4dd6' },
-              { icon: Shield, text: 'Your data is encrypted and secure', color: '#10B981' },
-              { icon: Users, text: 'Join 2,500+ active traders', color: '#3B82F6' },
+              { icon: Zap, text: 'Instant account setup — trade in minutes', color: '#bd4dd6' },
+              { icon: Shield, text: 'Bank-grade encryption & data security', color: '#10B981' },
+              { icon: Users, text: 'Trusted by traders in 120+ countries', color: '#3B82F6' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-gray-500">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${item.color}10` }}>
@@ -176,23 +204,49 @@ export default function Signup() {
               </div>
             )}
 
-            <form onSubmit={handleSignup} className="space-y-5">
-              <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-gray-600 focus:outline-none focus:border-[#10B981]/40 focus:ring-1 focus:ring-[#10B981]/20 transition-all text-sm"
-                    placeholder="Your full name"
-                    required
-                    disabled={loading}
-                  />
+            <form onSubmit={handleSignup} className="space-y-4">
+              {/* Name + Country row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-gray-600 focus:outline-none focus:border-[#10B981]/40 focus:ring-1 focus:ring-[#10B981]/20 transition-all text-sm"
+                      placeholder="Your name"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Country</label>
+                  <div className="relative">
+                    <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 z-10" />
+                    <select
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white focus:outline-none focus:border-[#10B981]/40 focus:ring-1 focus:ring-[#10B981]/20 transition-all text-sm appearance-none cursor-pointer"
+                      required
+                      disabled={loading}
+                      style={{ colorScheme: 'dark' }}
+                    >
+                      <option value="" className="bg-[#111] text-gray-500">Select country</option>
+                      {COUNTRIES.map(c => (
+                        <option key={c} value={c} className="bg-[#111] text-white">{c}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <svg className="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                    </div>
+                  </div>
                 </div>
               </div>
 
+              {/* Email */}
               <div>
                 <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Email Address</label>
                 <div className="relative">
@@ -209,35 +263,69 @@ export default function Signup() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-11 pr-12 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-gray-600 focus:outline-none focus:border-[#10B981]/40 focus:ring-1 focus:ring-[#10B981]/20 transition-all text-sm"
-                    placeholder="Min. 6 characters"
-                    required
-                    disabled={loading}
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                {/* Password strength bar */}
-                {password.length > 0 && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="flex-1 flex gap-1">
-                      {[1, 2, 3].map(i => (
-                        <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300" style={{ backgroundColor: i <= passwordStrength ? strengthColors[passwordStrength] : 'rgba(255,255,255,0.05)' }} />
-                      ))}
-                    </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: strengthColors[passwordStrength] }}>{strengthLabels[passwordStrength]}</span>
+              {/* Password + Confirm row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-11 pr-11 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-gray-600 focus:outline-none focus:border-[#10B981]/40 focus:ring-1 focus:ring-[#10B981]/20 transition-all text-sm"
+                      placeholder="Min. 6 chars"
+                      required
+                      disabled={loading}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors">
+                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
                   </div>
-                )}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Confirm Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/[0.03] border text-white placeholder-gray-600 focus:outline-none transition-all text-sm ${
+                        confirmPassword.length > 0
+                          ? passwordsMatch
+                            ? 'border-emerald-500/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20'
+                            : 'border-red-500/30 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/20'
+                          : 'border-white/[0.08] focus:border-[#10B981]/40 focus:ring-1 focus:ring-[#10B981]/20'
+                      }`}
+                      placeholder="Re-enter"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
               </div>
+
+              {/* Password strength + match indicator */}
+              {(password.length > 0 || confirmPassword.length > 0) && (
+                <div className="flex items-center justify-between gap-4">
+                  {password.length > 0 && (
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="flex gap-1 flex-1">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300" style={{ backgroundColor: i <= passwordStrength ? strengthColors[passwordStrength] : 'rgba(255,255,255,0.05)' }} />
+                        ))}
+                      </div>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap" style={{ color: strengthColors[passwordStrength] }}>{strengthLabels[passwordStrength]}</span>
+                    </div>
+                  )}
+                  {confirmPassword.length > 0 && (
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap ${passwordsMatch ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {passwordsMatch ? '✓ Match' : '✗ Mismatch'}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <button
                 type="submit"
@@ -263,7 +351,7 @@ export default function Signup() {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
+            <div className="mt-6 pt-5 border-t border-white/[0.04] text-center">
               <p className="text-gray-500 text-sm">
                 Already have an account?{' '}
                 <Link to="/login" className="text-[#10B981] hover:text-[#34d399] font-semibold transition-colors">
