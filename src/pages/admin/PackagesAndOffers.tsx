@@ -45,6 +45,7 @@ interface AccountRule {
   drawdown_basis: string;
   rule_version: string;
   is_template: boolean;
+  discount_percent: number;
 }
 
 interface PromotionalOffer {
@@ -98,6 +99,7 @@ export default function PackagesAndOffers() {
     minimum_trading_days_phase2: '0',
     minimum_withdrawal_amount: '20',
     payout_split_percent: '80',
+    discount_percent: '0',
     news_trading_allowed: true,
     weekend_holding_allowed: true,
     is_active: true,
@@ -182,6 +184,8 @@ export default function PackagesAndOffers() {
           overall_drawdown_type_funded: packageForm.overall_drawdown_type_funded,
           minimum_trading_days_phase1: parseInt(packageForm.minimum_trading_days_phase1),
           payout_split_percent: parseFloat(packageForm.payout_split_percent),
+          minimum_withdrawal_amount: parseFloat(packageForm.minimum_withdrawal_amount),
+          discount_percent: parseFloat(packageForm.discount_percent),
           news_trading_allowed: packageForm.news_trading_allowed,
           weekend_holding_allowed: packageForm.weekend_holding_allowed,
           is_template: true,
@@ -342,6 +346,8 @@ export default function PackagesAndOffers() {
         overall_drawdown_type_phase1: master.overall_drawdown_type_phase1,
         overall_drawdown_type_funded: master.overall_drawdown_type_funded,
         payout_split_percent: (master.payout_split_percent ?? 80).toString(),
+        minimum_withdrawal_amount: (master.minimum_withdrawal_amount ?? 20).toString(),
+        discount_percent: (master.discount_percent ?? 0).toString(),
       } as any);
     } else {
       resetPackageForm();
@@ -472,6 +478,9 @@ export default function PackagesAndOffers() {
                                  account_type: pkg.account_type,
                                  profit_target_phase1: (master?.profit_target_phase1 ?? 10).toString(),
                                  daily_drawdown_funded: (master?.daily_drawdown_funded ?? 5).toString(),
+                                 payout_split_percent: (master?.payout_split_percent ?? 80).toString(),
+                                 minimum_withdrawal_amount: (master?.minimum_withdrawal_amount ?? 20).toString(),
+                                 discount_percent: (master?.discount_percent ?? 0).toString(),
                                } as any);
                                setPackageBuilderStep(1);
                                setShowPackageModal(true);
@@ -709,10 +718,14 @@ export default function PackagesAndOffers() {
                            </div>
 
                            {/* GLOBAL CATEGORY SPECS (Payout/Split) */}
-                           <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6 p-8 rounded-[24px] bg-white/[0.01] border border-white/5 shadow-inner">
+                           <div className="col-span-full grid grid-cols-1 md:grid-cols-4 gap-6 p-8 rounded-[24px] bg-white/[0.01] border border-white/5 shadow-inner">
                               <div>
                                 <label className="text-[10px] font-black text-gray-500 uppercase mb-3 block tracking-widest px-1">Profit Split (%)</label>
                                 <input type="number" value={packageForm.payout_split_percent} onChange={e => setPackageForm({...packageForm, payout_split_percent: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold" />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-black text-gray-500 uppercase mb-3 block tracking-widest px-1">Global Discount (%)</label>
+                                <input type="number" value={packageForm.discount_percent} onChange={e => setPackageForm({...packageForm, discount_percent: e.target.value})} className="w-full bg-emerald-500/10 border border-emerald-500/20 rounded-2xl px-6 py-4 text-emerald-400 font-bold" />
                               </div>
                               <div>
                                 <label className="text-[10px] font-black text-gray-500 uppercase mb-3 block tracking-widest px-1">Withdrawal Floor ($)</label>
@@ -720,7 +733,7 @@ export default function PackagesAndOffers() {
                               </div>
                               <div>
                                 <label className="text-[10px] font-black text-gray-500 uppercase mb-3 block tracking-widest px-1">Payout Cycle</label>
-                                <select className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold appearance-none outline-none focus:border-primary-500 transition-all">
+                                <select className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold appearance-none outline-none focus:border-primary-500 transition-all text-sm">
                                   <option value="bi_weekly">Bi-Weekly</option>
                                   <option value="weekly">Weekly</option>
                                   <option value="on_demand">On-Demand</option>
