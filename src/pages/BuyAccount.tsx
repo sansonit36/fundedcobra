@@ -81,6 +81,7 @@ export default function BuyAccount() {
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentShown, setExitIntentShown] = useState(false);
   const [tickerIndex, setTickerIndex] = useState(0);
+  const [rulePhaseTab, setRulePhaseTab] = useState<'p1' | 'p2' | 'funded'>('p1');
 
   const getPackageModel = (pkg?: AccountPackage | null): AccountModelType => {
     return normalizeModelType(pkg?.account_type);
@@ -357,79 +358,125 @@ export default function BuyAccount() {
             </div>
           </div>
 
-          {/* 2. Professional Comparison Table (Phase Aware) */}
-          {selectedPackage && (
-            <div className="bg-[#161616] rounded-[3rem] border border-[#2A2A2A] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-8">
-               <div className="grid grid-cols-2 sm:grid-cols-3 p-10 border-b border-white/5 bg-black/40">
-                  <div className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em]">Parameters</div>
-                  <div className="text-[10px] font-black text-white uppercase tracking-[0.3em] text-center">Evaluation</div>
-                  <div className="hidden sm:block text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] text-right">Funded</div>
-               </div>
+          {/* 2. Phase-Tabbed Rule Card (Inspired by FundedSquad) */}
+          {selectedPackage && (() => {
+            const r = selectedPackageRules;
+            const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+            const availableTabs = selectedModel === 'instant' ? ['funded'] as const 
+              : selectedModel === '1_step' ? ['p1', 'funded'] as const 
+              : ['p1', 'p2', 'funded'] as const;
+            const activeTab = availableTabs.includes(rulePhaseTab as any) ? rulePhaseTab : availableTabs[0];
 
-               {[
-                 { 
-                   label: 'Trailing Daily Loss', 
-                   val: selectedModel === 'instant' ? 'N/A' : `${selectedPackageRules?.daily_drawdown_phase1 ?? selectedPackageRules?.daily_drawdown_percent ?? 5}%`, 
-                   funded: `${selectedPackageRules?.daily_drawdown_percent ?? 5}%`, 
-                   alert: true 
-                 },
-                 { 
-                   label: 'Overall Drawdown', 
-                   val: selectedModel === 'instant' ? 'N/A' : `${selectedPackageRules?.overall_drawdown_phase1 ?? selectedPackageRules?.overall_drawdown_percent ?? 12}%`, 
-                   funded: `${selectedPackageRules?.overall_drawdown_percent ?? 12}%`, 
-                   alert: true 
-                 },
-                 { 
-                   label: 'Profit Target', 
-                   val: selectedModel === 'instant' ? 'N/A' : 
-                        selectedModel === '2_step' ? `P1: ${selectedPackageRules?.profit_target_phase1}% / P2: ${selectedPackageRules?.profit_target_phase2}%` :
-                        `${selectedPackageRules?.profit_target_phase1 ?? 10}%`, 
-                   funded: 'N/A' 
-                 },
-                 { 
-                   label: 'Minimum Trading Days', 
-                   val: selectedModel === 'instant' ? 'N/A' : 
-                        selectedModel === '2_step' ? `P1: ${selectedPackageRules?.minimum_trading_days_phase1 ?? 0} / P2: ${selectedPackageRules?.minimum_trading_days_phase2 ?? 0} Days` :
-                        `${selectedPackageRules?.minimum_trading_days_phase1 ?? selectedPackageRules?.minimum_trading_days ?? 0} Days`,
-                   funded: '0 Days' 
-                 },
-                 { 
-                   label: 'Profit Share', 
-                   val: 'N/A', 
-                   funded: `Up to ${selectedPackageRules?.payout_split_percent ?? 80}%`, 
-                   success: true 
-                 },
-                 { 
-                   label: 'Withdrawal Target', 
-                   val: 'N/A', 
-                   funded: `${selectedPackageRules?.withdrawal_target_percent ?? 5}%`, 
-                   success: true 
-                 },
-                 { 
-                   label: 'Leverage', 
-                   val: selectedModel === 'instant' ? 'N/A' : '1:100', 
-                   funded: '1:100' 
-                 }
-               ].map((row, i) => (
-                 <div key={i} className="grid grid-cols-2 sm:grid-cols-3 p-10 border-b border-white/5 hover:bg-white/5 transition-all">
-                    <div className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-3">
-                       <div className={`w-1.5 h-1.5 rounded-full ${row.alert ? 'bg-red-500' : row.success ? 'bg-emerald-500' : 'bg-gray-700'}`}></div>
-                       {row.label}
+            // Phase-specific values
+            const phaseRules = activeTab === 'p1' ? {
+              profitTarget: `${r?.profit_target_phase1 ?? 10}%`,
+              dailyDD: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%`,
+              overallDD: `${r?.overall_drawdown_phase1 ?? r?.overall_drawdown_percent ?? 12}%`,
+              minDays: `${r?.minimum_trading_days_phase1 ?? r?.minimum_trading_days ?? 0} Days`,
+            } : activeTab === 'p2' ? {
+              profitTarget: `${r?.profit_target_phase2 ?? 5}%`,
+              dailyDD: `${r?.daily_drawdown_phase2 ?? r?.daily_drawdown_percent ?? 5}%`,
+              overallDD: `${r?.overall_drawdown_phase2 ?? r?.overall_drawdown_percent ?? 12}%`,
+              minDays: `${r?.minimum_trading_days_phase2 ?? 0} Days`,
+            } : {
+              profitTarget: null,
+              dailyDD: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%`,
+              overallDD: `${r?.overall_drawdown_funded ?? r?.overall_drawdown_percent ?? 12}%`,
+              minDays: 'Unlimited',
+            };
+
+            return (
+              <div className="bg-[#161616] rounded-[2.5rem] border border-[#2A2A2A] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2">
+
+                  {/* LEFT: Phase Rules */}
+                  <div className="p-10 border-b lg:border-b-0 lg:border-r border-white/5">
+                    <h4 className="text-lg font-black text-white tracking-tight mb-1">
+                      ${selectedPackage.balance.toLocaleString()} {MODEL_META[selectedModel].label}
+                    </h4>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-8">Account Includes</p>
+
+                    {/* Phase Tabs */}
+                    <div className="flex gap-2 mb-10">
+                      {availableTabs.map(tab => (
+                        <button
+                          key={tab}
+                          onClick={() => setRulePhaseTab(tab as any)}
+                          className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${
+                            activeTab === tab
+                              ? 'text-white shadow-lg'
+                              : 'border-white/10 text-gray-500 hover:text-white hover:border-white/20'
+                          }`}
+                          style={activeTab === tab ? { backgroundColor: modelColor, borderColor: modelColor } : {}}
+                        >
+                          {tab === 'p1' ? 'Phase 1' : tab === 'p2' ? 'Phase 2' : 'Funded'}
+                        </button>
+                      ))}
                     </div>
-                    <div className="text-sm font-black text-center text-white">
-                      {row.val}
+
+                    {/* Rules List */}
+                    <div className="space-y-0">
+                      {[
+                        ...(phaseRules.profitTarget ? [{ label: 'Profit Target', value: phaseRules.profitTarget }] : []),
+                        { label: 'Daily Loss Limit', value: phaseRules.dailyDD },
+                        { label: 'Max Overall Drawdown', value: phaseRules.overallDD },
+                        { label: 'Minimum Trading Days', value: phaseRules.minDays },
+                        ...(activeTab === 'funded' ? [
+                          { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
+                        ] : []),
+                        { label: 'Refundable Fee', value: '100%' },
+                      ].map((item, i) => (
+                        <div key={i} className="flex justify-between items-center py-5 border-b border-white/5 last:border-0">
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: modelColor, opacity: 0.7 }} />
+                            <span className="text-sm text-gray-300 font-medium">{item.label}</span>
+                          </div>
+                          <span className="text-sm font-black text-white">{item.value}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="hidden sm:block text-sm font-black text-right text-gray-400">
-                      {row.funded}
+
+                    <div className="mt-8 p-5 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
+                      <button onClick={() => setShowRules(true)} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white transition-colors">
+                        For more detailed rules, <span className="underline" style={{ color: modelColor }}>review our FAQs</span>
+                      </button>
                     </div>
-                 </div>
-               ))}
-               
-               <div className="p-10 text-center">
-                  <button onClick={() => setShowRules(true)} className="text-[10px] font-black text-[#bd4dd6] uppercase tracking-[0.4em] hover:underline">Read Full Whitepaper Disclosures</button>
-               </div>
-            </div>
-          )}
+                  </div>
+
+                  {/* RIGHT: General Account Specs */}
+                  <div className="p-10">
+                    <h4 className="text-sm font-black text-white uppercase tracking-widest mb-8">This Evaluation Includes:</h4>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-8">
+                      {[
+                        { label: 'Trading Period', value: 'Unlimited' },
+                        { label: 'Reward Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
+                        { label: 'Leverage', value: '1:100' },
+                        { label: 'Drawdown Type', value: (() => {
+                          const t = activeTab === 'p1' ? r?.daily_drawdown_type_phase1 
+                            : activeTab === 'p2' ? r?.daily_drawdown_type_phase2 
+                            : r?.daily_drawdown_type_funded;
+                          return (t || 'static').charAt(0).toUpperCase() + (t || 'static').slice(1);
+                        })() },
+                        { label: 'EAs Allowed', value: 'Yes' },
+                        { label: 'News Trading', value: r?.news_trading_allowed !== false ? 'Yes' : 'No' },
+                        { label: 'Reward Cycle', value: r?.daily_payout_enabled ? 'Daily' : r?.bi_weekly_payout_enabled ? 'Bi-Weekly' : 'Weekly' },
+                        { label: 'Platform', value: 'MetaTrader 5' },
+                      ].map((spec, i) => (
+                        <div key={i} className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: modelColor }} />
+                            <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{spec.label}</span>
+                          </div>
+                          <p className="text-sm font-black text-white pl-3.5">{spec.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* RIGHT COLUMN (4) */}
