@@ -309,7 +309,11 @@ export default function BuyAccount() {
               return (
                 <button
                   key={type}
-                  onClick={() => { setSelectedModel(model); setSelectedPackage(null); }}
+                  onClick={() => {
+                    setSelectedModel(model);
+                    const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
+                    setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
+                  }}
                   className={`px-5 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider transition-all ${
                     active ? 'text-white shadow-lg' : 'text-gray-500 hover:text-white'
                   }`}
@@ -327,24 +331,26 @@ export default function BuyAccount() {
       {(() => {
         const r = categoryRules[selectedModel];
         const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+        const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : 'Bi-Weekly';
+        const maxDD = r?.overall_drawdown_percent || r?.overall_drawdown_phase1 || 6;
         return (
           <div className="max-w-7xl mx-auto px-4 mb-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
-                <div className="text-lg font-black text-white">Up to {r?.payout_split_percent || 80}%</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase">Profit Split</div>
+              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
+                <div className="text-xl font-black text-white">Up to {r?.payout_split_percent || 80}%</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Profit Split</div>
               </div>
-              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
-                <div className="text-lg font-black" style={{color: modelColor}}>{r?.daily_payout_enabled ? 'Daily' : r?.bi_weekly_payout_enabled ? 'Bi-Weekly' : 'Weekly'}</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase">Payout Cycle</div>
+              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
+                <div className="text-xl font-black" style={{color: modelColor}}>{payoutCycle}</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Payout Cycle</div>
               </div>
-              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
-                <div className="text-lg font-black text-emerald-400">{r?.max_overall_drawdown_percent_phase1 || 6}%</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase">Max Drawdown</div>
+              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
+                <div className="text-xl font-black text-emerald-400">{maxDD}%</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Max Drawdown</div>
               </div>
-              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
-                <div className="text-lg font-black text-yellow-400">1:100</div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase">Leverage</div>
+              <div className="bg-gradient-to-b from-[#1a1a1a] to-[#111] border border-[#2A2A2A] rounded-xl p-4 text-center shadow-lg">
+                <div className="text-xl font-black text-yellow-400">1:100</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase mt-1">Leverage</div>
               </div>
             </div>
           </div>
@@ -375,25 +381,26 @@ export default function BuyAccount() {
                 const isSelected = selectedPackage?.id === pkg.id;
                 const discountedPrice = pkg.price * (1 - categoryDiscount / 100);
                 const savings = pkg.price - discountedPrice;
+                const balanceLabel = pkg.balance >= 10000 ? `$${(pkg.balance / 1000).toFixed(0)}K` : `$${pkg.balance.toLocaleString()}`;
                 return (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg)}
-                    className={`relative p-3 rounded-lg border-2 transition-all duration-200 text-center group ${
+                    className={`relative p-3.5 rounded-xl border-2 transition-all duration-200 text-center group ${
                       isSelected 
-                        ? 'bg-white/5 scale-[1.02]'
-                        : 'border-[#2A2A2A] bg-[#111] hover:border-white/20 hover:bg-white/[0.02]'
+                        ? 'shadow-xl scale-[1.03]'
+                        : 'border-[#2A2A2A] bg-gradient-to-b from-[#161616] to-[#0d0d0d] hover:border-white/25 hover:shadow-lg hover:scale-[1.01]'
                     }`}
-                    style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}08` } : {}}
+                    style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}0a`, boxShadow: `0 0 25px ${modelColor}15` } : {}}
                   >
-                    {isSelected && <div className="absolute -top-1 -right-1"><CheckCircle className="w-4 h-4" style={{ color: modelColor }} /></div>}
-                    <div className="text-lg font-black text-white tracking-tight">${(pkg.balance / 1000).toFixed(0)}K</div>
-                    <div className="flex items-center justify-center gap-1.5 mt-1">
+                    {isSelected && <div className="absolute -top-1.5 -right-1.5 bg-[#0B0B0C] rounded-full p-0.5"><CheckCircle className="w-4 h-4" style={{ color: modelColor }} /></div>}
+                    <div className="text-lg font-black text-white tracking-tight">{balanceLabel}</div>
+                    <div className="flex items-center justify-center gap-1.5 mt-1.5">
                       {categoryDiscount > 0 && <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>}
-                      <span className="text-sm font-black" style={{ color: modelColor }}>${discountedPrice.toFixed(0)}</span>
+                      <span className="text-base font-black" style={{ color: modelColor }}>${discountedPrice.toFixed(0)}</span>
                     </div>
                     {categoryDiscount > 0 && savings > 0 && (
-                      <div className="text-[9px] font-bold text-emerald-400 mt-1">Save ${savings.toFixed(0)}</div>
+                      <div className="text-[9px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 rounded px-1.5 py-0.5 inline-block">Save ${savings.toFixed(0)}</div>
                     )}
                   </button>
                 );
@@ -610,10 +617,10 @@ export default function BuyAccount() {
                         { label: 'EAs Allowed', value: 'Yes' },
                         { label: 'News Trading', value: r?.news_trading_allowed !== false ? 'Yes' : 'No' },
                         { label: 'Reward Cycle', value: (() => {
-                          if (r?.daily_payout_enabled) return 'Daily';
-                          if (r?.bi_weekly_payout_enabled) return 'Bi-Weekly';
-                          if (r?.weekly_payout_enabled) return 'Weekly';
-                          return 'Weekly';
+                          if (r?.daily_payout_enabled === true) return 'Daily';
+                          if (r?.bi_weekly_payout_enabled === true) return 'Bi-Weekly';
+                          if (r?.weekly_payout_enabled === true) return 'Weekly';
+                          return 'Bi-Weekly';
                         })() },
                         { label: 'Platform', value: 'MetaTrader 5' },
                       ].map((spec, i) => (
