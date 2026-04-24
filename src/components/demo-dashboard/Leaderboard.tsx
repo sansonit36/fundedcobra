@@ -75,52 +75,47 @@ export default function Leaderboard() {
             {traders.map((trader, index) => (
               <div
                 key={trader.id}
-                className="flex items-center space-x-4 p-4 border-b border-[#2A2A2A] last:border-0 hover:bg-[#2A2A2A]/30 transition-colors cursor-pointer"
+                className="flex items-center gap-3 p-4 border-b border-[#2A2A2A] last:border-0 hover:bg-[#2A2A2A]/30 transition-colors cursor-pointer"
               >
                 {/* Rank */}
-                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 flex items-center justify-center flex-shrink-0">
                   {getRankIcon(index)}
                 </div>
 
-                {/* Avatar + Name */}
-                <div className="flex items-center space-x-3 flex-1 min-w-0">
-                  <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 rounded overflow-hidden ${
-                    index === 0 ? 'bg-[#bd4dd6] text-white' : 
-                    index === 1 ? 'bg-[#2A2A2A] text-white' :
-                    index === 2 ? 'bg-[#2A2A2A] text-white' : 
-                    'bg-[#2A2A2A] text-[#a0a0a0]'
-                  }`}>
-                    {trader.avatar_url ? (
-                      <img src={trader.avatar_url} alt={trader.display_name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-xs font-bold">
-                        {getInitials(trader.display_name)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex flex-col items-start gap-1">
-                    <p className="text-sm font-bold text-white truncate">{trader.display_name}</p>
-                    {trader.account_type && (
-                      <span className="bg-[#2A2A2A] text-[#a0a0a0] text-[10px] px-2 py-0.5 rounded-sm">
-                        {trader.account_type}
-                      </span>
-                    )}
-                  </div>
+                {/* Avatar */}
+                <div className={`w-8 h-8 flex items-center justify-center flex-shrink-0 rounded overflow-hidden ${
+                  index === 0 ? 'bg-[#bd4dd6] text-white' : 'bg-[#2A2A2A] text-[#a0a0a0]'
+                }`}>
+                  {trader.avatar_url ? (
+                    <img src={trader.avatar_url} alt={trader.display_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-bold">
+                      {getInitials(trader.display_name)}
+                    </span>
+                  )}
                 </div>
 
-                {/* Payout Amount */}
-                <div className="text-right flex-shrink-0 px-4">
-                  <p className="text-sm font-bold text-green-500">
-                    ${trader.total_payout.toLocaleString()}
-                  </p>
-                  <p className="text-[10px] text-[#808080]">Rewarded</p>
+                {/* Name + Payout — stacked on mobile */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-bold text-white truncate">{trader.display_name}</p>
+                    <p className="text-sm font-bold text-green-500 flex-shrink-0 whitespace-nowrap">
+                      ${trader.total_payout.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    {trader.account_type ? (
+                      <span className="bg-[#2A2A2A] text-[#a0a0a0] text-[10px] px-2 py-0.5 rounded-sm">{trader.account_type}</span>
+                    ) : <span />}
+                    <span className="text-[10px] text-[#808080]">Rewarded</span>
+                  </div>
                 </div>
 
                 {/* Profile Link */}
                 {trader.user_id && (
                   <Link
                     to={`/trader/${trader.user_id}`}
-                    className="p-1.5 flex items-center justify-center transition-colors text-[#8B949E] hover:text-[#E6EDF3] flex-shrink-0"
+                    className="p-1 flex items-center justify-center transition-colors text-[#8B949E] hover:text-[#E6EDF3] flex-shrink-0"
                     title="View Public Profile"
                   >
                     <ArrowUpRight className="w-4 h-4" />
