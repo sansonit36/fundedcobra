@@ -333,14 +333,7 @@ export default function BuyAccount() {
                         : 'border-[#2A2A2A] bg-[#111] hover:border-white/20'
                     }`}
                     style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}08` } : {}}
-                  >
-                    {categoryDiscount > 0 && (
-                      <div className="absolute top-0 left-0 px-3 py-1 text-[8px] font-black uppercase tracking-widest rounded-br-xl bg-emerald-500 text-white">
-                        {categoryDiscount}% OFF
-                      </div>
-                    )}
-
-                    <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
+                  >                    <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Balance</div>
                     <div className="text-4xl font-black text-white tracking-tighter mb-6">${pkg.balance.toLocaleString()}</div>
                     <div className="flex justify-between items-center pt-4 border-t border-white/5">
                        <div className="flex flex-col">
@@ -363,6 +356,7 @@ export default function BuyAccount() {
                       <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
                         <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
                         Special {modelLabel} Accounts
+                        <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">10% OFF</span>
                       </h3>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
                         {specialPkgs.map(renderCard)}
@@ -383,6 +377,7 @@ export default function BuyAccount() {
                       <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
                         <span className="w-8 h-[1px]" style={{ backgroundColor: `${modelColor}50` }}></span>
                         Premium {modelLabel} Accounts
+                        <span className="ml-2 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">50% OFF</span>
                       </h3>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
                         {premiumPkgs.map(renderCard)}
