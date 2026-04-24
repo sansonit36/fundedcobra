@@ -110,17 +110,15 @@ export default function Signup() {
         <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
 
         <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 40px' }}>
-          <img src="/auth-team.png" alt="FundedCobra Team" style={{ width: '100%', maxWidth: 480, height: 'auto', objectFit: 'contain', marginBottom: 32, filter: 'drop-shadow(0 20px 60px rgba(189,77,214,0.25))' }} />
-
           <h2 style={{ fontFamily: F.head, fontSize: 34, fontWeight: 700, color: '#fff', marginBottom: 12, lineHeight: 1.15, letterSpacing: '-0.03em' }}>
             Your trading journey{' '}
             <span style={{ background: 'linear-gradient(135deg, #bd4dd6, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>starts here.</span>
           </h2>
-          <p style={{ fontFamily: F.body, fontSize: 15, fontWeight: 500, color: '#666', lineHeight: 1.6, maxWidth: 340, marginBottom: 32 }}>
+          <p style={{ fontFamily: F.body, fontSize: 15, fontWeight: 500, color: '#666', lineHeight: 1.6, maxWidth: 340, marginBottom: 28 }}>
             Get instant access to funded accounts up to $200K. No experience required.
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, width: '100%', maxWidth: 360 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, width: '100%', maxWidth: 360, marginBottom: 32 }}>
             {[{ n: '47K+', l: 'Traders' }, { n: '$12M+', l: 'Funded' }, { n: '120+', l: 'Countries' }].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: F.head, fontSize: 26, fontWeight: 700, color: '#fff', letterSpacing: '-0.03em' }}>{s.n}</div>
@@ -128,6 +126,8 @@ export default function Signup() {
               </div>
             ))}
           </div>
+
+          <img src="/auth-team.png" alt="FundedCobra Team" style={{ width: '100%', maxWidth: 480, height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 20px 60px rgba(189,77,214,0.25))' }} />
         </div>
       </div>
 
