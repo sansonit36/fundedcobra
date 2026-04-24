@@ -513,7 +513,12 @@ export default function BuyAccount() {
                         })() },
                         { label: 'EAs Allowed', value: 'Yes' },
                         { label: 'News Trading', value: r?.news_trading_allowed !== false ? 'Yes' : 'No' },
-                        { label: 'Reward Cycle', value: r?.daily_payout_enabled ? 'Daily' : r?.bi_weekly_payout_enabled ? 'Bi-Weekly' : 'Weekly' },
+                        { label: 'Reward Cycle', value: (() => {
+                          if (r?.daily_payout_enabled) return 'Daily';
+                          if (r?.bi_weekly_payout_enabled) return 'Bi-Weekly';
+                          if (r?.weekly_payout_enabled) return 'Weekly';
+                          return 'Weekly';
+                        })() },
                         { label: 'Platform', value: 'MetaTrader 5' },
                       ].map((spec, i) => (
                         <div key={i} className="space-y-1.5">
