@@ -331,8 +331,8 @@ export default function BuyAccount() {
       {(() => {
         const r = categoryRules[selectedModel];
         const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
-        const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : 'Bi-Weekly';
-        const maxDD = r?.overall_drawdown_percent || r?.overall_drawdown_phase1 || 6;
+        const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : '—';
+        const maxDD = r?.overall_drawdown_percent || r?.overall_drawdown_phase1 || '—';
         return (
           <div className="max-w-7xl mx-auto px-4 mb-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -620,7 +620,7 @@ export default function BuyAccount() {
                           if (r?.daily_payout_enabled === true) return 'Daily';
                           if (r?.bi_weekly_payout_enabled === true) return 'Bi-Weekly';
                           if (r?.weekly_payout_enabled === true) return 'Weekly';
-                          return 'Bi-Weekly';
+                          return '—';
                         })() },
                         { label: 'Platform', value: 'MetaTrader 5' },
                       ].map((spec, i) => (
