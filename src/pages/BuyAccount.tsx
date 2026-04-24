@@ -68,8 +68,8 @@ export default function BuyAccount() {
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'usdt' | 'pkr' | null>(null);
   const [selectedPkrMethod, setSelectedPkrMethod] = useState<PaymentMethod | null>(null);
-  const [selectedPlatform, setSelectedPlatform] = useState('MT5');
-  const [selectedServer, setSelectedServer] = useState('Exness');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
+  const [selectedServer, setSelectedServer] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<AccountModelType>('instant');
   const [rulesByPackageName, setRulesByPackageName] = useState<Record<string, AccountRuleConfig>>({});
   const [categoryRules, setCategoryRules] = useState<Record<string, AccountRuleConfig>>({});
@@ -281,39 +281,88 @@ export default function BuyAccount() {
         </div>
       )}
 
-      {/* 🔴 HEADER */}
-      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10 text-center">
-        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter mb-6 leading-none">GET <span className="text-[#bd4dd6]">FUNDED</span></h1>
-        
-        <div className="inline-flex p-1.5 bg-[#161616] rounded-xl border border-[#2A2A2A]">
-           {['instant', '1_step', '2_step'].map((type) => {
-             const model = type as AccountModelType;
-             const active = selectedModel === model;
-             const color = model === 'instant' ? '#bd4dd6' : model === '1_step' ? '#3B82F6' : '#10B981';
-             return (
-               <button
-                 key={type}
-                 onClick={() => setSelectedModel(model)}
-                 className={`px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
-                   active ? 'text-white shadow-lg' : 'text-gray-500 hover:text-white'
-                 }`}
-                 style={active ? { backgroundColor: color } : {}}
-               >
-                 {MODEL_META[model].label}
-               </button>
-             );
-           })}
+      {/* 🔥 URGENCY BAR */}
+      <div className="bg-gradient-to-r from-red-600/90 via-red-500/90 to-orange-500/90 py-2.5 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 text-white text-xs font-bold">
+          <span className="animate-pulse">🔴 LIVE</span>
+          <span>Only <span className="bg-white/20 px-1.5 py-0.5 rounded font-black">{Math.floor(Math.random() * 8) + 3}</span> spots remaining today</span>
+          <span className="hidden md:inline">•</span>
+          <span className="hidden md:inline">Prices increase at midnight</span>
+          <span>•</span>
+          <span className="bg-white text-red-600 px-2 py-0.5 rounded font-black">UP TO 50% OFF</span>
         </div>
       </div>
 
+      {/* 🔴 HEADER */}
+      <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl lg:text-5xl font-black tracking-tight mb-3 leading-none">Get Funded <span className="text-[#bd4dd6]">Today</span></h1>
+          <p className="text-gray-400 text-sm max-w-lg mx-auto">Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
+        </div>
+        
+        <div className="flex justify-center">
+          <div className="inline-flex p-1 bg-[#161616] rounded-lg border border-[#2A2A2A]">
+            {['instant', '1_step', '2_step'].map((type) => {
+              const model = type as AccountModelType;
+              const active = selectedModel === model;
+              const color = model === 'instant' ? '#bd4dd6' : model === '1_step' ? '#3B82F6' : '#10B981';
+              return (
+                <button
+                  key={type}
+                  onClick={() => { setSelectedModel(model); setSelectedPackage(null); }}
+                  className={`px-5 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider transition-all ${
+                    active ? 'text-white shadow-lg' : 'text-gray-500 hover:text-white'
+                  }`}
+                  style={active ? { backgroundColor: color } : {}}
+                >
+                  {MODEL_META[model].label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 🔥 FEATURE CALLOUTS */}
+      {(() => {
+        const r = categoryRules[selectedModel];
+        const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+        return (
+          <div className="max-w-7xl mx-auto px-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
+                <div className="text-lg font-black text-white">Up to {r?.payout_split_percent || 80}%</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase">Profit Split</div>
+              </div>
+              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
+                <div className="text-lg font-black" style={{color: modelColor}}>{r?.daily_payout_enabled ? 'Daily' : r?.bi_weekly_payout_enabled ? 'Bi-Weekly' : 'Weekly'}</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase">Payout Cycle</div>
+              </div>
+              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
+                <div className="text-lg font-black text-emerald-400">{r?.max_overall_drawdown_percent_phase1 || 6}%</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase">Max Drawdown</div>
+              </div>
+              <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-3 text-center">
+                <div className="text-lg font-black text-yellow-400">1:100</div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase">Leverage</div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* 🔴 MAIN GRID */}
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* LEFT COLUMN (8) */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-6">
           
-          {/* 1. Account Balance Grid — Compact Cards */}
-          <div className="space-y-6">
+          {/* STEP 1: Choose Account Size */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-[#bd4dd6] flex items-center justify-center text-[10px] font-black text-white">1</div>
+              <h3 className="text-sm font-black text-white uppercase tracking-wider">Choose Your Account Size</h3>
+            </div>
             {(() => {
               const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
               const modelLabel = selectedModel === 'instant' ? 'Instant' : selectedModel === '1_step' ? '1-Step' : '2-Step';
@@ -325,28 +374,27 @@ export default function BuyAccount() {
               const renderCard = (pkg: any) => {
                 const isSelected = selectedPackage?.id === pkg.id;
                 const discountedPrice = pkg.price * (1 - categoryDiscount / 100);
+                const savings = pkg.price - discountedPrice;
                 return (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg)}
-                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 text-left group ${
+                    className={`relative p-3 rounded-lg border-2 transition-all duration-200 text-center group ${
                       isSelected 
-                        ? 'bg-white/5 shadow-lg'
-                        : 'border-[#2A2A2A] bg-[#111] hover:border-white/20'
+                        ? 'bg-white/5 scale-[1.02]'
+                        : 'border-[#2A2A2A] bg-[#111] hover:border-white/20 hover:bg-white/[0.02]'
                     }`}
                     style={isSelected ? { borderColor: modelColor, backgroundColor: `${modelColor}08` } : {}}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest group-hover:text-gray-300 transition-colors">Balance</span>
-                      {isSelected && <CheckCircle className="w-4 h-4" style={{ color: modelColor }} />}
-                    </div>
-                    <div className="text-xl font-black text-white tracking-tight mb-3">${pkg.balance.toLocaleString()}</div>
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                      {categoryDiscount > 0 && (
-                        <span className="text-[10px] text-gray-500 line-through">${pkg.price.toFixed(0)}</span>
-                      )}
+                    {isSelected && <div className="absolute -top-1 -right-1"><CheckCircle className="w-4 h-4" style={{ color: modelColor }} /></div>}
+                    <div className="text-lg font-black text-white tracking-tight">${(pkg.balance / 1000).toFixed(0)}K</div>
+                    <div className="flex items-center justify-center gap-1.5 mt-1">
+                      {categoryDiscount > 0 && <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>}
                       <span className="text-sm font-black" style={{ color: modelColor }}>${discountedPrice.toFixed(0)}</span>
                     </div>
+                    {categoryDiscount > 0 && savings > 0 && (
+                      <div className="text-[9px] font-bold text-emerald-400 mt-1">Save ${savings.toFixed(0)}</div>
+                    )}
                   </button>
                 );
               };
@@ -354,42 +402,40 @@ export default function BuyAccount() {
               return (
                 <>
                   {selectedModel === 'instant' ? (
-                    <>
-                      {/* Special Tier */}
+                    <div className="space-y-4">
                       {specialPkgs.length > 0 && (
-                        <div className="space-y-3">
-                          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                            Special {modelLabel} Accounts
-                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black border border-emerald-500/30">10% OFF</span>
-                          </h3>
-                          <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Special Accounts</span>
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10% OFF</span>
+                          </div>
+                          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
                             {specialPkgs.map(renderCard)}
                           </div>
                         </div>
                       )}
-
-                      {/* Premium Tier */}
                       {premiumPkgs.length > 0 && (
-                        <div className="space-y-3">
-                          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                            Premium {modelLabel} Accounts
-                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black border border-emerald-500/30">50% OFF</span>
-                          </h3>
-                          <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Premium Accounts</span>
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">🔥 50% OFF</span>
+                            <span className="text-[9px] text-orange-400 font-bold">Most Popular</span>
+                          </div>
+                          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
                             {premiumPkgs.map(renderCard)}
                           </div>
                         </div>
                       )}
-                    </>
+                    </div>
                   ) : (
-                    <div className="space-y-3">
-                      <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                        {modelLabel} Evaluation Sizes
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{modelLabel} Evaluation</span>
                         {categoryDiscount > 0 && (
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black border border-emerald-500/30">{categoryDiscount}% OFF</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{categoryDiscount}% OFF</span>
                         )}
-                      </h3>
-                      <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+                      </div>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
                         {selectedModelPackages.map(renderCard)}
                       </div>
                     </div>
@@ -399,69 +445,69 @@ export default function BuyAccount() {
             })()}
           </div>
 
-          {/* 2. Platform & Server Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Trading Platform */}
-            <div className="bg-[#161616] rounded-xl border border-[#2A2A2A] p-5">
-              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Trading Platform</h4>
-              <div className="space-y-2">
+          {/* STEP 2: Platform & Server */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white" style={{ backgroundColor: selectedPlatform && selectedServer ? '#10B981' : '#2A2A2A' }}>2</div>
+              <h3 className="text-sm font-black text-white uppercase tracking-wider">Configure Your Setup</h3>
+              {!selectedPlatform && <span className="text-[10px] text-red-400 font-bold animate-pulse">← Required</span>}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Platform */}
+              <div className="bg-[#161616] rounded-lg border border-[#2A2A2A] p-4">
+                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-3">Trading Platform</p>
                 <button
                   onClick={() => setSelectedPlatform('MT5')}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
-                    selectedPlatform === 'MT5' 
-                      ? 'border-[#bd4dd6] bg-[#bd4dd6]/5' 
-                      : 'border-[#2A2A2A] hover:border-white/20'
+                  className={`w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
+                    selectedPlatform === 'MT5' ? 'border-emerald-500 bg-emerald-500/5' : 'border-[#333] hover:border-white/20'
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-[10px] font-black">MT5</span>
+                  <div className="w-9 h-9 rounded bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-[9px] font-black">MT5</span>
                   </div>
                   <div className="text-left flex-1">
-                    <p className="text-sm font-bold text-white">MetaTrader 5</p>
-                    <p className="text-[10px] text-gray-500">Industry standard platform</p>
+                    <p className="text-xs font-bold text-white">MetaTrader 5</p>
+                    <p className="text-[10px] text-gray-500">Industry standard</p>
                   </div>
-                  {selectedPlatform === 'MT5' && <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" />}
+                  {selectedPlatform === 'MT5' ? <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
                 </button>
               </div>
-            </div>
 
-            {/* Server Selection */}
-            <div className="bg-[#161616] rounded-xl border border-[#2A2A2A] p-5">
-              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Server</h4>
-              <div className="space-y-2">
-                <button
-                  onClick={() => setSelectedServer('Exness')}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
-                    selectedServer === 'Exness' 
-                      ? 'border-[#bd4dd6] bg-[#bd4dd6]/5' 
-                      : 'border-[#2A2A2A] hover:border-white/20'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center flex-shrink-0">
-                    <span className="text-black text-[9px] font-black">EXN</span>
+              {/* Server */}
+              <div className="bg-[#161616] rounded-lg border border-[#2A2A2A] p-4">
+                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-3">Broker / Server</p>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setSelectedServer('Exness')}
+                    className={`w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
+                      selectedServer === 'Exness' ? 'border-emerald-500 bg-emerald-500/5' : 'border-[#333] hover:border-white/20'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded bg-gradient-to-br from-yellow-500 to-yellow-700 flex items-center justify-center flex-shrink-0">
+                      <span className="text-black text-[8px] font-black">EXN</span>
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className="text-xs font-bold text-white">Exness</p>
+                      <p className="text-[10px] text-emerald-400 font-bold">● Available</p>
+                    </div>
+                    {selectedServer === 'Exness' ? <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
+                  </button>
+                  <div className="w-full flex items-center gap-3 p-2.5 rounded-lg border border-[#222] opacity-40 cursor-not-allowed">
+                    <div className="w-9 h-9 rounded bg-gradient-to-br from-purple-700 to-purple-900 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-[8px] font-black">FC</span>
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className="text-xs font-bold text-white">FundedCobra</p>
+                      <p className="text-[10px] text-red-400 font-bold">● Server Full</p>
+                    </div>
+                    <Lock className="w-3.5 h-3.5 text-gray-700 flex-shrink-0" />
                   </div>
-                  <div className="text-left flex-1">
-                    <p className="text-sm font-bold text-white">Exness</p>
-                    <p className="text-[10px] text-emerald-400 font-bold">● Available</p>
-                  </div>
-                  {selectedServer === 'Exness' && <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" />}
-                </button>
-
-                <div className="w-full flex items-center gap-3 p-3 rounded-lg border-2 border-[#2A2A2A] opacity-50 cursor-not-allowed">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#bd4dd6] to-purple-900 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-[8px] font-black">FC</span>
-                  </div>
-                  <div className="text-left flex-1">
-                    <p className="text-sm font-bold text-white">FundedCobra</p>
-                    <p className="text-[10px] text-red-400 font-bold">● Server Full</p>
-                  </div>
-                  <Lock className="w-4 h-4 text-gray-600 flex-shrink-0" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 3. Phase-Tabbed Rule Card */}
+          {/* STEP 3: Account Rules (inline, always visible when package selected) */}
           {selectedPackage && (() => {
             const r = selectedPackageRules;
             const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
@@ -593,78 +639,103 @@ export default function BuyAccount() {
         </div>
 
         {/* RIGHT COLUMN (4) - Checkout */}
-        <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-           <div className="bg-[#161616] rounded-2xl border border-[#2A2A2A] shadow-xl overflow-hidden">
-              {/* Header */}
-              <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
-                <h3 className="text-xs font-black text-white uppercase tracking-widest">Order Summary</h3>
+        <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit space-y-4">
+           <div className="bg-[#161616] rounded-xl border border-[#2A2A2A] shadow-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                <h3 className="text-xs font-black text-white uppercase tracking-wider">Your Order</h3>
+                {selectedPackage && <span className="text-[10px] text-emerald-400 font-bold">✓ Ready</span>}
               </div>
               
-              <div className="p-6 space-y-5">
+              <div className="p-5 space-y-4">
                 {selectedPackage ? (
                   <>
-                    {/* Selected Account */}
-                    <div className="bg-black/30 rounded-xl p-5 border border-white/5 text-center">
-                       <div className="text-3xl font-black tracking-tight text-white mb-1">${selectedPackage.balance.toLocaleString()}</div>
-                       <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}>
-                         {MODEL_META[selectedModel].label}
-                       </p>
-                    </div>
-
-                    {/* Config Summary */}
-                    <div className="flex gap-2">
-                      <div className="flex-1 bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
-                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Platform</p>
-                        <p className="text-xs font-black text-white">{selectedPlatform}</p>
-                      </div>
-                      <div className="flex-1 bg-white/[0.03] rounded-lg p-3 text-center border border-white/5">
-                        <p className="text-[9px] text-gray-500 font-bold uppercase mb-1">Server</p>
-                        <p className="text-xs font-black text-white">{selectedServer}</p>
+                    <div className="bg-black/30 rounded-lg p-4 border border-white/5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-2xl font-black text-white">${selectedPackage.balance.toLocaleString()}</div>
+                          <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}>
+                            {MODEL_META[selectedModel].label}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500">{selectedPlatform || '—'}</div>
+                          <div className="text-xs text-gray-500">{selectedServer || '—'}</div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Price Breakdown */}
-                    <div className="space-y-3 pt-2">
-                       <div className="flex justify-between items-center text-xs">
+                    <div className="space-y-2">
+                       <div className="flex justify-between text-xs">
                           <span className="text-gray-400">Account Fee</span>
-                          <span className="text-white font-bold font-mono">${selectedPackage.price.toFixed(0)}</span>
+                          <span className="text-white font-bold">${selectedPackage.price}</span>
                        </div>
                        {categoryRules[selectedModel]?.discount_percent > 0 && (
-                         <div className="flex justify-between items-center text-xs">
-                            <span className="text-emerald-400">Discount ({categoryRules[selectedModel].discount_percent}%)</span>
-                            <span className="text-emerald-400 font-bold font-mono">-${(selectedPackage.price * categoryRules[selectedModel].discount_percent / 100).toFixed(0)}</span>
+                         <div className="flex justify-between text-xs">
+                            <span className="text-emerald-400">Discount</span>
+                            <span className="text-emerald-400 font-bold">-${(selectedPackage.price * categoryRules[selectedModel].discount_percent / 100).toFixed(0)} ({categoryRules[selectedModel].discount_percent}%)</span>
                          </div>
                        )}
                        {appliedCoupon && (
-                         <div className="flex justify-between items-center text-xs p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
-                            <span className="text-emerald-400 font-bold">{appliedCoupon.code}</span>
-                            <span className="text-emerald-400 font-bold font-mono">-{appliedCoupon.discount}%</span>
+                         <div className="flex justify-between text-xs bg-emerald-500/5 p-2 rounded border border-emerald-500/20">
+                            <span className="text-emerald-400">{appliedCoupon.code}</span>
+                            <span className="text-emerald-400 font-bold">-{appliedCoupon.discount}%</span>
                          </div>
                        )}
-
-                       <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                          <span className="text-sm font-bold text-gray-300">Total Due</span>
-                          <span className="text-3xl font-black text-white tracking-tight">${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                       <div className="pt-3 border-t border-white/5 flex justify-between items-center">
+                          <span className="text-sm font-bold text-white">Total</span>
+                          <div className="text-right">
+                            <span className="text-2xl font-black text-white">${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                          </div>
                        </div>
                     </div>
 
-                    {/* CTA */}
+                    {(!selectedPlatform || !selectedServer) && (
+                      <div className="text-[10px] text-yellow-500 font-bold bg-yellow-500/5 p-2.5 rounded-lg border border-yellow-500/20 text-center">
+                        ⚠ Please select platform and server above to continue
+                      </div>
+                    )}
+
                     <button
                       onClick={handlePurchase}
-                      className="w-full py-4 text-white hover:brightness-110 transition-all rounded-xl font-black text-sm uppercase tracking-widest shadow-lg active:scale-[0.98] flex items-center justify-center gap-2"
+                      disabled={!selectedPlatform || !selectedServer}
+                      className={`w-full py-4 text-white font-black text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+                        (!selectedPlatform || !selectedServer) ? 'opacity-40 cursor-not-allowed' : 'hover:brightness-110 shadow-lg'
+                      }`}
                       style={{ backgroundColor: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981' }}
                     >
-                      <Lock className="w-4 h-4" /> Buy Now
+                      <Lock className="w-4 h-4" /> Get Funded Now
                     </button>
-                    <p className="text-center text-[9px] text-gray-600 font-bold">Secure encrypted checkout • Instant provisioning</p>
+                    
+                    {/* Trust signals */}
+                    <div className="flex items-center justify-center gap-3 pt-1">
+                      <div className="flex items-center gap-1 text-[9px] text-gray-500"><Shield className="w-3 h-3" /> SSL Secured</div>
+                      <div className="flex items-center gap-1 text-[9px] text-gray-500"><Zap className="w-3 h-3" /> Instant Setup</div>
+                      <div className="flex items-center gap-1 text-[9px] text-gray-500"><Check className="w-3 h-3" /> Verified</div>
+                    </div>
                   </>
                 ) : (
-                  <div className="py-12 text-center opacity-30">
-                     <Shield className="w-10 h-10 mx-auto mb-3" />
-                     <p className="text-[10px] font-black uppercase tracking-widest">Select an account to continue</p>
+                  <div className="py-10 text-center opacity-30">
+                     <Shield className="w-8 h-8 mx-auto mb-2" />
+                     <p className="text-[10px] font-bold uppercase tracking-wider">Select an account size</p>
                   </div>
                 )}
               </div>
+           </div>
+
+           {/* Social Proof */}
+           <div className="bg-[#161616] rounded-lg border border-[#2A2A2A] p-4">
+             <div className="flex items-center gap-2 mb-3">
+               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+               <span className="text-[10px] font-bold text-gray-400 uppercase">Recent Purchases</span>
+             </div>
+             <div className="space-y-2">
+               {['Ahmed K. funded $25K — 3 min ago', 'Samira R. funded $10K — 8 min ago', 'Trader X funded $50K — 14 min ago'].map((txt, i) => (
+                 <div key={i} className="text-[10px] text-gray-500 flex items-center gap-2">
+                   <CheckCircle className="w-3 h-3 text-emerald-500/50" />
+                   {txt}
+                 </div>
+               ))}
+             </div>
            </div>
         </div>
       </div>
