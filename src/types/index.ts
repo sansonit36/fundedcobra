@@ -30,6 +30,8 @@ export interface AccountPackage {
   name: string;
   balance: number;
   price: number;
+  account_type: 'instant' | '1_step' | '2_step';
+  is_active: boolean;
   tradingDays: number;
   profitTarget: number;
   dailyLossLimit: number;
@@ -45,6 +47,8 @@ export interface Database {
           name: string;
           balance: number;
           price: number;
+          account_type: 'instant' | '1_step' | '2_step';
+          is_active: boolean;
           trading_days: number;
           profit_target: number;
           daily_loss_limit: number;

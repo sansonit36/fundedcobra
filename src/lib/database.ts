@@ -19,10 +19,27 @@ export interface AccountPackage {
   name: string;
   balance: number;
   price: number;
+  account_type: 'instant' | '1_step' | '2_step';
+  is_active: boolean;
   trading_days: number;
   profit_target: number;
   daily_loss_limit: number;
   overall_loss_limit: number;
+}
+
+export interface AccountRuleConfig {
+  id: string;
+  package_id: string | null;
+  account_package_name: string;
+  account_type: 'instant' | '1_step' | '2_step';
+  profit_target_phase1: number;
+  profit_target_phase2: number | null;
+  daily_drawdown_percent: number;
+  overall_drawdown_percent: number;
+  minimum_trading_days: number;
+  news_trading_allowed: boolean;
+  weekend_holding_allowed: boolean;
+  payout_split_percent: number;
 }
 
 export interface AccountRequest {
@@ -31,6 +48,7 @@ export interface AccountRequest {
     name: string;
     balance: number;
     price: number;
+    account_type?: 'instant' | '1_step' | '2_step';
   };
   status: 'pending_payment' | 'payment_submitted';
   amount: number;
@@ -202,14 +220,45 @@ export async function getActiveAccounts(userId: string): Promise<AccountData[]> 
 }
 
 // Account Packages
-export async function getAccountPackages(): Promise<AccountPackage[]> {
-  const { data, error } = await supabase
+export async function getAccountPackages(includeInactive = false): Promise<AccountPackage[]> {
+  let query = supabase
     .from('account_packages')
     .select('*')
     .order('balance', { ascending: true });
 
+  if (!includeInactive) {
+    query = query.eq('is_active', true);
+  }
+
+  const { data, error } = await query;
+
   if (error) throw error;
   return data;
+}
+
+export async function getAccountRulesForPackages(): Promise<AccountRuleConfig[]> {
+  const { data, error } = await supabase
+    .from('account_rules')
+    .select(`
+      id,
+      package_id,
+      account_package_name,
+      account_type,
+      profit_target_phase1,
+      profit_target_phase2,
+      daily_drawdown_percent,
+      overall_drawdown_percent,
+      minimum_trading_days,
+      news_trading_allowed,
+      weekend_holding_allowed,
+      payout_split_percent,
+      rule_version
+    `)
+    .neq('rule_version', 'legacy')
+    .order('account_package_name', { ascending: true });
+
+  if (error) throw error;
+  return (data || []) as AccountRuleConfig[];
 }
 
 // Account Requests
@@ -220,12 +269,15 @@ export async function createAccountPurchase(
   // First, get the package details to calculate the amount
   const { data: packageData, error: packageError } = await supabase
     .from('account_packages')
-    .select('price')
+    .select('price, is_active')
     .eq('id', packageId)
     .single();
   
   if (packageError) throw packageError;
   if (!packageData) throw new Error('Package not found');
+  if (packageData.is_active === false) {
+    throw new Error('This account package is currently unavailable');
+  }
   
   // Calculate discount if coupon provided
   let discount = 0;
@@ -311,7 +363,8 @@ export async function getPendingAccounts(userId: string): Promise<AccountRequest
       package:account_packages (
         name,
         balance,
-        price
+        price,
+        account_type
       )
     `)
     .eq('user_id', userId)
