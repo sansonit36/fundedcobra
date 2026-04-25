@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertOctagon, CheckCircle, ArrowRight } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -34,27 +34,32 @@ export default function ComplianceStatus() {
   if (loading || breachedAccounts.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-md bg-[#1e1e1e] border border-[#2A2A2A] shadow-sm overflow-hidden">
-      <div className="p-8 flex flex-col md:flex-row items-center justify-between">
-        <div className="max-w-2xl text-center md:text-left mb-6 md:mb-0">
-          <h3 className="text-2xl font-bold text-white mb-3">
-            Keep growing in your trading journey with FundedCobra
-          </h3>
-          <p className="text-[#a0a0a0] text-sm leading-relaxed">
-            Your previous {breachedAccounts.length} account{breachedAccounts.length > 1 ? 's are' : ' is'} now behind you. 
-            Keep your momentum going! Unlike other firms, our accounts are 100% instant—no evaluations, no waiting periods.
-            Grab a new allocation and jump straight back into the action.
-          </p>
+    <div className="relative overflow-hidden rounded-2xl border border-red-500/10"
+         style={{ background: 'linear-gradient(135deg, #1f1418 0%, #161B22 100%)' }}>
+      <div className="absolute top-0 right-0 w-48 h-48 bg-red-500/5 rounded-full blur-[80px] pointer-events-none" />
+      
+      <div className="relative z-10 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <AlertTriangle className="w-5 h-5 text-red-400" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white">
+              {breachedAccounts.length} account{breachedAccounts.length > 1 ? 's' : ''} breached
+            </p>
+            <p className="text-xs text-[#8B949E] mt-1 max-w-lg leading-relaxed">
+              Keep your momentum going! Unlike other firms, our Instant accounts require no evaluations — get back to trading in minutes.
+            </p>
+          </div>
         </div>
-        
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <button
-            onClick={() => navigate('/buy-account')} 
-            className="px-6 py-2.5 bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-bold rounded text-sm transition-colors w-full sm:w-auto text-nowrap"
-          >
-            Get Instant Funding
-          </button>
-        </div>
+
+        <button
+          onClick={() => navigate('/buy-account')}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap shadow-md shadow-emerald-500/20"
+        >
+          <Rocket className="w-4 h-4" />
+          Get New Account
+        </button>
       </div>
     </div>
   );

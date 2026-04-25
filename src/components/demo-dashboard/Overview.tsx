@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, Activity, Users, Award } from 'lucide-react';
+import { DollarSign, Activity, Wallet, BarChart3, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 
@@ -31,23 +31,13 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
   const loadStats = async () => {
     try {
       setLoading(true);
-
-      // Get active trading accounts
       const { data: accounts, error: accountsError } = await supabase
         .from('trading_accounts')
-        .select(`
-          id,
-          mt5_login,
-          balance,
-          equity,
-          status,
-          created_at
-        `)
+        .select('id, mt5_login, balance, equity, status, created_at')
         .eq('user_id', user!.id);
 
       if (accountsError) throw accountsError;
 
-      // Get pending account requests
       const { data: pendingRequests, error: requestsError } = await supabase
         .from('account_requests')
         .select('id')
@@ -55,12 +45,10 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
         .in('status', ['pending_payment', 'payment_submitted']);
 
       if (requestsError) throw requestsError;
-
       setAllAccounts(accounts || []);
 
-      // Filter accounts based on groups or specific MT5 Login
-      const filteredAccounts = filterType === 'all' 
-        ? (accounts || []) 
+      const filteredAccounts = filterType === 'all'
+        ? (accounts || [])
         : filterType === 'active' || filterType === 'breached'
           ? (accounts?.filter(acc => acc.status === filterType) || [])
           : (accounts?.filter(acc => acc.mt5_login === filterType) || []);
@@ -76,7 +64,6 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
       const today = new Date();
 
       if (mt5Logins.length > 0) {
-        // Fetch Live Metrics
         const { data: extendedData } = await supabase
           .from('account_data_extended')
           .select('mt5_id, running_balance, running_equity, initial_equity')
@@ -84,15 +71,13 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
 
         const extMap = new Map((extendedData || []).map(d => [d.mt5_id, d]));
 
-        // Calculate live balances
         filteredAccounts.forEach(acc => {
-           const ext = extMap.get(acc.mt5_login);
-           totalBalance += ext ? ext.running_balance : acc.balance;
-           totalEquity += ext ? ext.running_equity : acc.equity;
-           totalInitial += ext ? ext.initial_equity : acc.balance; 
+          const ext = extMap.get(acc.mt5_login);
+          totalBalance += ext ? ext.running_balance : acc.balance;
+          totalEquity += ext ? ext.running_equity : acc.equity;
+          totalInitial += ext ? ext.initial_equity : acc.balance;
         });
 
-        // Fetch Live Trades
         const { data: trades, error: tradesError } = await supabase
           .from('trade_history')
           .select('profit, close_time')
@@ -101,40 +86,27 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
         if (!tradesError && trades) {
           totalTrades = trades.length;
           realizedProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0);
-          const todayTrades = trades.filter(t => {
-            const d = new Date(t.close_time);
-            return d.toDateString() === today.toDateString();
-          });
+          const todayTrades = trades.filter(t => new Date(t.close_time).toDateString() === today.toDateString());
           dailyPL = todayTrades.reduce((sum, t) => sum + t.profit, 0);
         }
       } else {
-        // Fallback for no active MT5 accounts
         totalBalance = filteredAccounts.reduce((sum, acc) => sum + acc.balance, 0);
         totalEquity = filteredAccounts.reduce((sum, acc) => sum + acc.equity, 0);
         totalInitial = totalBalance;
       }
 
       const totalProfits = realizedProfit;
-
-      // The calculations for daily and trade array are handled above.
       const activeAccounts = accounts?.filter(acc => acc.status === 'active') || [];
       const pendingAccounts = requestsError ? 0 : pendingRequests?.length || 0;
-
-      // Calculate monthly change
       const monthlyChange = totalBalance > 0 ? ((totalEquity - totalBalance) / totalBalance) * 100 : 0;
       const dailyChangePercent = totalBalance > 0 ? (dailyPL / totalBalance) * 100 : 0;
 
       setStats({
-        totalBalance,
-        monthlyChange,
-        activeAccounts: activeAccounts.length,
-        pendingAccounts,
-        dailyPL,
-        dailyChangePercent,
-        monthlyPL: totalProfits,
-        monthlyChangePercent: monthlyChange,
-        totalProfits,
-        totalTrades
+        totalBalance, monthlyChange,
+        activeAccounts: activeAccounts.length, pendingAccounts,
+        dailyPL, dailyChangePercent,
+        monthlyPL: totalProfits, monthlyChangePercent: monthlyChange,
+        totalProfits, totalTrades
       });
     } catch (err) {
       console.error('Error loading stats:', err);
@@ -146,16 +118,10 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-[#161B22] border border-[#30363D] rounded-sm p-6">
-              <div className="animate-pulse">
-                <div className="w-8 h-8 rounded bg-[#30363D]/50 mb-6"></div>
-                <div className="h-3 bg-[#30363D]/50 w-24 mb-3"></div>
-                <div className="h-8 bg-[#30363D]/50 w-32"></div>
-              </div>
-            </div>
+            <div key={i} className="h-[140px] bg-[#161B22]/80 rounded-2xl border border-white/[0.06] animate-pulse" />
           ))}
         </div>
       </div>
@@ -164,108 +130,126 @@ export default function Overview({ filterType = 'all', setFilterType }: { filter
 
   if (error) {
     return (
-      <div className="card-gradient rounded-2xl p-6 border border-white/5">
-        <div className="text-red-400">{error}</div>
+      <div className="rounded-2xl bg-red-500/[0.06] border border-red-500/15 p-6">
+        <p className="text-red-400 text-sm">{error}</p>
       </div>
     );
   }
 
   if (!stats) return null;
 
+  const avgProfit = stats.totalTrades > 0 ? stats.totalProfits / stats.totalTrades : 0;
+
+  const cards = [
+    {
+      label: 'Total Balance',
+      value: `$${stats.totalBalance.toLocaleString(undefined, { minimumFractionDigits: 0 })}`,
+      sub: `${stats.monthlyChange >= 0 ? '+' : ''}${stats.monthlyChange.toFixed(1)}% equity change`,
+      subColor: stats.monthlyChange >= 0 ? 'text-emerald-400' : 'text-red-400',
+      icon: DollarSign,
+      iconBg: 'bg-emerald-500/10 border-emerald-500/20',
+      iconColor: 'text-emerald-400',
+      glowColor: 'emerald'
+    },
+    {
+      label: 'Active Accounts',
+      value: String(stats.activeAccounts),
+      sub: stats.pendingAccounts > 0 ? `${stats.pendingAccounts} pending approval` : 'All accounts healthy',
+      subColor: stats.pendingAccounts > 0 ? 'text-yellow-400' : 'text-[#484f58]',
+      icon: Wallet,
+      iconBg: 'bg-[#8A2BE2]/10 border-[#8A2BE2]/20',
+      iconColor: 'text-[#8A2BE2]',
+      glowColor: 'purple'
+    },
+    {
+      label: 'Total Executions',
+      value: stats.totalTrades.toLocaleString(),
+      sub: `$${stats.totalProfits.toLocaleString(undefined, { minimumFractionDigits: 2 })} realized`,
+      subColor: stats.totalProfits >= 0 ? 'text-emerald-400' : 'text-red-400',
+      icon: Activity,
+      iconBg: 'bg-sky-500/10 border-sky-500/20',
+      iconColor: 'text-sky-400',
+      glowColor: 'sky'
+    },
+    {
+      label: 'Avg Profit/Trade',
+      value: `$${avgProfit.toFixed(2)}`,
+      sub: 'Per closed position',
+      subColor: 'text-[#484f58]',
+      icon: BarChart3,
+      iconBg: 'bg-amber-500/10 border-amber-500/20',
+      iconColor: 'text-amber-400',
+      glowColor: 'amber'
+    }
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Filters Dropdown and Tabs */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#161B22] border border-[#30363D] p-5 rounded-sm gap-4">
-        <div>
-          <h3 className="text-[#E6EDF3] text-sm font-bold uppercase tracking-widest">Dashboard Metrics</h3>
-          <p className="text-[#8B949E] text-xs mt-1">Select an account context to refilter data context.</p>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          {/* Quick Filter Tabs */}
-          <div className="flex bg-[#0E1117] border border-[#30363D] p-1 rounded-sm w-full sm:w-auto">
+    <div className="space-y-5">
+      {/* Filter Bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 rounded-2xl bg-[#161B22]/80 border border-white/[0.06] p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex bg-[#0D1117] rounded-xl border border-white/[0.06] p-1">
             {(['all', 'active', 'breached'] as const).map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType && setFilterType(type)}
-                className={`px-4 py-1.5 ${['all', 'active', 'breached'].includes(filterType) && filterType === type ? 'bg-[#30363D] text-[#E6EDF3]' : 'text-[#8B949E] hover:text-[#E6EDF3]'} rounded-sm text-xs font-bold uppercase tracking-wider transition-colors flex-1 sm:flex-none text-center`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all duration-200 ${
+                  ['all', 'active', 'breached'].includes(filterType) && filterType === type
+                    ? 'bg-white/[0.08] text-white shadow-sm'
+                    : 'text-[#484f58] hover:text-[#8B949E]'
+                }`}
               >
                 {type}
               </button>
             ))}
           </div>
-
-          {/* Specific Account Dropdown */}
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType && setFilterType(e.target.value)}
-            className="bg-[#0E1117] border border-[#30363D] text-[#E6EDF3] text-xs font-mono uppercase rounded-sm focus:ring-[#1D9BF0] focus:border-[#1D9BF0] block w-full sm:w-64 p-2.5 outline-none transition-colors hover:border-[#8B949E]"
-          >
-            <option value="all" disabled={['all', 'active', 'breached'].includes(filterType)}>-- Select Specific Account --</option>
-            {allAccounts.some(a => a.status === 'active') && (
-              <optgroup label="Specific Active Accounts">
-                {allAccounts.filter(a => a.status === 'active').map(a => (
-                  <option key={a.id} value={a.mt5_login}>Account #{a.mt5_login}</option>
-                ))}
-              </optgroup>
-            )}
-            {allAccounts.some(a => a.status === 'breached') && (
-              <optgroup label="Specific Breached Accounts">
-                {allAccounts.filter(a => a.status === 'breached').map(a => (
-                  <option key={a.id} value={a.mt5_login}>Account #{a.mt5_login} (Breached)</option>
-                ))}
-              </optgroup>
-            )}
-          </select>
         </div>
+
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType && setFilterType(e.target.value)}
+          className="bg-[#0D1117] border border-white/[0.06] text-[#E6EDF3] text-xs font-mono rounded-xl focus:ring-[#8A2BE2]/50 focus:border-[#8A2BE2]/50 w-full sm:w-60 px-4 py-2.5 outline-none transition-colors hover:border-white/[0.12] appearance-none"
+        >
+          <option value="all" disabled={['all', 'active', 'breached'].includes(filterType)}>-- Select Account --</option>
+          {allAccounts.some(a => a.status === 'active') && (
+            <optgroup label="Active Accounts">
+              {allAccounts.filter(a => a.status === 'active').map(a => (
+                <option key={a.id} value={a.mt5_login}>Account #{a.mt5_login}</option>
+              ))}
+            </optgroup>
+          )}
+          {allAccounts.some(a => a.status === 'breached') && (
+            <optgroup label="Breached Accounts">
+              {allAccounts.filter(a => a.status === 'breached').map(a => (
+                <option key={a.id} value={a.mt5_login}>Account #{a.mt5_login} (Breached)</option>
+              ))}
+            </optgroup>
+          )}
+        </select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Balance */}
-        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
-          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Total Balance</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-white">${stats.totalBalance.toLocaleString()}</h3>
-          </div>
-          <div className="mt-4 flex items-center text-xs font-bold text-[#bd4dd6]">
-            <span>+{stats.monthlyChange.toFixed(1)}% Active Change</span>
-          </div>
-        </div>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {cards.map((card, i) => (
+          <div
+            key={i}
+            className="group relative overflow-hidden rounded-2xl bg-[#161B22]/80 border border-white/[0.06] p-6 hover:border-white/[0.12] transition-all duration-300 hover:-translate-y-0.5"
+          >
+            {/* Subtle top glow */}
+            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-32 h-12 bg-${card.glowColor}-500/[0.06] rounded-full blur-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
-        {/* Active Accounts */}
-        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
-          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Active Accounts</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-white">{stats.activeAccounts}</h3>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-semibold text-[#484f58] uppercase tracking-wider">{card.label}</p>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${card.iconBg}`}>
+                  <card.icon className={`w-4.5 h-4.5 ${card.iconColor}`} />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-white tracking-tight mb-2">{card.value}</h3>
+              <p className={`text-xs font-medium ${card.subColor}`}>{card.sub}</p>
+            </div>
           </div>
-          <div className="mt-4 flex items-center text-xs font-bold text-[#a0a0a0]">
-            <span>{stats.pendingAccounts} Pending Approval</span>
-          </div>
-        </div>
-
-        {/* Total Trades */}
-        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
-          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Total Executions</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-white">{stats.totalTrades}</h3>
-          </div>
-          <div className="mt-4 flex items-center text-xs font-bold text-[#bd4dd6]">
-            <span className="text-white mr-1">${stats.totalProfits.toLocaleString()}</span> Realized
-          </div>
-        </div>
-
-        {/* Average Trade Size */}
-        <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md p-6">
-          <p className="text-xs font-bold text-[#808080] uppercase mb-4">Avg Profit Context</p>
-          <div className="flex items-baseline space-x-1">
-            <h3 className="text-3xl font-bold text-white">
-              ${stats.totalTrades > 0 ? (stats.totalProfits / stats.totalTrades).toFixed(2) : '0.00'}
-            </h3>
-          </div>
-          <div className="mt-4 flex items-center text-xs font-bold text-[#bd4dd6]">
-            <span>Per Closed Action</span>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

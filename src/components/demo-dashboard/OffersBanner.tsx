@@ -11,7 +11,7 @@ interface PackageInfo {
   account_type: string;
 }
 
-export default function OffersBanner() {
+export default function OffersBanner({ compact = false }: { compact?: boolean }) {
   const navigate = useNavigate();
   const [premiumPackages, setPremiumPackages] = useState<PackageInfo[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -23,7 +23,6 @@ export default function OffersBanner() {
 
   const loadPremiumPackages = async () => {
     try {
-      // Only load Premium Instant packages (balance >= 10000)
       const { data, error } = await supabase
         .from('account_packages')
         .select('id, name, balance, price, account_type')
@@ -46,84 +45,61 @@ export default function OffersBanner() {
 
   if (loading || premiumPackages.length === 0) return null;
 
-  return (
-    <div className="mb-6 space-y-6">
-      {/* Hero Section */}
-      <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md overflow-hidden shadow-sm">
-        <div className="bg-gradient-to-br from-[#12161f] to-[#1e1e1e] border-b border-[#2A2A2A] relative flex flex-col md:flex-row items-center justify-between text-left overflow-hidden">
-          <div className="p-8 lg:p-12 relative z-10 flex-1">
-            <div className="inline-flex items-center bg-[#bd4dd6] text-white text-xs font-bold px-3 py-1 rounded-sm mb-6">
-              <Zap className="w-3 h-3 mr-1.5" />
-              Premium Instant Funding — 50% OFF
-            </div>
-            
-            <h2 className="text-2xl md:text-4xl font-bold text-white mb-3">
-              Scale Your Capital Instantly.
-            </h2>
-            <p className="text-[#a0a0a0] mb-8 max-w-lg">
-              No evaluation phases. No subjective rules. Get up to $200,000 in firm capital with instant provisioning. 
-              All Premium Instant accounts are <span className="text-[#bd4dd6] font-bold">50% OFF</span> right now.
-            </p>
+  // ============================================================
+  // COMPACT MODE — slim banner for active trader dashboard
+  // ============================================================
+  if (compact) {
+    return (
+      <div
+        className="relative overflow-hidden rounded-2xl border border-white/[0.06] cursor-pointer group"
+        style={{ background: 'linear-gradient(135deg, #1a1025 0%, #161B22 60%, #161B22 100%)' }}
+        onClick={() => navigate('/buy-account')}
+      >
+        <div className="absolute top-0 right-0 w-60 h-60 bg-[#8A2BE2]/8 rounded-full blur-[80px] pointer-events-none" />
 
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/buy-account')}
-                className="px-8 py-3 bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-bold rounded text-sm transition-colors"
-              >
-                Get Funded Now
-              </button>
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between p-5 sm:p-6 gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-[#8A2BE2]/15 border border-[#8A2BE2]/20 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-5 h-5 text-[#8A2BE2]" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">Premium Instant Funding — 50% OFF</p>
+              <p className="text-xs text-[#8B949E] mt-0.5">Get up to $200K in firm capital. No evaluations, no waiting.</p>
             </div>
           </div>
-
-          <div className="w-full md:w-[400px] h-64 md:h-full relative z-0 flex items-end justify-center md:justify-end pr-0 md:pr-12 pt-8 md:pt-0">
-             <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e] md:from-transparent to-transparent z-10 pointer-events-none"></div>
-             <img src="/guy-holding-phone.png" alt="Trader" className="w-[80%] max-w-[300px] h-auto relative z-0 object-contain object-bottom drop-shadow-2xl translate-y-[20%]" />
-          </div>
-        </div>
-
-        {/* Feature Strip */}
-        <div className="bg-black/20 p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-2 text-xs font-bold text-white px-3 py-2 border border-[#2A2A2A] rounded bg-[#1e1e1e]">
-              <Shield className="w-4 h-4 text-[#bd4dd6]" />
-              RISK MANAGEMENT
-            </div>
-            <div className="flex items-center justify-center gap-2 text-xs font-bold text-white px-3 py-2 border border-[#2A2A2A] rounded bg-[#1e1e1e]">
-              <TrendingUp className="w-4 h-4 text-[#bd4dd6]" />
-              UP TO 80% SPLIT
-            </div>
-            <div className="flex items-center justify-center gap-2 text-xs font-bold text-white px-3 py-2 border border-[#2A2A2A] rounded bg-[#1e1e1e]">
-              <Zap className="w-4 h-4 text-[#bd4dd6]" />
-              MT5 PLATFORM
-            </div>
-            <div className="flex items-center justify-center gap-2 text-xs font-bold text-white px-3 py-2 border border-[#2A2A2A] rounded bg-[#1e1e1e]">
-              <Clock className="w-4 h-4 text-[#bd4dd6]" />
-              NO TIME LIMITS
-            </div>
-          </div>
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#8A2BE2] hover:bg-[#7c22d1] text-white text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap shadow-md shadow-[#8A2BE2]/20 group-hover:shadow-[#8A2BE2]/30">
+            Get Funded <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
-      
+    );
+  }
+
+  // ============================================================
+  // FULL MODE — for new signups (kept from original, restyled)
+  // ============================================================
+  return (
+    <div className="space-y-6">
       {/* Premium Accounts Selector */}
-      <h3 className="text-sm font-bold text-white uppercase tracking-widest px-1 drop-shadow-[0_0_8px_rgba(189,77,214,0.5)] flex items-center gap-3">
+      <h3 className="text-sm font-semibold text-[#8B949E] uppercase tracking-wider px-1 flex items-center gap-3">
         Premium Instant Accounts
-        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[9px] font-black tracking-widest border border-emerald-500/30">50% OFF</span>
+        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px] font-bold tracking-wider border border-emerald-500/20">50% OFF</span>
       </h3>
 
-      <div className="bg-[#1e1e1e] border border-[#2A2A2A] rounded-md overflow-hidden flex flex-col">
-        <div className="p-5 md:p-6">
+      <div className="rounded-2xl bg-[#161B22]/80 border border-white/[0.06] overflow-hidden">
+        <div className="p-6">
           {/* Size Selector */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-            <span className="text-sm text-gray-400 font-medium w-full sm:w-auto">Select Account Size:</span>
+            <span className="text-sm text-[#8B949E] font-medium">Select size:</span>
             <div className="flex flex-wrap items-center gap-2">
               {premiumPackages.map((pkg, index) => (
                 <button
                   key={pkg.id}
                   onClick={() => setSelectedIndex(index)}
-                  className={`px-4 py-2 rounded text-sm font-bold transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                     selectedIndex === index
-                      ? 'bg-[#bd4dd6] text-white border border-[#bd4dd6] shadow-[0_0_15px_rgba(189,77,214,0.3)]'
-                      : 'bg-transparent text-gray-400 border border-[#404040] hover:border-[#bd4dd6] hover:text-white'
+                      ? 'bg-[#8A2BE2] text-white border border-[#8A2BE2] shadow-md shadow-[#8A2BE2]/25'
+                      : 'bg-transparent text-[#8B949E] border border-white/[0.08] hover:border-[#8A2BE2]/50 hover:text-white'
                   }`}
                 >
                   ${(pkg.balance / 1000).toFixed(0)}K
@@ -132,55 +108,44 @@ export default function OffersBanner() {
             </div>
           </div>
 
-          {/* Price & Action Row */}
+          {/* Price & Action */}
           {selectedPkg && (
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#161616] p-5 md:p-6 rounded border border-[#2A2A2A] shadow-inner relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#bd4dd6]"></div>
-              <div>
-                <h3 className="text-xl font-bold text-white mb-2">
+            <div className="relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0D1117]/60 p-6 rounded-xl border border-white/[0.06]">
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#8A2BE2] to-emerald-500" />
+              <div className="pl-4">
+                <h3 className="text-lg font-bold text-white mb-2">
                   ${(selectedPkg.balance / 1000).toFixed(0)}K Instant Allocation
                 </h3>
                 <div className="flex items-center gap-3">
-                   <span className="text-sm text-gray-500 line-through font-mono font-bold mt-1">
-                     ${selectedPkg.price}
-                   </span>
-                   <span className="text-3xl font-black text-[#bd4dd6] font-mono leading-none tracking-tight">
-                     ${discountedPrice}
-                   </span>
-                   <span className="text-[10px] uppercase bg-[#bd4dd6]/10 text-[#bd4dd6] px-2 py-1 rounded font-bold border border-[#bd4dd6]/20 mt-1">
-                     Save 50%
-                   </span>
+                  <span className="text-sm text-[#484f58] line-through font-mono font-bold">${selectedPkg.price}</span>
+                  <span className="text-3xl font-bold text-[#8A2BE2] font-mono tracking-tight">${discountedPrice}</span>
+                  <span className="text-[10px] uppercase bg-[#8A2BE2]/10 text-[#8A2BE2] px-2 py-1 rounded-lg font-semibold border border-[#8A2BE2]/20">
+                    Save 50%
+                  </span>
                 </div>
               </div>
-              <div className="flex-shrink-0 w-full md:w-auto mt-2 md:mt-0">
-                <button 
-                  onClick={() => navigate('/buy-account')}
-                  className="w-full md:w-auto px-8 py-3.5 bg-[#bd4dd6] hover:bg-[#a63aba] text-white font-bold rounded text-sm transition-colors shadow-sm flex items-center justify-center gap-2"
-                >
-                  Claim ${(selectedPkg.balance / 1000).toFixed(0)}K Allocation <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => navigate('/buy-account')}
+                className="w-full md:w-auto px-8 py-3.5 bg-[#8A2BE2] hover:bg-[#7c22d1] text-white font-semibold rounded-xl text-sm transition-all duration-200 shadow-lg shadow-[#8A2BE2]/25 hover:shadow-[#8A2BE2]/40 flex items-center justify-center gap-2"
+              >
+                Claim ${(selectedPkg.balance / 1000).toFixed(0)}K <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           )}
 
-          {/* Features Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-3 gap-x-4 mt-6 pt-5 border-t border-[#2A2A2A]">
-            <div className="flex items-start md:items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-              <Check className="w-4 h-4 text-[#bd4dd6] mt-0.5 md:mt-0 flex-shrink-0" />
-              <span className="text-[11px] md:text-xs text-[#a0a0a0] font-medium leading-tight">Direct Allocation</span>
-            </div>
-            <div className="flex items-start md:items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-              <Check className="w-4 h-4 text-[#bd4dd6] mt-0.5 md:mt-0 flex-shrink-0" />
-              <span className="text-[11px] md:text-xs text-[#a0a0a0] font-medium leading-tight">No Evaluation Phases</span>
-            </div>
-            <div className="flex items-start md:items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-              <Check className="w-4 h-4 text-[#bd4dd6] mt-0.5 md:mt-0 flex-shrink-0" />
-              <span className="text-[11px] md:text-xs text-[#a0a0a0] font-medium leading-tight">Keep up to 80% Profits</span>
-            </div>
-            <div className="flex items-start md:items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-              <Check className="w-4 h-4 text-[#bd4dd6] mt-0.5 md:mt-0 flex-shrink-0" />
-              <span className="text-[11px] md:text-xs text-[#a0a0a0] font-medium leading-tight">Bi-Weekly Payouts</span>
-            </div>
+          {/* Features */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/[0.04]">
+            {[
+              'Direct Allocation',
+              'No Evaluation Phases',
+              'Keep up to 80% Profits',
+              'Bi-Weekly Payouts'
+            ].map((feat) => (
+              <div key={feat} className="flex items-center gap-2">
+                <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                <span className="text-xs text-[#8B949E] font-medium">{feat}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
