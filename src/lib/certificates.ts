@@ -159,6 +159,27 @@ export async function getRecommendedTraders(): Promise<TraderProfile[]> {
     console.error('Error fetching recommended traders:', error);
     return [];
   }
+
+  // Enrich with avatar_url from profiles table
+  if (data && data.length > 0) {
+    const userIds = data.map(p => p.id);
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, avatar_url, full_name, name')
+      .in('id', userIds);
+
+    const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+    return data.map(tp => {
+      const p = profileMap.get(tp.id);
+      return {
+        ...tp,
+        avatar_url: tp.avatar_url || p?.avatar_url || null,
+        full_name: tp.display_name || p?.full_name || p?.name || null,
+      };
+    });
+  }
+
   return data || [];
 }
 
