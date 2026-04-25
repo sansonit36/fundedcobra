@@ -284,29 +284,102 @@ export default function BuyAccount() {
         {/* LEFT COLUMN */}
         <div className="lg:col-span-8 space-y-6">
 
-          {/* ACCOUNT TYPE + INLINE RULES */}
+          {/* ACCOUNT TYPE + PHASE RULES */}
           {(() => {
             const r = categoryRules[selectedModel];
             const modelColor = selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
-            const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : '—';
             const fmtType = (t: string | undefined | null) => { const v = t || 'static'; return v.charAt(0).toUpperCase() + v.slice(1); };
-            const dailyDDType = fmtType(r?.daily_drawdown_type_phase1 || r?.daily_drawdown_type_funded);
-            const overallDDType = fmtType(r?.overall_drawdown_type_phase1 || r?.overall_drawdown_type_funded);
 
-            const ruleItems = [
-              ...(selectedModel !== 'instant' ? [{ label: 'Profit Target', value: `${r?.profit_target_phase1 ?? 10}%` }] : []),
-              { label: `Daily Loss (${dailyDDType})`, value: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%` },
-              { label: `Max Drawdown (${overallDDType})`, value: `${r?.overall_drawdown_phase1 ?? r?.overall_drawdown_percent ?? 12}%` },
-              { label: 'Min Trading Days', value: `${r?.minimum_trading_days_phase1 ?? r?.minimum_trading_days ?? 0} days` },
-              { label: 'Trading Period', value: 'Unlimited' },
-              { label: 'Payout Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
-              { label: 'Payout Cycle', value: payoutCycle },
-              { label: 'Leverage', value: '1:100' },
-              { label: 'Refundable Fee', value: '100%' },
-            ];
+            // Build phase columns based on model type
+            const phases: { label: string; color: string; rules: { label: string; value: string }[] }[] = [];
+
+            if (selectedModel === 'instant') {
+              phases.push({
+                label: 'Funded Account',
+                color: modelColor,
+                rules: [
+                  { label: 'Profit Target', value: 'No Target' },
+                  { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%` },
+                  { label: 'Max Drawdown', value: `${r?.overall_drawdown_funded ?? r?.overall_drawdown_percent ?? 12}%` },
+                  { label: 'Drawdown Type', value: fmtType(r?.daily_drawdown_type_funded) },
+                  { label: 'Min Trading Days', value: `${r?.minimum_trading_days ?? 0} Days` },
+                  { label: 'Trading Period', value: 'Unlimited' },
+                  { label: 'Profit Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
+                  { label: 'Leverage', value: '1:100' },
+                ],
+              });
+            } else if (selectedModel === '1_step') {
+              phases.push(
+                {
+                  label: 'Phase 1 — Evaluation',
+                  color: '#3B82F6',
+                  rules: [
+                    { label: 'Profit Target', value: `${r?.profit_target_phase1 ?? 10}%` },
+                    { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%` },
+                    { label: 'Max Drawdown', value: `${r?.overall_drawdown_phase1 ?? r?.overall_drawdown_percent ?? 12}%` },
+                    { label: 'Drawdown Type', value: fmtType(r?.daily_drawdown_type_phase1) },
+                    { label: 'Min Trading Days', value: `${r?.minimum_trading_days_phase1 ?? 0} Days` },
+                    { label: 'Trading Period', value: 'Unlimited' },
+                    { label: 'Leverage', value: '1:100' },
+                  ],
+                },
+                {
+                  label: 'Funded Account',
+                  color: '#10B981',
+                  rules: [
+                    { label: 'Profit Target', value: 'No Target' },
+                    { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%` },
+                    { label: 'Max Drawdown', value: `${r?.overall_drawdown_funded ?? r?.overall_drawdown_percent ?? 12}%` },
+                    { label: 'Drawdown Type', value: fmtType(r?.daily_drawdown_type_funded) },
+                    { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
+                    { label: 'Profit Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
+                    { label: 'Refundable Fee', value: '100%' },
+                  ],
+                }
+              );
+            } else {
+              phases.push(
+                {
+                  label: 'Phase 1',
+                  color: '#3B82F6',
+                  rules: [
+                    { label: 'Profit Target', value: `${r?.profit_target_phase1 ?? 10}%` },
+                    { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%` },
+                    { label: 'Max Drawdown', value: `${r?.overall_drawdown_phase1 ?? r?.overall_drawdown_percent ?? 12}%` },
+                    { label: 'Drawdown Type', value: fmtType(r?.daily_drawdown_type_phase1) },
+                    { label: 'Min Trading Days', value: `${r?.minimum_trading_days_phase1 ?? 0} Days` },
+                    { label: 'Trading Period', value: 'Unlimited' },
+                  ],
+                },
+                {
+                  label: 'Phase 2',
+                  color: '#F59E0B',
+                  rules: [
+                    { label: 'Profit Target', value: `${r?.profit_target_phase2 ?? 5}%` },
+                    { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_phase2 ?? r?.daily_drawdown_percent ?? 5}%` },
+                    { label: 'Max Drawdown', value: `${r?.overall_drawdown_phase2 ?? r?.overall_drawdown_percent ?? 12}%` },
+                    { label: 'Drawdown Type', value: fmtType(r?.daily_drawdown_type_phase2) },
+                    { label: 'Min Trading Days', value: `${r?.minimum_trading_days_phase2 ?? 0} Days` },
+                    { label: 'Trading Period', value: 'Unlimited' },
+                  ],
+                },
+                {
+                  label: 'Funded',
+                  color: '#10B981',
+                  rules: [
+                    { label: 'Profit Target', value: 'No Target' },
+                    { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%` },
+                    { label: 'Max Drawdown', value: `${r?.overall_drawdown_funded ?? r?.overall_drawdown_percent ?? 12}%` },
+                    { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
+                    { label: 'Profit Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
+                    { label: 'Refundable Fee', value: '100%' },
+                  ],
+                }
+              );
+            }
 
             return (
-              <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: '#161B22' }}>
+              <div className="rounded-2xl border border-white/[0.06] overflow-hidden" style={{ background: 'linear-gradient(180deg, #161B22 0%, #0D1117 100%)' }}>
                 {/* Type Tabs */}
                 <div className="flex border-b border-white/[0.06]">
                   {['instant', '1_step', '2_step'].map((type) => {
@@ -321,32 +394,68 @@ export default function BuyAccount() {
                           const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
                           setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
                         }}
-                        className={`flex-1 px-4 py-3.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
+                        className={`flex-1 px-3 py-4 transition-all border-b-2 ${
                           active ? 'text-white' : 'text-[#484f58] hover:text-[#8B949E] border-transparent'
                         }`}
                         style={active ? { borderBottomColor: color, background: `${color}08` } : {}}
                       >
-                        <div className="flex items-center justify-center gap-2">
-                          {active && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />}
-                          {MODEL_META[model].label}
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-xs font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
+                          <span className="text-[9px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
                         </div>
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Inline Rules Grid */}
-                <div className="p-4 md:p-6">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
-                    {ruleItems.map((item, i) => (
-                      <div key={i} className="flex justify-between items-center py-1.5 border-b border-white/[0.04] last:border-0">
-                        <span className="text-[11px] text-[#8B949E] font-medium">{item.label}</span>
-                        <span className="text-[11px] text-white font-bold ml-2">{item.value}</span>
-                      </div>
-                    ))}
+                {/* Phase Progression Visual */}
+                {selectedModel !== 'instant' && (
+                  <div className="px-5 pt-5 pb-2">
+                    <div className="flex items-center gap-2">
+                      {phases.map((phase, i) => (
+                        <React.Fragment key={i}>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: phase.color }} />
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">{phase.label}</span>
+                          </div>
+                          {i < phases.length - 1 && (
+                            <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${phases[i].color}40, ${phases[i + 1].color}40)` }} />
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
                   </div>
-                  <button onClick={() => setShowRules(true)} className="mt-4 text-[10px] font-semibold uppercase tracking-wider hover:text-white transition-colors" style={{ color: modelColor }}>
-                    View full rules →
+                )}
+
+                {/* Phase Rules Columns */}
+                <div className={`grid gap-0 ${phases.length === 1 ? 'grid-cols-1' : phases.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
+                  {phases.map((phase, phaseIdx) => (
+                    <div key={phaseIdx} className={`p-5 ${phaseIdx > 0 ? 'border-t md:border-t-0 md:border-l border-white/[0.04]' : ''}`}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: phase.color }} />
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">{phase.label}</h4>
+                      </div>
+                      <div className="space-y-0">
+                        {phase.rules.map((rule, ruleIdx) => (
+                          <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
+                            <span className="text-[11px] text-[#8B949E]">{rule.label}</span>
+                            <span className="text-[11px] text-white font-bold">{rule.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="px-5 py-3 border-t border-white/[0.04] flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-[10px] text-[#484f58]">
+                    <span>EAs Allowed: <span className="text-[#8B949E] font-semibold">Yes</span></span>
+                    <span>News Trading: <span className="text-[#8B949E] font-semibold">{r?.news_trading_allowed !== false ? 'Yes' : 'No'}</span></span>
+                    <span>Leverage: <span className="text-[#8B949E] font-semibold">1:100</span></span>
+                  </div>
+                  <button onClick={() => setShowRules(true)} className="text-[10px] font-semibold uppercase tracking-wider hover:text-white transition-colors" style={{ color: modelColor }}>
+                    Full rules →
                   </button>
                 </div>
               </div>
