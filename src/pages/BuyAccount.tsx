@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Check, AlertTriangle, HelpCircle, ChevronRight, Tag, Copy, Upload, Info, CreditCard, Zap, Sparkles, Clock, Lock, Star, Calendar, Trophy, CheckCircle, X } from 'lucide-react';
+import { Shield, Check, ChevronRight, Copy, Upload, CreditCard, Zap, Lock, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { AccountPackage } from '../types';
 import { AccountRuleConfig, createAccountPurchase, submitPaymentProof, getAccountPackages, getAccountRulesForPackages } from '../lib/database';
@@ -73,16 +73,11 @@ export default function BuyAccount() {
   const [selectedModel, setSelectedModel] = useState<AccountModelType>('instant');
   const [rulesByPackageName, setRulesByPackageName] = useState<Record<string, AccountRuleConfig>>({});
   const [categoryRules, setCategoryRules] = useState<Record<string, AccountRuleConfig>>({});
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [discountExpired, setDiscountExpired] = useState(false);
   const [isIndianUser, setIsIndianUser] = useState(false);
   const [aiVerifying, setAiVerifying] = useState(false);
   const [verificationStep, setVerificationStep] = useState(0);
-  const [showExitIntent, setShowExitIntent] = useState(false);
-  const [exitIntentShown, setExitIntentShown] = useState(false);
 
   const [rulePhaseTab, setRulePhaseTab] = useState<'p1' | 'p2' | 'funded'>('p1');
-  const [countdown, setCountdown] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
   const getPackageModel = (pkg?: AccountPackage | null): AccountModelType => {
     return normalizeModelType(pkg?.account_type);
@@ -109,23 +104,7 @@ export default function BuyAccount() {
 
 
 
-  // Countdown timer to midnight
-  useEffect(() => {
-    const tick = () => {
-      const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0);
-      const diff = midnight.getTime() - now.getTime();
-      setCountdown({
-        hours: Math.floor(diff / 3600000),
-        minutes: Math.floor((diff % 3600000) / 60000),
-        seconds: Math.floor((diff % 60000) / 1000)
-      });
-    };
-    tick();
-    const t = setInterval(tick, 1000);
-    return () => clearInterval(t);
-  }, []);
+
 
   useEffect(() => {
     async function loadPackages() {
@@ -290,214 +269,158 @@ export default function BuyAccount() {
         </div>
       )}
 
-      {/* PROMOTION STRIP */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a1025 0%, #161B22 50%, #12161f 100%)' }}>
-        <div className="absolute inset-0 bg-[#8A2BE2]/[0.04]" />
-        <div className="relative max-w-7xl mx-auto flex items-center justify-center gap-4 text-white text-sm font-semibold py-3 px-4" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-          <span className="px-2.5 py-1 rounded-lg bg-[#8A2BE2]/15 text-[#c084fc] text-[10px] font-black tracking-wider border border-[#8A2BE2]/25">50% OFF</span>
-          <span className="text-[#8B949E] text-xs">Premium Instant accounts — limited time offer</span>
-          <span className="hidden md:inline text-[#484f58]">·</span>
-          <span className="hidden md:flex items-center gap-1.5 text-xs text-[#8B949E]">
-            <Clock className="w-3.5 h-3.5 text-[#c084fc]" />
-            <span className="font-mono font-bold text-white">{String(countdown.hours).padStart(2,'0')}:{String(countdown.minutes).padStart(2,'0')}:{String(countdown.seconds).padStart(2,'0')}</span>
-            <span>remaining</span>
-          </span>
+      {/* PAGE HEADER */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 md:pt-10 pb-6">
+        <div className="flex items-center gap-2 text-xs text-[#484f58] mb-4">
+          <span>Trader</span><span>/</span><span className="text-white font-medium">Get Funded</span>
         </div>
+        <h1 className="text-xl md:text-2xl font-bold text-white mb-1" style={{ fontFamily: 'Outfit, sans-serif' }}>Start Your FundedCobra Challenge</h1>
+        <p className="text-sm text-[#8B949E]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your account type, configure your setup, and start trading with our capital.</p>
       </div>
 
-      {/* HEADER */}
-      <div className="relative max-w-7xl mx-auto px-4 pt-8 md:pt-14 pb-6 md:pb-8">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-10" style={{ backgroundColor: '#bd4dd6' }} />
-          <div className="absolute top-10 right-1/4 w-72 h-72 rounded-full blur-[100px] opacity-[0.07]" style={{ backgroundColor: '#3B82F6' }} />
-        </div>
-        <div className="relative text-center mb-6 md:mb-10">
-          <h1 className="text-3xl md:text-5xl lg:text-7xl tracking-tight mb-2 md:mb-4 leading-[1.05]" style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Get Funded <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">Today</span></h1>
-          <p className="text-gray-400 text-sm md:text-base max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
-        </div>
-        
-        {/* ACCOUNT TYPE TABS - Big and prominent */}
-        <div className="relative flex justify-center">
-          <div className="inline-flex gap-2 p-1.5 rounded-2xl border border-white/10" style={{ background: 'rgba(15,15,15,0.9)', backdropFilter: 'blur(20px)' }}>
-            {['instant', '1_step', '2_step'].map((type) => {
-              const model = type as AccountModelType;
-              const active = selectedModel === model;
-              const color = model === 'instant' ? '#bd4dd6' : model === '1_step' ? '#3B82F6' : '#10B981';
-              return (
-                <button
-                  key={type}
-                  onClick={() => {
-                    setSelectedModel(model);
-                    const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
-                    setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
-                  }}
-                  className={`px-4 md:px-8 py-3 md:py-4 rounded-xl text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
-                    active ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-                  }`}
-                  style={active ? { background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 6px 30px ${color}50, 0 0 0 1px ${color}30` } : { fontFamily: 'Plus Jakarta Sans, sans-serif' }}
-                >
-                  {MODEL_META[model].label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      {/* MAIN GRID */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
-      {/* FEATURE CALLOUTS */}
-      {(() => {
-        const r = categoryRules[selectedModel];
-        const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
-        const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : '—';
-        const maxDD = r?.overall_drawdown_percent || r?.overall_drawdown_phase1 || '—';
-        const featureItems = [
-          { value: `Up to ${r?.payout_split_percent || 80}%`, label: 'Profit Split', color: '#fff', Icon: Trophy },
-          { value: payoutCycle, label: 'Payout Cycle', color: modelColor, Icon: Zap },
-          { value: `${maxDD}%`, label: 'Max Drawdown', color: '#34d399', Icon: Shield },
-          { value: '1:100', label: 'Leverage', color: '#facc15', Icon: Sparkles },
-        ];
-        return (
-          <div className="max-w-7xl mx-auto px-4 mb-6">
-            {/* Desktop: 4 cards */}
-            <div className="hidden md:grid grid-cols-4 gap-3">
-              {featureItems.map((item, idx) => (
-                <div key={idx} className="relative group rounded-xl p-[1px] transition-all duration-300" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))` }}>
-                  <div className="rounded-xl p-5 text-center h-full" style={{ background: 'linear-gradient(180deg, #151515 0%, #0d0d0d 100%)' }}>
-                    <item.Icon className="w-5 h-5 mx-auto mb-2 opacity-40" style={{ color: item.color }} />
-                    <div className="text-2xl font-bold" style={{ color: item.color, fontFamily: 'Outfit, sans-serif' }}>{item.value}</div>
-                    <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{item.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Mobile: compact horizontal strip */}
-            <div className="flex md:hidden gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-              {featureItems.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.06] whitespace-nowrap flex-shrink-0" style={{ background: '#111' }}>
-                  <item.Icon className="w-3.5 h-3.5 opacity-50" style={{ color: item.color }} />
-                  <span className="text-xs font-bold" style={{ color: item.color }}>{item.value}</span>
-                  <span className="text-[9px] text-gray-600 font-semibold uppercase">{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* 🔴 MAIN GRID */}
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* LEFT COLUMN (8) */}
+        {/* LEFT COLUMN */}
         <div className="lg:col-span-8 space-y-6">
-          
-          {/* STEP 1: Choose Account Size */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #bd4dd6, #9333ea)' }}>1</div>
-              <h3 className="text-base font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Outfit, sans-serif' }}>Choose Your Account Size</h3>
-            </div>
-            {(() => {
-              const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
-              const modelLabel = selectedModel === 'instant' ? 'Instant' : selectedModel === '1_step' ? '1-Step' : '2-Step';
-              const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
-              
-              const specialPkgs = selectedModelPackages.filter(p => p.balance < 10000);
-              const premiumPkgs = selectedModelPackages.filter(p => p.balance >= 10000);
 
-              const renderCard = (pkg: any) => {
-                const isSelected = selectedPackage?.id === pkg.id;
-                const catDiscount = categoryDiscount;
-                const baseDiscounted = pkg.price * (1 - catDiscount / 100);
-                // Also apply default coupon preview for unselected cards
-                const model = getPackageModel(pkg);
-                const defaultCoupon = model === 'instant' && pkg.balance >= 10000 ? 50 : 10;
-                const fullDiscount = Math.min(catDiscount + defaultCoupon, 100);
-                const finalPrice = pkg.price * (1 - fullDiscount / 100);
-                const savings = pkg.price - finalPrice;
-                const balanceLabel = pkg.balance >= 10000 ? `$${(pkg.balance / 1000).toFixed(0)}K` : `$${pkg.balance.toLocaleString()}`;
-                return (
-                  <button
-                    key={pkg.id}
-                    onClick={() => setSelectedPackage(pkg)}
-                    className={`relative p-3 md:p-4 rounded-xl border transition-all duration-300 text-center group ${
-                      isSelected 
-                        ? 'border-transparent scale-[1.03]'
-                        : 'border-white/[0.06] hover:border-white/15 hover:scale-[1.02]'
-                    }`}
-                    style={isSelected 
-                      ? { background: `linear-gradient(180deg, ${modelColor}12 0%, ${modelColor}05 100%)`, borderColor: `${modelColor}60`, boxShadow: `0 0 30px ${modelColor}20, inset 0 1px 0 ${modelColor}20` } 
-                      : { background: 'linear-gradient(180deg, rgba(22,22,22,1) 0%, rgba(13,13,13,1) 100%)' }
-                    }
-                  >
-                    {isSelected && <div className="absolute -top-1.5 -right-1.5 rounded-full shadow-lg" style={{ background: modelColor }}><Check className="w-4 h-4 text-white p-0.5" /></div>}
-                    <div className="text-lg md:text-xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
-                    <div className="flex items-center justify-center gap-1.5 mt-1.5">
-                      <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>
-                      <span className="text-sm md:text-base font-bold" style={{ color: modelColor, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>${finalPrice.toFixed(0)}</span>
-                    </div>
-                    {savings > 0 && (
-                      <div className="text-[8px] md:text-[9px] font-semibold text-emerald-400 mt-1 bg-emerald-500/10 rounded-md px-1.5 py-0.5 inline-block border border-emerald-500/20">Save ${savings.toFixed(0)}</div>
-                    )}
+          {/* ACCOUNT TYPE + INLINE RULES */}
+          {(() => {
+            const r = categoryRules[selectedModel];
+            const modelColor = selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+            const payoutCycle = r?.daily_payout_enabled === true ? 'Daily' : r?.bi_weekly_payout_enabled === true ? 'Bi-Weekly' : r?.weekly_payout_enabled === true ? 'Weekly' : '—';
+            const fmtType = (t: string | undefined | null) => { const v = t || 'static'; return v.charAt(0).toUpperCase() + v.slice(1); };
+            const dailyDDType = fmtType(r?.daily_drawdown_type_phase1 || r?.daily_drawdown_type_funded);
+            const overallDDType = fmtType(r?.overall_drawdown_type_phase1 || r?.overall_drawdown_type_funded);
+
+            const ruleItems = [
+              ...(selectedModel !== 'instant' ? [{ label: 'Profit Target', value: `${r?.profit_target_phase1 ?? 10}%` }] : []),
+              { label: `Daily Loss (${dailyDDType})`, value: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%` },
+              { label: `Max Drawdown (${overallDDType})`, value: `${r?.overall_drawdown_phase1 ?? r?.overall_drawdown_percent ?? 12}%` },
+              { label: 'Min Trading Days', value: `${r?.minimum_trading_days_phase1 ?? r?.minimum_trading_days ?? 0} days` },
+              { label: 'Trading Period', value: 'Unlimited' },
+              { label: 'Payout Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
+              { label: 'Payout Cycle', value: payoutCycle },
+              { label: 'Leverage', value: '1:100' },
+              { label: 'Refundable Fee', value: '100%' },
+            ];
+
+            return (
+              <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: '#161B22' }}>
+                {/* Type Tabs */}
+                <div className="flex border-b border-white/[0.06]">
+                  {['instant', '1_step', '2_step'].map((type) => {
+                    const model = type as AccountModelType;
+                    const active = selectedModel === model;
+                    const color = model === 'instant' ? '#8A2BE2' : model === '1_step' ? '#3B82F6' : '#10B981';
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => {
+                          setSelectedModel(model);
+                          const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
+                          setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
+                        }}
+                        className={`flex-1 px-4 py-3.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
+                          active ? 'text-white' : 'text-[#484f58] hover:text-[#8B949E] border-transparent'
+                        }`}
+                        style={active ? { borderBottomColor: color, background: `${color}08` } : {}}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          {active && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />}
+                          {MODEL_META[model].label}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Inline Rules Grid */}
+                <div className="p-4 md:p-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3">
+                    {ruleItems.map((item, i) => (
+                      <div key={i} className="flex justify-between items-center py-1.5 border-b border-white/[0.04] last:border-0">
+                        <span className="text-[11px] text-[#8B949E] font-medium">{item.label}</span>
+                        <span className="text-[11px] text-white font-bold ml-2">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setShowRules(true)} className="mt-4 text-[10px] font-semibold uppercase tracking-wider hover:text-white transition-colors" style={{ color: modelColor }}>
+                    View full rules →
                   </button>
-                );
-              };
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ACCOUNT BALANCE */}
+          <div>
+            <h3 className="text-sm font-bold text-white mb-1" style={{ fontFamily: 'Outfit, sans-serif' }}>Account Balance</h3>
+            <p className="text-[11px] text-[#484f58] font-medium mb-4">Trading Account Currency: <span className="text-[#8B949E]">USD</span></p>
+
+            {(() => {
+              const modelColor = selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+              const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
+              const allPkgs = selectedModelPackages;
 
               return (
-                <>
-                  {selectedModel === 'instant' ? (
-                    <div className="space-y-4">
-                      {specialPkgs.length > 0 && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Special Accounts</span>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10% OFF</span>
-                          </div>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-                            {specialPkgs.map(renderCard)}
-                          </div>
-                        </div>
-                      )}
-                      {premiumPkgs.length > 0 && (
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Premium Accounts</span>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">🔥 50% OFF</span>
-                            <span className="text-[9px] text-orange-400 font-bold">Most Popular</span>
-                          </div>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-                            {premiumPkgs.map(renderCard)}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{modelLabel} Evaluation</span>
-                        {categoryDiscount > 0 && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{categoryDiscount}% OFF</span>
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+                  {allPkgs.map((pkg) => {
+                    const isSelected = selectedPackage?.id === pkg.id;
+                    const model = getPackageModel(pkg);
+                    const defaultCoupon = model === 'instant' && pkg.balance >= 10000 ? 50 : 10;
+                    const fullDiscount = Math.min(categoryDiscount + defaultCoupon, 100);
+                    const finalPrice = pkg.price * (1 - fullDiscount / 100);
+                    const balanceLabel = pkg.balance >= 1000 ? `$ ${(pkg.balance).toLocaleString()}` : `$${pkg.balance}`;
+                    const isPremium = model === 'instant' && pkg.balance >= 10000;
+
+                    return (
+                      <button
+                        key={pkg.id}
+                        onClick={() => setSelectedPackage(pkg)}
+                        className={`relative flex-shrink-0 w-[140px] md:w-auto md:flex-1 rounded-xl border-2 p-3 md:p-4 text-left transition-all duration-200 ${
+                          isSelected
+                            ? 'border-current'
+                            : 'border-white/[0.06] hover:border-white/15'
+                        }`}
+                        style={{
+                          background: isSelected ? `${modelColor}0a` : '#0D1117',
+                          color: isSelected ? modelColor : 'inherit',
+                          borderColor: isSelected ? modelColor : undefined,
+                        }}
+                      >
+                        {isPremium && (
+                          <span className="absolute -top-2 left-3 px-1.5 py-0.5 rounded text-[8px] font-black bg-red-500/90 text-white">SALE</span>
                         )}
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-                        {selectedModelPackages.map(renderCard)}
-                      </div>
-                    </div>
-                  )}
-                </>
+                        {isSelected && (
+                          <div className="absolute top-2 right-2">
+                            <CheckCircle className="w-4 h-4" style={{ color: modelColor }} />
+                          </div>
+                        )}
+                        <div className="text-base md:text-lg font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
+                        <div className="space-y-0.5">
+                          <div className="text-base md:text-lg font-bold" style={{ color: modelColor, fontFamily: 'Outfit, sans-serif' }}>${finalPrice.toFixed(0)}</div>
+                          {fullDiscount > 0 && (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-[#484f58] line-through">${pkg.price}</span>
+                              <span className="text-[9px] font-bold text-emerald-400">-{fullDiscount}%</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-[9px] text-[#484f58] mt-1.5 font-medium">One-time payment</div>
+                      </button>
+                    );
+                  })}
+                </div>
               );
             })()}
           </div>
 
-          {/* STEP 2: Platform & Server */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-lg transition-all" style={{ background: selectedPlatform && selectedServer ? 'linear-gradient(135deg, #10B981, #059669)' : '#2A2A2A' }}>2</div>
-              <h3 className="text-base font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Outfit, sans-serif' }}>Configure Your Setup</h3>
-              {!selectedPlatform && <span className="text-[10px] text-red-400 font-bold animate-pulse">← Required</span>}
-            </div>
+          {/* PLATFORM & SERVER */}
+          <div>
+            <h3 className="text-sm font-bold text-white mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>Platform</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {/* Platform */}
-              <div className="bg-[#161616] rounded-lg border border-[#2A2A2A] p-4">
+              <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: '#161B22' }}>
                 <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-3">Trading Platform</p>
                 <button
                   onClick={() => setSelectedPlatform('MT5')}
@@ -546,226 +469,97 @@ export default function BuyAccount() {
             </div>
           </div>
 
-          {/* STEP 3: Account Rules (inline, always visible when package selected) */}
-          {selectedPackage && (() => {
-            const r = selectedPackageRules;
-            const modelColor = selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
-            const availableTabs = selectedModel === 'instant' ? ['funded'] as const 
-              : selectedModel === '1_step' ? ['p1', 'funded'] as const 
-              : ['p1', 'p2', 'funded'] as const;
-            const activeTab = availableTabs.includes(rulePhaseTab as any) ? rulePhaseTab : availableTabs[0];
-
-            // Phase-specific values
-            const phaseRules = activeTab === 'p1' ? {
-              profitTarget: `${r?.profit_target_phase1 ?? 10}%`,
-              dailyDD: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%`,
-              overallDD: `${r?.overall_drawdown_phase1 ?? r?.overall_drawdown_percent ?? 12}%`,
-              minDays: `${r?.minimum_trading_days_phase1 ?? r?.minimum_trading_days ?? 0} Days`,
-            } : activeTab === 'p2' ? {
-              profitTarget: `${r?.profit_target_phase2 ?? 5}%`,
-              dailyDD: `${r?.daily_drawdown_phase2 ?? r?.daily_drawdown_percent ?? 5}%`,
-              overallDD: `${r?.overall_drawdown_phase2 ?? r?.overall_drawdown_percent ?? 12}%`,
-              minDays: `${r?.minimum_trading_days_phase2 ?? 0} Days`,
-            } : {
-              profitTarget: null,
-              dailyDD: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%`,
-              overallDD: `${r?.overall_drawdown_funded ?? r?.overall_drawdown_percent ?? 12}%`,
-              minDays: 'Unlimited',
-            };
-
-            return (
-              <div className="bg-[#161616] rounded-[2.5rem] border border-[#2A2A2A] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2">
-
-                  {/* LEFT: Phase Rules */}
-                  <div className="p-10 border-b lg:border-b-0 lg:border-r border-white/5">
-                    <h4 className="text-lg font-black text-white tracking-tight mb-1">
-                      ${selectedPackage.balance.toLocaleString()} {MODEL_META[selectedModel].label}
-                    </h4>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-8">Account Includes</p>
-
-                    {/* Phase Tabs */}
-                    <div className="flex gap-2 mb-10">
-                      {availableTabs.map(tab => (
-                        <button
-                          key={tab}
-                          onClick={() => setRulePhaseTab(tab as any)}
-                          className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${
-                            activeTab === tab
-                              ? 'text-white shadow-lg'
-                              : 'border-white/10 text-gray-500 hover:text-white hover:border-white/20'
-                          }`}
-                          style={activeTab === tab ? { backgroundColor: modelColor, borderColor: modelColor } : {}}
-                        >
-                          {tab === 'p1' ? 'Phase 1' : tab === 'p2' ? 'Phase 2' : 'Funded'}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Rules List */}
-                    <div className="space-y-0">
-                      {(() => {
-                        const fmtType = (t: string | undefined | null) => { const v = t || 'static'; return v.charAt(0).toUpperCase() + v.slice(1); };
-                        const dailyType = fmtType(activeTab === 'p1' ? r?.daily_drawdown_type_phase1 : activeTab === 'p2' ? r?.daily_drawdown_type_phase2 : r?.daily_drawdown_type_funded);
-                        const overallType = fmtType(activeTab === 'p1' ? r?.overall_drawdown_type_phase1 : activeTab === 'p2' ? r?.overall_drawdown_type_phase2 : r?.overall_drawdown_type_funded);
-                        return [
-                          ...(phaseRules.profitTarget ? [{ label: 'Profit Target', value: phaseRules.profitTarget }] : []),
-                          { label: `Daily Loss Limit (${dailyType})`, value: phaseRules.dailyDD },
-                          { label: `Max Overall Drawdown (${overallType})`, value: phaseRules.overallDD },
-                          { label: 'Minimum Trading Days', value: phaseRules.minDays },
-                          ...(activeTab === 'funded' ? [
-                            { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
-                          ] : []),
-                          { label: 'Refundable Fee', value: '100%' },
-                        ].map((item, i) => (
-                          <div key={i} className="flex justify-between items-center py-5 border-b border-white/5 last:border-0">
-                            <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: modelColor, opacity: 0.7 }} />
-                              <span className="text-sm text-gray-300 font-medium">{item.label}</span>
-                            </div>
-                            <span className="text-sm font-black text-white">{item.value}</span>
-                          </div>
-                        ));
-                      })()}
-                    </div>
-
-                    <div className="mt-8 p-5 rounded-2xl bg-white/[0.03] border border-white/5 text-center">
-                      <button onClick={() => setShowRules(true)} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white transition-colors">
-                        For more detailed rules, <span className="underline" style={{ color: modelColor }}>review our FAQs</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* RIGHT: General Account Specs */}
-                  <div className="p-10">
-                    <h4 className="text-sm font-black text-white uppercase tracking-widest mb-8">This Evaluation Includes:</h4>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-8">
-                      {[
-                        { label: 'Trading Period', value: 'Unlimited' },
-                        { label: 'Reward Split', value: `Up to ${r?.payout_split_percent ?? 80}%` },
-                        { label: 'Leverage', value: '1:100' },
-                        { label: 'Drawdown Type', value: (() => {
-                          const t = activeTab === 'p1' ? r?.daily_drawdown_type_phase1 
-                            : activeTab === 'p2' ? r?.daily_drawdown_type_phase2 
-                            : r?.daily_drawdown_type_funded;
-                          return (t || 'static').charAt(0).toUpperCase() + (t || 'static').slice(1);
-                        })() },
-                        { label: 'EAs Allowed', value: 'Yes' },
-                        { label: 'News Trading', value: r?.news_trading_allowed !== false ? 'Yes' : 'No' },
-                        { label: 'Reward Cycle', value: (() => {
-                          if (r?.daily_payout_enabled === true) return 'Daily';
-                          if (r?.bi_weekly_payout_enabled === true) return 'Bi-Weekly';
-                          if (r?.weekly_payout_enabled === true) return 'Weekly';
-                          return '—';
-                        })() },
-                        { label: 'Platform', value: 'MetaTrader 5' },
-                      ].map((spec, i) => (
-                        <div key={i} className="space-y-1.5">
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: modelColor }} />
-                            <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{spec.label}</span>
-                          </div>
-                          <p className="text-sm font-black text-white pl-3.5">{spec.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            );
-          })()}
         </div>
 
-        {/* RIGHT COLUMN (4) - Checkout */}
-        <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit space-y-4">
-           <div className="rounded-2xl border border-white/[0.08] overflow-hidden shadow-2xl" style={{ background: 'linear-gradient(180deg, rgba(22,22,22,0.95) 0%, rgba(12,12,12,0.98) 100%)', backdropFilter: 'blur(20px)' }}>
-              <div className="px-5 py-3.5 border-b border-white/[0.06] flex items-center justify-between" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))' }}>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: 'Outfit, sans-serif' }}>Your Order</h3>
-                {selectedPackage && <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Ready</span>}
+        {/* RIGHT COLUMN — Summary */}
+        <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
+           <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: '#161B22' }}>
+              <div className="px-5 py-4 border-b border-white/[0.06]">
+                <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Summary</h3>
               </div>
               
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-5">
                 {selectedPackage ? (
                   <>
-                    <div className="rounded-xl p-4 border border-white/[0.06]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.3) 100%)' }}>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${selectedPackage.balance.toLocaleString()}</div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                            {MODEL_META[selectedModel].label}
-                          </p>
-                        </div>
-                        <div className="text-right space-y-0.5">
-                          <div className="text-[11px] text-gray-400 font-medium">{selectedPlatform || '—'}</div>
-                          <div className="text-[11px] text-gray-400 font-medium">{selectedServer || '—'}</div>
-                        </div>
+                    <div>
+                      <div className="text-xs text-[#8B949E] font-medium">FundedCobra Challenge</div>
+                      <div className="text-lg font-bold text-white mt-0.5" style={{ fontFamily: 'Outfit, sans-serif' }}>${selectedPackage.balance.toLocaleString()} account</div>
+                    </div>
+
+                    <div className="space-y-2.5 py-3 border-y border-white/[0.04]">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[#8B949E]">Type</span>
+                        <span className="text-white font-semibold">{MODEL_META[selectedModel].label}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[#8B949E]">Platform</span>
+                        <span className="text-white font-semibold">{selectedPlatform || '—'}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[#8B949E]">Server</span>
+                        <span className="text-white font-semibold">{selectedServer || '—'}</span>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-400">Account Fee</span>
-                          <span className="text-white font-bold">${selectedPackage.price}</span>
+                          <span className="text-[#8B949E]">Price</span>
+                          <span className="text-white font-semibold">${selectedPackage.price}</span>
                        </div>
-                       {categoryRules[selectedModel]?.discount_percent > 0 && (
-                         <div className="flex justify-between text-xs">
-                            <span className="text-emerald-400">Discount</span>
-                            <span className="text-emerald-400 font-bold">-${(selectedPackage.price * categoryRules[selectedModel].discount_percent / 100).toFixed(0)} ({categoryRules[selectedModel].discount_percent}%)</span>
-                         </div>
-                       )}
-                       {appliedCoupon && (
-                         <div className="flex justify-between text-xs bg-emerald-500/5 p-2 rounded border border-emerald-500/20">
-                            <span className="text-emerald-400">{appliedCoupon.code}</span>
-                            <span className="text-emerald-400 font-bold">-{appliedCoupon.discount}%</span>
-                         </div>
-                       )}
-                       <div className="pt-3 border-t border-white/5 flex justify-between items-center">
+                       {(() => {
+                         const catDiscount = categoryRules[selectedModel]?.discount_percent || 0;
+                         const couponDiscount = appliedCoupon?.discount || 0;
+                         const totalDiscount = Math.min(catDiscount + couponDiscount, 100);
+                         if (totalDiscount <= 0) return null;
+                         return (
+                           <div className="flex justify-between text-xs">
+                              <span className="text-emerald-400">Discount ({totalDiscount}%)</span>
+                              <span className="text-emerald-400 font-semibold">-${(selectedPackage.price * totalDiscount / 100).toFixed(0)}</span>
+                           </div>
+                         );
+                       })()}
+                       <div className="pt-3 border-t border-white/[0.06] flex justify-between items-center">
                           <span className="text-sm font-bold text-white">Total</span>
                           <div className="text-right">
-                            <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                            <span className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                            <div className="text-[9px] text-[#484f58]">Incl. VAT</div>
                           </div>
                        </div>
                     </div>
 
                     {(!selectedPlatform || !selectedServer) && (
-                      <div className="text-[10px] text-yellow-500 font-semibold bg-yellow-500/5 p-2.5 rounded-xl border border-yellow-500/15 text-center" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                        ⚠ Please select platform and server above to continue
+                      <div className="text-[10px] text-yellow-500/80 font-medium bg-yellow-500/5 p-3 rounded-lg border border-yellow-500/10 text-center">
+                        Select platform and server to continue
                       </div>
                     )}
 
                     <button
                       onClick={handlePurchase}
                       disabled={!selectedPlatform || !selectedServer}
-                      className={`w-full py-4 text-white font-bold text-sm uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all duration-300 active:scale-[0.97] ${
-                        (!selectedPlatform || !selectedServer) ? 'opacity-30 cursor-not-allowed' : 'hover:brightness-110'
+                      className={`w-full py-3.5 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all duration-200 ${
+                        (!selectedPlatform || !selectedServer) ? 'opacity-30 cursor-not-allowed' : 'hover:brightness-110 active:scale-[0.98]'
                       }`}
                       style={{
                         fontFamily: 'Outfit, sans-serif',
-                        background: `linear-gradient(135deg, ${selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981'}, ${selectedModel === 'instant' ? '#9333ea' : selectedModel === '1_step' ? '#2563eb' : '#059669'})`,
-                        boxShadow: (!selectedPlatform || !selectedServer) ? 'none' : `0 4px 25px ${selectedModel === 'instant' ? '#bd4dd640' : selectedModel === '1_step' ? '#3B82F640' : '#10B98140'}`
+                        background: selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981',
                       }}
                     >
-                      <Lock className="w-4 h-4" /> Get Funded Now
+                      Continue to Payment
                     </button>
                     
-                    {/* Trust signals */}
-                    <div className="flex items-center justify-center gap-3 pt-1">
-                      <div className="flex items-center gap-1 text-[9px] text-gray-500"><Shield className="w-3 h-3" /> SSL Secured</div>
-                      <div className="flex items-center gap-1 text-[9px] text-gray-500"><Zap className="w-3 h-3" /> Instant Setup</div>
-                      <div className="flex items-center gap-1 text-[9px] text-gray-500"><Check className="w-3 h-3" /> Verified</div>
+                    <div className="flex items-center justify-center gap-2 pt-1">
+                      <Shield className="w-3.5 h-3.5 text-[#484f58]" />
+                      <span className="text-[10px] text-[#484f58] font-medium">Trusted by 2,000+ traders worldwide</span>
                     </div>
                   </>
                 ) : (
-                  <div className="py-10 text-center opacity-30">
-                     <Shield className="w-8 h-8 mx-auto mb-2" />
-                     <p className="text-[10px] font-bold uppercase tracking-wider">Select an account size</p>
+                  <div className="py-8 text-center">
+                     <Shield className="w-8 h-8 mx-auto mb-2 text-[#484f58]" />
+                     <p className="text-[11px] font-medium text-[#484f58]">Select an account size to continue</p>
                   </div>
                 )}
               </div>
            </div>
-
-
         </div>
       </div>
 
@@ -917,31 +711,26 @@ export default function BuyAccount() {
       )}
     </div>
 
-    {/* STICKY MOBILE CHECKOUT BAR */}
+    {/* STICKY MOBILE BAR */}
     {selectedPackage && (
-      <div className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden border-t border-white/10 px-4 py-3 safe-area-bottom" style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)' }}>
+      <div className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden border-t border-white/[0.06] px-4 py-3 safe-area-bottom" style={{ background: 'rgba(13,17,23,0.95)', backdropFilter: 'blur(20px)' }}>
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <div className="text-lg font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</div>
-            <div className="text-[11px] text-gray-400 truncate" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>${selectedPackage.balance.toLocaleString()} {MODEL_META[selectedModel].label}</div>
-          </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-gray-500 font-mono">
-            <Clock className="w-3.5 h-3.5" />
-            {String(countdown.hours).padStart(2,'0')}:{String(countdown.minutes).padStart(2,'0')}:{String(countdown.seconds).padStart(2,'0')}
+            <div className="text-[11px] text-[#8B949E] truncate">${selectedPackage.balance.toLocaleString()} {MODEL_META[selectedModel].label}</div>
           </div>
           <button
             onClick={handlePurchase}
             disabled={!selectedPlatform || !selectedServer}
-            className={`px-6 py-3 text-white font-bold text-sm uppercase tracking-wider rounded-xl transition-all ${
+            className={`px-6 py-3 text-white font-bold text-sm rounded-xl transition-all ${
               (!selectedPlatform || !selectedServer) ? 'opacity-40 cursor-not-allowed' : 'active:scale-95'
             }`}
             style={{
               fontFamily: 'Outfit, sans-serif',
-              background: `linear-gradient(135deg, ${selectedModel === 'instant' ? '#bd4dd6' : selectedModel === '1_step' ? '#3B82F6' : '#10B981'}, ${selectedModel === 'instant' ? '#9333ea' : selectedModel === '1_step' ? '#2563eb' : '#059669'})`,
-              boxShadow: (!selectedPlatform || !selectedServer) ? 'none' : `0 4px 20px ${selectedModel === 'instant' ? '#bd4dd640' : selectedModel === '1_step' ? '#3B82F640' : '#10B98140'}`
+              background: selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981',
             }}
           >
-            Get Funded
+            Continue
           </button>
         </div>
       </div>
