@@ -81,7 +81,7 @@ const handleApprove = async () => {
         .select('referrer_id, status')
         .eq('referred_id', selectedRequest.user_id)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
       if (referralData) {
         // Get referrer's current tier and commission rate

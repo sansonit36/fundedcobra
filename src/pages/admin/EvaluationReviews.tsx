@@ -76,7 +76,7 @@ export default function EvaluationReviews() {
         .select(`
           *,
           account:trading_accounts!account_id(mt5_login, model_type, current_phase, balance, starting_balance, equity, package_name, daily_loss_limit, overall_loss_limit),
-          profile:profiles!evaluation_reviews_profile_id_fkey(name, email)
+          profile:profiles!user_id(name, email)
         `)
         .order('created_at', { ascending: false });
 

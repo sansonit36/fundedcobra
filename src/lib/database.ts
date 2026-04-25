@@ -673,7 +673,7 @@ export async function createPayoutRequest(
   // Get user info for email
   const { data: userProfile, error: profileError } = await supabase
     .from('profiles')
-    .select('full_name, email')
+    .select('name, email')
     .eq('id', account.user_id)
     .single();
 
@@ -698,7 +698,7 @@ export async function createPayoutRequest(
       to: import.meta.env.VITE_ADMIN_EMAIL,
       template: 'admin_payout_requested',
       data: {
-        userName: userProfile?.full_name || 'Unknown',
+        userName: userProfile?.name || 'Unknown',
         userEmail: userProfile?.email || 'N/A',
         mt5Login: account.mt5_login,
         packageName: account.package_name || 'N/A',

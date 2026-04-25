@@ -637,7 +637,7 @@ export default function Payouts() {
                         <p className="text-primary-400 font-medium">Account Details</p>
                         <div className="mt-2 space-y-1 text-sm">
                           <p className="text-gray-300">
-                            Account Package: <span className="text-white font-medium">{packageName}</span>
+                            Account Package: <span className="text-white font-medium">{account.package_name || 'N/A'}</span>
                           </p>
                           <p className="text-gray-300">
                             Initial Equity: <span className="text-white font-medium">${account.initial_equity.toLocaleString()}</span>

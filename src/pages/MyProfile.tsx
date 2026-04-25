@@ -45,12 +45,12 @@ export default function MyProfile() {
       // Get default profile info
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('full_name, name, email, avatar_url')
+        .select('name, email, avatar_url')
         .eq('id', user.id)
         .single();
 
       if (profileData) {
-        setDefaultName(profileData.full_name || profileData.name || '');
+        setDefaultName(profileData.name || '');
         setDefaultEmail(profileData.email || user.email || '');
         if (profileData.avatar_url) setAvatarUrl(profileData.avatar_url);
       }
@@ -66,7 +66,7 @@ export default function MyProfile() {
         if (traderProfile.avatar_url) setAvatarUrl(traderProfile.avatar_url);
       } else {
         // No profile yet — prefill with defaults
-        setDisplayName(profileData?.full_name || profileData?.name || '');
+        setDisplayName(profileData?.name || '');
         setIsPublic(false);
       }
 
