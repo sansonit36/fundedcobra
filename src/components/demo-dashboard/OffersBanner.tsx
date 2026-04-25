@@ -11,7 +11,7 @@ interface PackageInfo {
   account_type: string;
 }
 
-export default function OffersBanner() {
+export default function OffersBanner({ compact = false }: { compact?: boolean }) {
   const navigate = useNavigate();
   const [premiumPackages, setPremiumPackages] = useState<PackageInfo[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -45,6 +45,40 @@ export default function OffersBanner() {
   const discountedPrice = selectedPkg ? Math.round(selectedPkg.price * 0.5) : 0;
 
   if (loading || premiumPackages.length === 0) return null;
+
+  // Compact mode for returning users who already have accounts
+  if (compact) {
+    return (
+      <div className="mb-6">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-white/[0.06] cursor-pointer group"
+          style={{ background: 'linear-gradient(135deg, #12161f 0%, #1a1025 50%, #161B22 100%)' }}
+          onClick={() => navigate('/buy-account')}
+        >
+          {/* Decorative glow */}
+          <div className="absolute top-0 right-0 w-60 h-60 bg-[#8A2BE2]/8 rounded-full blur-[80px] pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between p-5 sm:p-6 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8A2BE2]/20 to-[#8A2BE2]/5 border border-white/[0.04] flex items-center justify-center flex-shrink-0">
+                <Zap className="w-5 h-5 text-[#c084fc]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <p className="text-sm font-bold text-white">Premium Instant Funding</p>
+                  <span className="px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-400 text-[9px] font-black tracking-wider border border-emerald-500/20">50% OFF</span>
+                </div>
+                <p className="text-xs text-[#8B949E] mt-0.5">Up to $200K in firm capital · No evaluations · Instant provisioning</p>
+              </div>
+            </div>
+            <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#8A2BE2] hover:bg-[#7c22d1] text-white text-sm font-bold rounded-xl transition-all duration-200 whitespace-nowrap shadow-lg shadow-[#8A2BE2]/20 group-hover:shadow-[#8A2BE2]/30 hover:-translate-y-0.5">
+              Get Funded <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-6 space-y-6">
