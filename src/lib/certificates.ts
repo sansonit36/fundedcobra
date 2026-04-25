@@ -30,6 +30,10 @@ export interface TraderProfile {
   total_certificates: number;
   created_at: string;
   updated_at: string;
+  // Admin-controlled social proof overrides
+  custom_joined_date?: string | null;
+  custom_total_payouts?: number | null;
+  custom_total_certificates?: number | null;
   // Joined fields
   email?: string;
   full_name?: string;
@@ -376,18 +380,26 @@ export async function createTraderProfile(data: {
   is_featured?: boolean;
   total_payouts?: number;
   total_certificates?: number;
+  custom_joined_date?: string;
+  custom_total_payouts?: number;
+  custom_total_certificates?: number;
 }): Promise<void> {
+  const insertData: any = {
+    id: data.user_id,
+    display_name: data.display_name,
+    bio: data.bio || null,
+    is_public: data.is_public ?? false,
+    is_featured: data.is_featured ?? false,
+    total_payouts: data.total_payouts ?? 0,
+    total_certificates: data.total_certificates ?? 0,
+  };
+  if (data.custom_joined_date) insertData.custom_joined_date = data.custom_joined_date;
+  if (data.custom_total_payouts != null) insertData.custom_total_payouts = data.custom_total_payouts;
+  if (data.custom_total_certificates != null) insertData.custom_total_certificates = data.custom_total_certificates;
+
   const { error } = await supabase
     .from('trader_profiles')
-    .insert({
-      id: data.user_id,
-      display_name: data.display_name,
-      bio: data.bio || null,
-      is_public: data.is_public ?? false,
-      is_featured: data.is_featured ?? false,
-      total_payouts: data.total_payouts ?? 0,
-      total_certificates: data.total_certificates ?? 0,
-    });
+    .insert(insertData);
 
   if (error) throw error;
 }
@@ -397,6 +409,9 @@ export async function updateTraderProfile(userId: string, updates: {
   bio?: string;
   is_public?: boolean;
   is_featured?: boolean;
+  custom_joined_date?: string | null;
+  custom_total_payouts?: number | null;
+  custom_total_certificates?: number | null;
 }): Promise<void> {
   const { error } = await supabase
     .from('trader_profiles')

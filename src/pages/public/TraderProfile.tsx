@@ -130,7 +130,10 @@ export default function TraderProfile() {
   }
 
   const displayName = profile.display_name || profile.full_name || 'Trader';
-  const daysSinceJoined = getDaysSinceJoined(profile.created_at);
+  const effectiveJoinDate = profile.custom_joined_date || profile.created_at;
+  const daysSinceJoined = getDaysSinceJoined(effectiveJoinDate);
+  const effectivePayouts = profile.custom_total_payouts != null ? profile.custom_total_payouts : profile.total_payouts;
+  const effectiveCerts = profile.custom_total_certificates != null ? profile.custom_total_certificates : certificates.length;
   const visibleTrades = showAllTrades ? trades : trades.slice(0, 4);
 
   return (
@@ -224,7 +227,7 @@ export default function TraderProfile() {
             {/* Rewarded Value Card */}
             <div className="rounded-2xl bg-[#161B22] border border-white/[0.04] p-8 text-center">
               <p className="text-4xl font-extrabold tracking-tight text-[#3FB950] tabular-nums">
-                {formatAmountShort(profile.total_payouts)}
+                {formatAmountShort(effectivePayouts)}
               </p>
               <p className="text-sm font-medium mt-2 text-[#8B949E] uppercase tracking-widest">
                 Total Rewarded
@@ -256,7 +259,7 @@ export default function TraderProfile() {
                 <div className="flex items-center space-x-3">
                   <h2 className="text-lg font-bold text-[#E6EDF3] tracking-tight">Certificates</h2>
                   <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#21262D] text-[#8B949E] border border-white/[0.04]">
-                    {certificates.length}
+                    {effectiveCerts}
                   </span>
                 </div>
                 {certificates.length > 5 && (

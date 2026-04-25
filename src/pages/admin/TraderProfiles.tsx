@@ -45,14 +45,16 @@ export default function TraderProfiles() {
   // Create profile modal state
   const [showCreateProfileModal, setShowCreateProfileModal] = useState(false);
   const [profileForm, setProfileForm] = useState({
-    user_id: '', display_name: '', bio: '', is_public: true, is_featured: false
+    user_id: '', display_name: '', bio: '', is_public: true, is_featured: false,
+    custom_joined_date: '', custom_total_payouts: '', custom_total_certificates: ''
   });
 
   // Edit profile modal state
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [editingProfile, setEditingProfile] = useState<TraderProfile | null>(null);
   const [editForm, setEditForm] = useState({
-    display_name: '', bio: ''
+    display_name: '', bio: '',
+    custom_joined_date: '', custom_total_payouts: '', custom_total_certificates: ''
   });
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -109,16 +111,20 @@ export default function TraderProfiles() {
     if (processing) return;
     setProcessing(true);
     try {
-      await createTraderProfile({
+      const createData: any = {
         user_id: profileForm.user_id,
         display_name: profileForm.display_name,
         bio: profileForm.bio || undefined,
         is_public: profileForm.is_public,
-        is_featured: profileForm.is_featured
-      });
+        is_featured: profileForm.is_featured,
+      };
+      if (profileForm.custom_joined_date) createData.custom_joined_date = profileForm.custom_joined_date;
+      if (profileForm.custom_total_payouts) createData.custom_total_payouts = Number(profileForm.custom_total_payouts);
+      if (profileForm.custom_total_certificates) createData.custom_total_certificates = Number(profileForm.custom_total_certificates);
+      await createTraderProfile(createData);
       setSuccess('Trader profile created!');
       setShowCreateProfileModal(false);
-      setProfileForm({ user_id: '', display_name: '', bio: '', is_public: true, is_featured: false });
+      setProfileForm({ user_id: '', display_name: '', bio: '', is_public: true, is_featured: false, custom_joined_date: '', custom_total_payouts: '', custom_total_certificates: '' });
       await loadData();
     } catch (err: any) {
       if (err?.code === '23505') {
@@ -135,7 +141,10 @@ export default function TraderProfiles() {
     setEditingProfile(profile);
     setEditForm({
       display_name: profile.display_name || profile.full_name || '',
-      bio: profile.bio || ''
+      bio: profile.bio || '',
+      custom_joined_date: profile.custom_joined_date ? profile.custom_joined_date.split('T')[0] : '',
+      custom_total_payouts: profile.custom_total_payouts != null ? String(profile.custom_total_payouts) : '',
+      custom_total_certificates: profile.custom_total_certificates != null ? String(profile.custom_total_certificates) : ''
     });
     setShowEditProfileModal(true);
   };
@@ -145,10 +154,15 @@ export default function TraderProfiles() {
     if (!editingProfile || processing) return;
     setProcessing(true);
     try {
-      await updateTraderProfile(editingProfile.id, {
+      const updateData: any = {
         display_name: editForm.display_name,
-        bio: editForm.bio || undefined
-      });
+        bio: editForm.bio || undefined,
+      };
+      // Handle custom fields — empty string means clear (null), value means set
+      updateData.custom_joined_date = editForm.custom_joined_date || null;
+      updateData.custom_total_payouts = editForm.custom_total_payouts ? Number(editForm.custom_total_payouts) : null;
+      updateData.custom_total_certificates = editForm.custom_total_certificates ? Number(editForm.custom_total_certificates) : null;
+      await updateTraderProfile(editingProfile.id, updateData);
       setSuccess('Profile updated successfully!');
       setShowEditProfileModal(false);
       await loadData();
@@ -893,6 +907,48 @@ export default function TraderProfiles() {
                 </label>
               </div>
 
+              {/* Social Proof Overrides */}
+              <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+                <p className="text-xs font-semibold text-yellow-400 uppercase tracking-wider mb-3">⚡ Social Proof Controls</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">Custom Join Date</label>
+                    <input
+                      type="date"
+                      value={profileForm.custom_joined_date}
+                      onChange={e => setProfileForm(prev => ({ ...prev, custom_joined_date: e.target.value }))}
+                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-yellow-500/50 text-sm"
+                    />
+                    <p className="text-[10px] text-gray-500 mt-1">Override "X days with FundedCobra". Leave empty = real date.</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">Total Payouts ($)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={profileForm.custom_total_payouts}
+                        onChange={e => setProfileForm(prev => ({ ...prev, custom_total_payouts: e.target.value }))}
+                        className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-yellow-500/50 text-sm"
+                        placeholder="e.g. 25000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">Certificates #</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={profileForm.custom_total_certificates}
+                        onChange={e => setProfileForm(prev => ({ ...prev, custom_total_certificates: e.target.value }))}
+                        className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-yellow-500/50 text-sm"
+                        placeholder="e.g. 8"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={processing}
@@ -977,6 +1033,48 @@ export default function TraderProfiles() {
                   className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500/50 resize-none"
                   placeholder="A brief description about this trader..."
                 />
+              </div>
+
+              {/* Social Proof Overrides */}
+              <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+                <p className="text-xs font-semibold text-yellow-400 uppercase tracking-wider mb-3">⚡ Social Proof Controls</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">Custom Join Date</label>
+                    <input
+                      type="date"
+                      value={editForm.custom_joined_date}
+                      onChange={e => setEditForm(prev => ({ ...prev, custom_joined_date: e.target.value }))}
+                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-yellow-500/50 text-sm"
+                    />
+                    <p className="text-[10px] text-gray-500 mt-1">Override "X days with FundedCobra". Clear to use real date.</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">Total Payouts ($)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={editForm.custom_total_payouts}
+                        onChange={e => setEditForm(prev => ({ ...prev, custom_total_payouts: e.target.value }))}
+                        className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-yellow-500/50 text-sm"
+                        placeholder="e.g. 25000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1">Certificates #</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={editForm.custom_total_certificates}
+                        onChange={e => setEditForm(prev => ({ ...prev, custom_total_certificates: e.target.value }))}
+                        className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-yellow-500/50 text-sm"
+                        placeholder="e.g. 8"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <button
