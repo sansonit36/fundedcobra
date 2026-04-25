@@ -54,6 +54,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
   const [reviews, setReviews] = useState<EvalReview[]>([]);
   const [masterRules, setMasterRules] = useState<Record<string, any>>({});
   const [submittingReview, setSubmittingReview] = useState<string | null>(null);
+  const [expandedAccounts, setExpandedAccounts] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Load master rules for phase targets
@@ -146,6 +147,22 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
     }));
   };
 
+  const toggleAccountExpanded = (accountId: string) => {
+    setExpandedAccounts(prev => ({
+      ...prev,
+      [accountId]: !prev[accountId]
+    }));
+  };
+
+  const isAccountExpanded = (accountId: string) => expandedAccounts[accountId] ?? (filteredAccounts.length === 1);
+
+  const allExpanded = filteredAccounts.every(a => isAccountExpanded(a.id));
+  const toggleAll = () => {
+    const newState: Record<string, boolean> = {};
+    filteredAccounts.forEach(a => { newState[a.id] = !allExpanded; });
+    setExpandedAccounts(prev => ({ ...prev, ...newState }));
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
@@ -172,7 +189,20 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+      {/* Expand/Collapse All */}
+      {filteredAccounts.length > 1 && (
+        <div className="flex justify-end">
+          <button
+            onClick={toggleAll}
+            className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+          >
+            {allExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {allExpanded ? 'Collapse All' : 'Expand All'}
+          </button>
+        </div>
+      )}
+
       {filteredAccounts.map((account) => {
         const extended = extendedData[account.mt5_login];
         const bal = extended?.running_balance || 0;
@@ -180,76 +210,104 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
         const startBal = account.starting_balance || account.balance || 1;
         const pnl = eq - startBal;
         const pnlPct = startBal > 0 ? (pnl / startBal) * 100 : 0;
+        const expanded = isAccountExpanded(account.id);
         
         return (
-          <div key={account.id} className="space-y-4">
-            {/* ── Account Overview Card ── */}
-            <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${statusStyles[account.status]}`}>
+          <div key={account.id} className="space-y-3">
+            {/* ── Clickable Account Header ── */}
+            <div
+              className="rounded-2xl bg-[#141414] border border-[#1e1e1e] overflow-hidden cursor-pointer hover:border-[#2a2a2a] transition-colors"
+              onClick={() => toggleAccountExpanded(account.id)}
+            >
+              {/* Compact Summary Row (always visible) */}
+              <div className="flex items-center justify-between p-5">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold flex-shrink-0 ${statusStyles[account.status]}`}>
                     {statusIcons[account.status]}
                     <span className="capitalize">{account.status}</span>
                   </div>
-                  {account.package_name && <span className="text-sm text-gray-400 font-medium">{account.package_name}</span>}
+                  {account.package_name && <span className="text-sm text-gray-400 font-medium truncate">{account.package_name}</span>}
+                  <span className="text-xs text-gray-600 font-mono flex-shrink-0">#{account.mt5_login}</span>
                 </div>
-                <span className="text-xs text-gray-600">{new Date(account.created_at).toLocaleDateString()}</span>
-              </div>
-
-              {/* Hero Numbers */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Balance</p>
-                  <p className="text-3xl font-bold text-white tracking-tight">${bal.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Equity</p>
-                  <p className="text-3xl font-bold text-white tracking-tight">${eq.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Profit / Loss</p>
-                  <p className={`text-3xl font-bold tracking-tight ${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {pnl >= 0 ? '+' : ''}${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Return</p>
-                  <p className={`text-3xl font-bold tracking-tight ${pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%
-                  </p>
+                <div className="flex items-center gap-6">
+                  <div className="hidden sm:flex items-center gap-6">
+                    <div className="text-right">
+                      <p className="text-[10px] text-gray-600 uppercase">Balance</p>
+                      <p className="text-sm font-bold text-white">${bal.toLocaleString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-gray-600 uppercase">P&L</p>
+                      <p className={`text-sm font-bold ${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {pnl >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
                 </div>
               </div>
 
-              {/* Credentials Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-[#0c0c0c] border border-[#1e1e1e]">
-                <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">MT5 Login</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-white font-mono font-medium">{account.mt5_login}</span>
-                    <button onClick={() => copyToClipboard(account.mt5_login)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>
+              {/* Expanded Content */}
+              {expanded && (
+                <div className="px-5 pb-5 pt-0" onClick={e => e.stopPropagation()}>
+                  {/* Hero Numbers */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-5 pt-4 border-t border-[#1e1e1e]">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Balance</p>
+                      <p className="text-3xl font-bold text-white tracking-tight">${bal.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Equity</p>
+                      <p className="text-3xl font-bold text-white tracking-tight">${eq.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Profit / Loss</p>
+                      <p className={`text-3xl font-bold tracking-tight ${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {pnl >= 0 ? '+' : ''}${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Return</p>
+                      <p className={`text-3xl font-bold tracking-tight ${pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Credentials Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-[#0c0c0c] border border-[#1e1e1e]">
+                    <div>
+                      <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">MT5 Login</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white font-mono font-medium">{account.mt5_login}</span>
+                        <button onClick={() => copyToClipboard(account.mt5_login)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">MT5 Password</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white font-mono font-medium">{showPasswords[account.id] ? account.mt5_password : '••••••••'}</span>
+                        <button onClick={() => togglePasswordVisibility(account.id)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white">
+                          {showPasswords[account.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                        {showPasswords[account.id] && <button onClick={() => copyToClipboard(account.mt5_password)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Server</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white font-mono font-medium">{account.mt5_server}</span>
+                        <button onClick={() => copyToClipboard(account.mt5_server)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">MT5 Password</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-white font-mono font-medium">{showPasswords[account.id] ? account.mt5_password : '••••••••'}</span>
-                    <button onClick={() => togglePasswordVisibility(account.id)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white">
-                      {showPasswords[account.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    </button>
-                    {showPasswords[account.id] && <button onClick={() => copyToClipboard(account.mt5_password)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Server</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-white font-mono font-medium">{account.mt5_server}</span>
-                    <button onClick={() => copyToClipboard(account.mt5_server)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* ── Risk Management Card ── */}
+            {/* ── Expanded Detail Cards ── */}
+            {expanded && (
+              <>
+                {/* ── Risk Management Card ── */}
             <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
 
                 {/* Enhanced Drawdown Limits Section */}
@@ -542,6 +600,8 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   )}
                 </div>
                 
+              </>
+            )}
           </div>
         );
       })}
