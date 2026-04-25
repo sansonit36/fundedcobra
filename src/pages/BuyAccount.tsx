@@ -549,7 +549,7 @@ export default function BuyAccount() {
               const allPkgs = selectedModelPackages;
 
               return (
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
                   {allPkgs.map((pkg) => {
                     const isSelected = selectedPackage?.id === pkg.id;
                     const model = getPackageModel(pkg);
@@ -563,28 +563,33 @@ export default function BuyAccount() {
                       <button
                         key={pkg.id}
                         onClick={() => setSelectedPackage(pkg)}
-                        className={`relative flex-shrink-0 w-[140px] md:w-auto md:flex-1 rounded-xl border-2 p-3 md:p-4 text-left transition-all duration-200 ${
+                        className={`relative rounded-xl border-2 p-4 text-left transition-all duration-200 group flex flex-col ${
                           isSelected
-                            ? 'border-current'
-                            : 'border-white/[0.06] hover:border-white/15'
+                            ? 'border-current shadow-lg scale-[1.02]'
+                            : 'border-white/[0.06] hover:border-white/20 hover:bg-white/[0.02]'
                         }`}
                         style={{
-                          background: isSelected ? `${modelColor}0a` : '#0D1117',
+                          background: isSelected ? `${modelColor}10` : '#0D1117',
                           color: isSelected ? modelColor : 'inherit',
                           borderColor: isSelected ? modelColor : undefined,
                         }}
                       >
                         {isPremium && (
-                          <span className="absolute -top-2 left-3 px-1.5 py-0.5 rounded text-[8px] font-black bg-red-500/90 text-white">SALE</span>
+                          <span className="absolute -top-2 left-3 px-1.5 py-0.5 rounded text-[8px] font-black bg-red-500/90 text-white shadow-sm shadow-red-500/20">SALE</span>
                         )}
                         {isSelected && (
                           <div className="absolute top-2 right-2">
                             <CheckCircle className="w-4 h-4" style={{ color: modelColor }} />
                           </div>
                         )}
-                        <div className="text-base md:text-lg font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
-                        <div className="space-y-0.5">
-                          <div className="text-base md:text-lg font-bold" style={{ color: modelColor, fontFamily: 'Outfit, sans-serif' }}>${finalPrice.toFixed(0)}</div>
+                        <div className="text-lg md:text-xl font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
+                        <div className="space-y-0.5 mt-auto">
+                          <div className="text-lg font-bold flex items-center justify-between" style={{ color: modelColor, fontFamily: 'Outfit, sans-serif' }}>
+                            ${finalPrice.toFixed(0)}
+                            {!isSelected && (
+                              <span className="text-[10px] font-semibold text-[#8B949E] opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
+                            )}
+                          </div>
                           {fullDiscount > 0 && (
                             <div className="flex items-center gap-1.5">
                               <span className="text-[10px] text-[#484f58] line-through">${pkg.price}</span>
