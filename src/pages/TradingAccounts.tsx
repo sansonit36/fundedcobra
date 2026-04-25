@@ -330,7 +330,6 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                 {/* End Drawdown Limits Section */}
             </div>
 
-                {/* Phase Progress (Step accounts only) */}
                 {account.model_type && account.model_type !== 'instant' && (() => {
                   const rule = masterRules[account.model_type];
                   if (!rule) return null;
@@ -342,91 +341,122 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   const profitPercent = startBal > 0 ? ((currentEquity - startBal) / startBal) * 100 : 0;
                   const progress = phaseTarget > 0 ? Math.min(100, Math.max(0, (profitPercent / phaseTarget) * 100)) : 0;
                   const targetMet = profitPercent >= (phaseTarget || 0);
-                  const modelColor = account.model_type === '1_step' ? '#3B82F6' : '#10B981';
-                  const modelLabel = account.model_type === '1_step' ? '1-Step' : '2-Step';
-                  const phaseLabel = isFunded ? 'Funded' : account.current_phase === 1 ? 'Phase 1 — Evaluation' : 'Phase 2 — Verification';
-                  
-                  // Check for existing review
                   const existingReview = reviews.find(r => r.account_id === account.id && r.status === 'pending');
-                  const approvedReview = reviews.find(r => r.account_id === account.id && r.status === 'approved');
                   const rejectedReview = reviews.find(r => r.account_id === account.id && r.status === 'rejected' && !reviews.some(r2 => r2.account_id === account.id && r2.status === 'pending'));
+                  const is2Step = account.model_type === '2_step';
+                  const steps = is2Step
+                    ? [
+                        { label: 'Phase 1', sub: 'Evaluation', target: `${rule.profit_target_phase1}%`, phase: 1 },
+                        { label: 'Phase 2', sub: 'Verification', target: `${rule.profit_target_phase2}%`, phase: 2 },
+                        { label: 'Funded', sub: 'Live Trading', target: '🎉', phase: 3 },
+                      ]
+                    : [
+                        { label: 'Phase 1', sub: 'Evaluation', target: `${rule.profit_target_phase1}%`, phase: 1 },
+                        { label: 'Funded', sub: 'Live Trading', target: '🎉', phase: 2 },
+                      ];
 
                   return (
                     <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4" style={{ color: modelColor }} />
-                          <h3 className="text-sm font-bold text-white">{modelLabel} Progress</h3>
-                        </div>
-                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest" style={{ backgroundColor: isFunded ? '#10B98120' : `${modelColor}20`, color: isFunded ? '#10B981' : modelColor }}>
-                          {phaseLabel}
-                        </span>
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-sm font-semibold text-gray-300">Your Journey</h3>
+                        <span className="text-xs text-gray-600">{is2Step ? '2-Step' : '1-Step'} Challenge</span>
                       </div>
 
-                      {!isFunded && (
-                        <>
-                          <div className="flex justify-between text-xs text-gray-400 mb-2">
-                            <span>Profit: <strong className={profitPercent >= 0 ? 'text-green-400' : 'text-red-400'}>{profitPercent.toFixed(2)}%</strong></span>
-                            <span>Target: <strong className="text-white">{phaseTarget}%</strong></span>
-                          </div>
-                          <div className="relative h-2.5 bg-white/5 rounded-full overflow-hidden mb-4">
-                            <div 
-                              className="absolute top-0 left-0 h-full rounded-full transition-all duration-700"
-                              style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${modelColor}, ${targetMet ? '#10B981' : modelColor}90)` }}
-                            />
-                          </div>
+                      {/* Visual Stepper */}
+                      <div className="flex items-start mb-8">
+                        {steps.map((step, i) => {
+                          const isCompleted = account.current_phase > step.phase || (step.phase === maxPhase && isFunded);
+                          const isCurrent = account.current_phase === step.phase && !isFunded;
+                          const isLast = i === steps.length - 1;
+                          const isFundedStep = step.phase === maxPhase;
+                          return (
+                            <React.Fragment key={step.phase}>
+                              <div className="flex flex-col items-center text-center" style={{ flex: '0 0 auto', minWidth: 80 }}>
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
+                                  isCompleted ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                                  : isCurrent ? 'bg-white text-[#141414] shadow-[0_0_20px_rgba(255,255,255,0.15)]'
+                                  : 'bg-[#1e1e1e] text-gray-600 border border-[#2a2a2a]'
+                                }`}>
+                                  {isCompleted ? <CheckCircle className="w-5 h-5" /> : isFundedStep ? <Zap className="w-5 h-5" /> : step.phase}
+                                </div>
+                                <p className={`text-xs font-semibold mt-2 ${isCompleted ? 'text-emerald-400' : isCurrent ? 'text-white' : 'text-gray-600'}`}>{step.label}</p>
+                                <p className={`text-[10px] ${isCompleted ? 'text-emerald-400/60' : isCurrent ? 'text-gray-400' : 'text-gray-700'}`}>{step.sub}</p>
+                                <p className={`text-[10px] mt-0.5 ${isCompleted ? 'text-emerald-400/40' : isCurrent ? 'text-gray-500' : 'text-gray-700'}`}>{step.target}</p>
+                              </div>
+                              {!isLast && (
+                                <div className="flex-1 flex items-center pt-5 px-1">
+                                  <div className="w-full h-[2px] rounded-full relative overflow-hidden bg-[#1e1e1e]">
+                                    <div className="absolute top-0 left-0 h-full rounded-full transition-all duration-700 bg-emerald-500"
+                                      style={{ width: isCompleted ? '100%' : isCurrent ? `${Math.min(progress, 100)}%` : '0%' }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
 
-                          {/* Review Status / Request Button */}
+                      {/* Current Phase Detail */}
+                      {!isFunded && (
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex justify-between items-end mb-2">
+                              <div>
+                                <p className="text-xs text-gray-500">Current Profit</p>
+                                <p className={`text-lg font-bold ${profitPercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{profitPercent >= 0 ? '+' : ''}{profitPercent.toFixed(2)}%</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xs text-gray-500">Target</p>
+                                <p className="text-lg font-bold text-white">{phaseTarget}%</p>
+                              </div>
+                            </div>
+                            <div className="relative h-3 bg-[#1e1e1e] rounded-full overflow-hidden">
+                              <div className="absolute top-0 left-0 h-full rounded-full transition-all duration-700"
+                                style={{ width: `${progress}%`, background: targetMet ? 'linear-gradient(90deg, #10B981, #34D399)' : 'linear-gradient(90deg, #ffffff20, #ffffff50)' }}
+                              />
+                            </div>
+                            {!targetMet && <p className="text-[10px] text-gray-600 mt-2 text-center">{(phaseTarget - profitPercent).toFixed(2)}% remaining to unlock phase review</p>}
+                          </div>
                           {existingReview ? (
-                            <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                              <Clock className="w-4 h-4 text-yellow-400" />
-                              <span className="text-xs font-bold text-yellow-400 uppercase tracking-widest">Review Pending — Submitted {new Date(existingReview.created_at).toLocaleDateString()}</span>
+                            <div className="flex items-center gap-3 p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+                              <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center flex-shrink-0"><Clock className="w-4 h-4 text-yellow-400" /></div>
+                              <div>
+                                <p className="text-xs font-semibold text-yellow-400">Review Pending</p>
+                                <p className="text-[10px] text-gray-500">Submitted {new Date(existingReview.created_at).toLocaleDateString()} — we'll get back to you soon</p>
+                              </div>
                             </div>
                           ) : rejectedReview ? (
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                                <AlertOctagon className="w-4 h-4 text-red-400" />
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+                                <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0"><AlertOctagon className="w-4 h-4 text-red-400" /></div>
                                 <div>
-                                  <span className="text-xs font-bold text-red-400 uppercase tracking-widest">Review Rejected</span>
-                                  {rejectedReview.admin_notes && <p className="text-xs text-gray-400 mt-1">{rejectedReview.admin_notes}</p>}
+                                  <p className="text-xs font-semibold text-red-400">Review Rejected</p>
+                                  {rejectedReview.admin_notes && <p className="text-[10px] text-gray-500 mt-0.5">{rejectedReview.admin_notes}</p>}
                                 </div>
                               </div>
                               {targetMet && (
-                                <button
-                                  onClick={() => requestPhaseReview(account, profitPercent, phaseTarget)}
-                                  disabled={submittingReview === account.id}
-                                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all text-white"
-                                  style={{ backgroundColor: modelColor }}
-                                >
-                                  <Send className="w-3.5 h-3.5" /> Resubmit Review Request
+                                <button onClick={() => requestPhaseReview(account, profitPercent, phaseTarget)} disabled={submittingReview === account.id}
+                                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all bg-white text-[#141414] hover:bg-gray-200 active:scale-[0.99]">
+                                  <Send className="w-3.5 h-3.5" /> Resubmit Review
                                 </button>
                               )}
                             </div>
                           ) : targetMet ? (
-                            <button
-                              onClick={() => requestPhaseReview(account, profitPercent, phaseTarget)}
-                              disabled={submittingReview === account.id}
-                              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.01] active:scale-[0.99] text-white"
-                              style={{ backgroundColor: modelColor, boxShadow: `0 0 20px ${modelColor}30` }}
-                            >
-                              {submittingReview === account.id ? (
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                              ) : (
-                                <><Send className="w-3.5 h-3.5" /> Request Phase Review</>
-                              )}
+                            <button onClick={() => requestPhaseReview(account, profitPercent, phaseTarget)} disabled={submittingReview === account.id}
+                              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold transition-all bg-emerald-500 text-white hover:bg-emerald-400 active:scale-[0.99] shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                              {submittingReview === account.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Send className="w-4 h-4" /> Request Phase Review</>}
                             </button>
-                          ) : (
-                            <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-                              Reach {phaseTarget}% profit to unlock phase review
-                            </p>
-                          )}
-                        </>
+                          ) : null}
+                        </div>
                       )}
-
                       {isFunded && (
-                        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                          <CheckCircle className="w-4 h-4 text-emerald-400" />
-                          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Account Funded — Trade freely & request payouts</span>
+                        <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                          <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0"><Zap className="w-5 h-5 text-emerald-400" /></div>
+                          <div>
+                            <p className="text-sm font-semibold text-emerald-400">You're Funded! 🎉</p>
+                            <p className="text-xs text-gray-500">Trade freely and request payouts whenever you're ready</p>
+                          </div>
                         </div>
                       )}
                     </div>
