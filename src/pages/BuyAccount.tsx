@@ -306,14 +306,14 @@ export default function BuyAccount() {
       </div>
 
       {/* HEADER */}
-      <div className="relative max-w-7xl mx-auto px-4 pt-14 pb-8">
+      <div className="relative max-w-7xl mx-auto px-4 pt-8 md:pt-14 pb-6 md:pb-8">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-10" style={{ backgroundColor: '#bd4dd6' }} />
           <div className="absolute top-10 right-1/4 w-72 h-72 rounded-full blur-[100px] opacity-[0.07]" style={{ backgroundColor: '#3B82F6' }} />
         </div>
-        <div className="relative text-center mb-10">
-          <h1 className="text-5xl lg:text-7xl tracking-tight mb-4 leading-[1.05]" style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Get Funded <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">Today</span></h1>
-          <p className="text-gray-400 text-base max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
+        <div className="relative text-center mb-6 md:mb-10">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl tracking-tight mb-2 md:mb-4 leading-[1.05]" style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>Get Funded <span className="bg-gradient-to-r from-[#bd4dd6] to-[#e879f9] bg-clip-text text-transparent">Today</span></h1>
+          <p className="text-gray-400 text-sm md:text-base max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your funding model, select your account size, and start trading with our capital in minutes.</p>
         </div>
         
         {/* ACCOUNT TYPE TABS - Big and prominent */}
@@ -331,7 +331,7 @@ export default function BuyAccount() {
                     const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
                     setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
                   }}
-                  className={`px-8 py-4 rounded-xl text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
+                  className={`px-4 md:px-8 py-3 md:py-4 rounded-xl text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
                     active ? 'text-white' : 'text-gray-500 hover:text-gray-300'
                   }`}
                   style={active ? { background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 6px 30px ${color}50, 0 0 0 1px ${color}30` } : { fontFamily: 'Plus Jakarta Sans, sans-serif' }}
@@ -357,8 +357,9 @@ export default function BuyAccount() {
           { value: '1:100', label: 'Leverage', color: '#facc15', Icon: Sparkles },
         ];
         return (
-          <div className="max-w-7xl mx-auto px-4 mb-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="max-w-7xl mx-auto px-4 mb-6">
+            {/* Desktop: 4 cards */}
+            <div className="hidden md:grid grid-cols-4 gap-3">
               {featureItems.map((item, idx) => (
                 <div key={idx} className="relative group rounded-xl p-[1px] transition-all duration-300" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))` }}>
                   <div className="rounded-xl p-5 text-center h-full" style={{ background: 'linear-gradient(180deg, #151515 0%, #0d0d0d 100%)' }}>
@@ -366,6 +367,16 @@ export default function BuyAccount() {
                     <div className="text-2xl font-bold" style={{ color: item.color, fontFamily: 'Outfit, sans-serif' }}>{item.value}</div>
                     <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-1" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{item.label}</div>
                   </div>
+                </div>
+              ))}
+            </div>
+            {/* Mobile: compact horizontal strip */}
+            <div className="flex md:hidden gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+              {featureItems.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.06] whitespace-nowrap flex-shrink-0" style={{ background: '#111' }}>
+                  <item.Icon className="w-3.5 h-3.5 opacity-50" style={{ color: item.color }} />
+                  <span className="text-xs font-bold" style={{ color: item.color }}>{item.value}</span>
+                  <span className="text-[9px] text-gray-600 font-semibold uppercase">{item.label}</span>
                 </div>
               ))}
             </div>
@@ -395,16 +406,22 @@ export default function BuyAccount() {
 
               const renderCard = (pkg: any) => {
                 const isSelected = selectedPackage?.id === pkg.id;
-                const discountedPrice = pkg.price * (1 - categoryDiscount / 100);
-                const savings = pkg.price - discountedPrice;
+                const catDiscount = categoryDiscount;
+                const baseDiscounted = pkg.price * (1 - catDiscount / 100);
+                // Also apply default coupon preview for unselected cards
+                const model = getPackageModel(pkg);
+                const defaultCoupon = model === 'instant' && pkg.balance >= 10000 ? 50 : 10;
+                const fullDiscount = Math.min(catDiscount + defaultCoupon, 100);
+                const finalPrice = pkg.price * (1 - fullDiscount / 100);
+                const savings = pkg.price - finalPrice;
                 const balanceLabel = pkg.balance >= 10000 ? `$${(pkg.balance / 1000).toFixed(0)}K` : `$${pkg.balance.toLocaleString()}`;
                 return (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPackage(pkg)}
-                    className={`relative p-4 rounded-xl border transition-all duration-300 text-center group ${
+                    className={`relative p-3 md:p-4 rounded-xl border transition-all duration-300 text-center group ${
                       isSelected 
-                        ? 'border-transparent scale-[1.04]'
+                        ? 'border-transparent scale-[1.03]'
                         : 'border-white/[0.06] hover:border-white/15 hover:scale-[1.02]'
                     }`}
                     style={isSelected 
@@ -413,13 +430,13 @@ export default function BuyAccount() {
                     }
                   >
                     {isSelected && <div className="absolute -top-1.5 -right-1.5 rounded-full shadow-lg" style={{ background: modelColor }}><Check className="w-4 h-4 text-white p-0.5" /></div>}
-                    <div className="text-xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
-                    <div className="flex items-center justify-center gap-1.5 mt-2">
-                      {categoryDiscount > 0 && <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>}
-                      <span className="text-base font-bold" style={{ color: modelColor, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>${discountedPrice.toFixed(0)}</span>
+                    <div className="text-lg md:text-xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
+                    <div className="flex items-center justify-center gap-1.5 mt-1.5">
+                      <span className="text-[10px] text-gray-600 line-through">${pkg.price}</span>
+                      <span className="text-sm md:text-base font-bold" style={{ color: modelColor, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>${finalPrice.toFixed(0)}</span>
                     </div>
-                    {categoryDiscount > 0 && savings > 0 && (
-                      <div className="text-[9px] font-semibold text-emerald-400 mt-1.5 bg-emerald-500/10 rounded-md px-2 py-0.5 inline-block border border-emerald-500/20">Save ${savings.toFixed(0)}</div>
+                    {savings > 0 && (
+                      <div className="text-[8px] md:text-[9px] font-semibold text-emerald-400 mt-1 bg-emerald-500/10 rounded-md px-1.5 py-0.5 inline-block border border-emerald-500/20">Save ${savings.toFixed(0)}</div>
                     )}
                   </button>
                 );
