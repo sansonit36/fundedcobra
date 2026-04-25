@@ -67,13 +67,13 @@ export default function TraderProfiles() {
       const [profilesData, lbData, { data: usersData }] = await Promise.all([
         getAllTraderProfiles(),
         getAllLeaderboardEntries(),
-        supabase.from('profiles').select('id, full_name, name, email').order('email')
+        supabase.from('profiles').select('id, name, email').order('email')
       ]);
       setProfiles(profilesData);
       setLeaderboardEntries(lbData);
       setUsers((usersData || []).map(u => ({
         id: u.id,
-        name: u.full_name || u.name || u.email,
+        name: u.name || u.email,
         email: u.email
       })));
     } catch (err) {

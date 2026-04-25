@@ -131,14 +131,14 @@ export async function getPublicTraderProfile(userId: string): Promise<TraderProf
   // Get additional profile info
   const { data: profileData } = await supabase
     .from('profiles')
-    .select('full_name, name, email, avatar_url')
+    .select('name, email, avatar_url')
     .eq('id', userId)
     .single();
 
   if (profileData) {
     return {
       ...data,
-      full_name: profileData.full_name || profileData.name,
+      full_name: profileData.name,
       email: profileData.email,
       avatar_url: data.avatar_url || profileData.avatar_url
     };
@@ -165,7 +165,7 @@ export async function getRecommendedTraders(): Promise<TraderProfile[]> {
     const userIds = data.map(p => p.id);
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, avatar_url, full_name, name')
+      .select('id, avatar_url, name')
       .in('id', userIds);
 
     const profileMap = new Map((profiles || []).map(p => [p.id, p]));
@@ -175,7 +175,7 @@ export async function getRecommendedTraders(): Promise<TraderProfile[]> {
       return {
         ...tp,
         avatar_url: tp.avatar_url || p?.avatar_url || null,
-        full_name: tp.display_name || p?.full_name || p?.name || null,
+        full_name: tp.display_name || p?.name || null,
       };
     });
   }
@@ -349,7 +349,7 @@ export async function getAllTraderProfiles(): Promise<TraderProfile[]> {
     const userIds = data.map(p => p.id);
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, full_name, name, email, avatar_url')
+      .select('id, name, email, avatar_url')
       .in('id', userIds);
 
     const profileMap = new Map((profiles || []).map(p => [p.id, p]));
@@ -358,7 +358,7 @@ export async function getAllTraderProfiles(): Promise<TraderProfile[]> {
       const p = profileMap.get(tp.id);
       return {
         ...tp,
-        full_name: p?.full_name || p?.name || null,
+        full_name: p?.name || null,
         email: p?.email || null,
         avatar_url: p?.avatar_url || null
       };
