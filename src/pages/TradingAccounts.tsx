@@ -182,70 +182,75 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
         const pnlPct = startBal > 0 ? (pnl / startBal) * 100 : 0;
         
         return (
-          <div key={account.id} className="card-gradient rounded-2xl border border-white/5 overflow-hidden">
-            {/* Hero Header */}
-            <div className="p-6 pb-4">
-              <div className="flex items-center justify-between mb-5">
+          <div key={account.id} className="space-y-4">
+            {/* ── Account Overview Card ── */}
+            <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
+              <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${statusStyles[account.status]}`}>
+                  <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${statusStyles[account.status]}`}>
                     {statusIcons[account.status]}
                     <span className="capitalize">{account.status}</span>
                   </div>
-                  {account.package_name && <span className="text-xs text-gray-500 font-medium">{account.package_name}</span>}
+                  {account.package_name && <span className="text-sm text-gray-400 font-medium">{account.package_name}</span>}
                 </div>
                 <span className="text-xs text-gray-600">{new Date(account.created_at).toLocaleDateString()}</span>
               </div>
 
-              {/* Balance Hero */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {/* Hero Numbers */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Balance</p>
-                  <p className="text-2xl font-bold text-white">${bal.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 mb-1">Balance</p>
+                  <p className="text-3xl font-bold text-white tracking-tight">${bal.toLocaleString()}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Equity</p>
-                  <p className="text-2xl font-bold text-white">${eq.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 mb-1">Equity</p>
+                  <p className="text-3xl font-bold text-white tracking-tight">${eq.toLocaleString()}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">P&L</p>
-                  <p className={`text-2xl font-bold ${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  <p className="text-xs text-gray-500 mb-1">Profit / Loss</p>
+                  <p className={`text-3xl font-bold tracking-tight ${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {pnl >= 0 ? '+' : ''}${Math.abs(pnl).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Return</p>
-                  <p className={`text-2xl font-bold ${pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <p className="text-xs text-gray-500 mb-1">Return</p>
+                  <p className={`text-3xl font-bold tracking-tight ${pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                     {pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%
                   </p>
                 </div>
               </div>
+
+              {/* Credentials Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-[#0c0c0c] border border-[#1e1e1e]">
+                <div>
+                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">MT5 Login</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-white font-mono font-medium">{account.mt5_login}</span>
+                    <button onClick={() => copyToClipboard(account.mt5_login)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">MT5 Password</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-white font-mono font-medium">{showPasswords[account.id] ? account.mt5_password : '••••••••'}</span>
+                    <button onClick={() => togglePasswordVisibility(account.id)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white">
+                      {showPasswords[account.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                    {showPasswords[account.id] && <button onClick={() => copyToClipboard(account.mt5_password)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Server</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-white font-mono font-medium">{account.mt5_server}</span>
+                    <button onClick={() => copyToClipboard(account.mt5_server)} className="p-1 hover:bg-white/10 rounded transition-colors text-gray-600 hover:text-white"><Copy className="w-3.5 h-3.5" /></button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Credentials Strip */}
-            <div className="px-6 py-3 bg-white/[0.02] border-y border-white/5 flex flex-wrap items-center gap-x-6 gap-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Login</span>
-                <code className="text-sm text-primary-400 font-semibold">{account.mt5_login}</code>
-                <button onClick={() => copyToClipboard(account.mt5_login)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300"><Copy className="w-3.5 h-3.5" /></button>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Password</span>
-                <code className="text-sm text-primary-400 font-semibold">{showPasswords[account.id] ? account.mt5_password : '••••••••'}</code>
-                <button onClick={() => togglePasswordVisibility(account.id)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300">
-                  {showPasswords[account.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                </button>
-                {showPasswords[account.id] && <button onClick={() => copyToClipboard(account.mt5_password)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300"><Copy className="w-3.5 h-3.5" /></button>}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Server</span>
-                <code className="text-sm text-primary-400 font-semibold">{account.mt5_server}</code>
-                <button onClick={() => copyToClipboard(account.mt5_server)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300"><Copy className="w-3.5 h-3.5" /></button>
-              </div>
-            </div>
-
-            {/* Content area */}
-            <div className="p-6 pt-5 space-y-4">
-              <div className="flex-1 space-y-4">
+            {/* ── Risk Management Card ── */}
+            <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
 
                 {/* Enhanced Drawdown Limits Section */}
                 <div className="space-y-3">
@@ -323,6 +328,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   </div>
                 </div>
                 {/* End Drawdown Limits Section */}
+            </div>
 
                 {/* Phase Progress (Step accounts only) */}
                 {account.model_type && account.model_type !== 'instant' && (() => {
@@ -346,7 +352,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   const rejectedReview = reviews.find(r => r.account_id === account.id && r.status === 'rejected' && !reviews.some(r2 => r2.account_id === account.id && r2.status === 'pending'));
 
                   return (
-                    <div className="mt-6 p-5 rounded-xl border" style={{ borderColor: `${modelColor}25`, background: `linear-gradient(135deg, ${modelColor}05, transparent)` }}>
+                    <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <Zap className="w-4 h-4" style={{ color: modelColor }} />
@@ -427,7 +433,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   );
                 })()}
 
-                {/* Account Rules Info Strip */}
+                {/* Account Rules */}
                 {(() => {
                   const mt = account.model_type || 'instant';
                   const rule = masterRules[mt];
@@ -435,75 +441,68 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   const mc = mt === 'instant' ? '#bd4dd6' : mt === '1_step' ? '#3B82F6' : '#10B981';
                   const ml = mt === 'instant' ? 'Instant' : mt === '1_step' ? '1-Step' : '2-Step';
                   return (
-                    <div className="mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Shield className="w-3.5 h-3.5 text-gray-500" />
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Account Rules</span>
-                        <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest" style={{ backgroundColor: `${mc}15`, color: mc }}>{ml}</span>
+                    <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Shield className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-semibold text-gray-300">Account Rules</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style={{ backgroundColor: `${mc}15`, color: mc }}>{ml}</span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                         <div>
-                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Profit Split</p>
-                          <p className="text-xs font-bold text-white">{rule.payout_split_percent || 80}%</p>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Profit Split</p>
+                          <p className="text-sm font-bold text-white">{rule.payout_split_percent || 80}%</p>
                         </div>
                         <div>
-                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Withdrawal Target</p>
-                          <p className="text-xs font-bold text-white">{rule.withdrawal_target_percent || 5}%</p>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Withdrawal Target</p>
+                          <p className="text-sm font-bold text-white">{rule.withdrawal_target_percent || 5}%</p>
                         </div>
                         <div>
-                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Min Withdrawal</p>
-                          <p className="text-xs font-bold text-white">${rule.minimum_withdrawal_amount || 50}</p>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Min Withdrawal</p>
+                          <p className="text-sm font-bold text-white">${rule.minimum_withdrawal_amount || 50}</p>
                         </div>
                         <div>
-                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Schedule</p>
-                          <p className="text-xs font-bold text-white">
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Schedule</p>
+                          <p className="text-sm font-bold text-white">
                             {rule.daily_payout_enabled ? 'Daily' : rule.weekly_payout_enabled ? 'Weekly' : '—'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-wider">Min Days</p>
-                          <p className="text-xs font-bold text-white">{rule.minimum_trading_days || 0}</p>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Min Days</p>
+                          <p className="text-sm font-bold text-white">{rule.minimum_trading_days || 0}</p>
                         </div>
                       </div>
                     </div>
                   );
                 })()}
                 
-                {/* Breach Reason Section */}
+                {/* Breach Reason */}
                 {account.status === 'breached' && account.breach_reason && (
-                  <div className="mt-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <h3 className="text-sm font-semibold text-red-400 mb-2 flex items-center">
+                  <div className="rounded-2xl bg-red-500/5 border border-red-500/10 p-6">
+                    <h3 className="text-sm font-semibold text-red-400 mb-3 flex items-center">
                       <AlertOctagon className="w-4 h-4 mr-2" />
                       Breach Reason
                     </h3>
-                    <p className="text-sm text-red-300">{account.breach_reason}</p>
-                    <div className="mt-3 flex flex-col sm:flex-row gap-2">
-                      <a
-                        href="/rules"
-                        className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors text-sm font-medium"
-                      >
+                    <p className="text-sm text-red-300 mb-4">{account.breach_reason}</p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <a href="/rules" className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors text-sm font-medium">
                         Review Trading Rules
                       </a>
-                      <a
-                        href="/buy-account"
-                        className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-[#bd4dd6] hover:bg-[#a63aba] text-white transition-colors text-sm font-medium"
-                      >
+                      <a href="/buy-account" className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#bd4dd6] hover:bg-[#a63aba] text-white transition-colors text-sm font-medium">
                         Get New Account
                       </a>
                     </div>
                   </div>
                 )}
-                {/* End Breach Reason Section */}
                 
-                {/* Trade History Toggle */}
-                <div className="mt-4 pt-4 border-t border-white/5">
+                {/* Trade History */}
+                <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
                   <button
                     onClick={() => toggleTradesVisibility(account.id)}
-                    className="flex items-center text-sm font-medium text-primary-400 hover:text-primary-300 transition-colors"
+                    className="flex items-center text-sm font-medium text-gray-300 hover:text-white transition-colors w-full"
                   >
-                    <History className="w-4 h-4 mr-2" />
+                    <History className="w-4 h-4 mr-2 text-gray-500" />
                     {showTrades[account.id] ? 'Hide Recent Trades' : 'View Recent Trades'}
-                    {showTrades[account.id] ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+                    {showTrades[account.id] ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
                   </button>
                   
                   {showTrades[account.id] && (
@@ -512,10 +511,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     </div>
                   )}
                 </div>
-                {/* End Trade History Toggle */}
                 
-              </div>
-            </div>
           </div>
         );
       })}
