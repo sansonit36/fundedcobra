@@ -394,14 +394,14 @@ export default function BuyAccount() {
                           const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
                           setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
                         }}
-                        className={`flex-1 px-3 py-4 transition-all border-b-2 ${
+                        className={`flex-1 px-3 py-3 transition-all border-b-2 ${
                           active ? 'text-white' : 'text-[#484f58] hover:text-[#8B949E] border-transparent'
                         }`}
                         style={active ? { borderBottomColor: color, background: `${color}08` } : {}}
                       >
                         <div className="flex flex-col items-center gap-0.5">
-                          <span className="text-xs font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
-                          <span className="text-[9px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
+                          <span className="text-[11px] font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
+                          <span className="text-[8px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
                         </div>
                       </button>
                     );
@@ -410,13 +410,13 @@ export default function BuyAccount() {
 
                 {/* Phase Progression Visual */}
                 {selectedModel !== 'instant' && (
-                  <div className="px-5 pt-5 pb-2">
+                  <div className="px-4 pt-3 pb-1">
                     <div className="flex items-center gap-2">
                       {phases.map((phase, i) => (
                         <React.Fragment key={i}>
                           <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: phase.color }} />
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">{phase.label}</span>
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: phase.color }} />
+                            <span className="text-[9px] font-bold text-white uppercase tracking-wider">{phase.label}</span>
                           </div>
                           {i < phases.length - 1 && (
                             <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${phases[i].color}40, ${phases[i + 1].color}40)` }} />
@@ -430,16 +430,16 @@ export default function BuyAccount() {
                 {/* Phase Rules Columns */}
                 <div className={`grid gap-0 ${phases.length === 1 ? 'grid-cols-1' : phases.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
                   {phases.map((phase, phaseIdx) => (
-                    <div key={phaseIdx} className={`p-5 ${phaseIdx > 0 ? 'border-t md:border-t-0 md:border-l border-white/[0.04]' : ''}`}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: phase.color }} />
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">{phase.label}</h4>
+                    <div key={phaseIdx} className={`px-4 py-3 ${phaseIdx > 0 ? 'border-t md:border-t-0 md:border-l border-white/[0.04]' : ''}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1 h-4 rounded-full" style={{ backgroundColor: phase.color }} />
+                        <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">{phase.label}</h4>
                       </div>
                       <div className="space-y-0">
                         {phase.rules.map((rule, ruleIdx) => (
-                          <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
-                            <span className="text-[11px] text-[#8B949E]">{rule.label}</span>
-                            <span className="text-[11px] text-white font-bold">{rule.value}</span>
+                          <div key={ruleIdx} className="flex justify-between items-center py-[7px] border-b border-white/[0.03] last:border-0">
+                            <span className="text-xs text-[#8B949E]">{rule.label}</span>
+                            <span className="text-xs text-white font-bold">{rule.value}</span>
                           </div>
                         ))}
                       </div>
@@ -448,10 +448,10 @@ export default function BuyAccount() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-5 py-3 border-t border-white/[0.04] flex items-center justify-between">
+                <div className="px-4 py-2.5 border-t border-white/[0.04] flex items-center justify-between">
                   <div className="flex items-center gap-4 text-[10px] text-[#484f58]">
-                    <span>EAs Allowed: <span className="text-[#8B949E] font-semibold">Yes</span></span>
-                    <span>News Trading: <span className="text-[#8B949E] font-semibold">{r?.news_trading_allowed !== false ? 'Yes' : 'No'}</span></span>
+                    <span>EAs: <span className="text-[#8B949E] font-semibold">Yes</span></span>
+                    <span>News: <span className="text-[#8B949E] font-semibold">{r?.news_trading_allowed !== false ? 'Yes' : 'No'}</span></span>
                     <span>Leverage: <span className="text-[#8B949E] font-semibold">1:100</span></span>
                   </div>
                   <button onClick={() => setShowRules(true)} className="text-[10px] font-semibold uppercase tracking-wider hover:text-white transition-colors" style={{ color: modelColor }}>
@@ -464,8 +464,36 @@ export default function BuyAccount() {
 
           {/* ACCOUNT BALANCE */}
           <div>
-            <h3 className="text-sm font-bold text-white mb-1" style={{ fontFamily: 'Outfit, sans-serif' }}>Account Balance</h3>
-            <p className="text-[11px] text-[#484f58] font-medium mb-4">Trading Account Currency: <span className="text-[#8B949E]">USD</span></p>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Account Balance</h3>
+                <p className="text-[10px] text-[#484f58] font-medium mt-0.5">Trading Account Currency: <span className="text-[#8B949E]">USD</span></p>
+              </div>
+              {/* Inline type switcher */}
+              <div className="flex gap-1 p-0.5 rounded-lg border border-white/[0.06]" style={{ background: '#0D1117' }}>
+                {['instant', '1_step', '2_step'].map((type) => {
+                  const model = type as AccountModelType;
+                  const active = selectedModel === model;
+                  const color = model === 'instant' ? '#8A2BE2' : model === '1_step' ? '#3B82F6' : '#10B981';
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        setSelectedModel(model);
+                        const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
+                        setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider transition-all ${
+                        active ? 'text-white' : 'text-[#484f58] hover:text-[#8B949E]'
+                      }`}
+                      style={active ? { background: color } : {}}
+                    >
+                      {MODEL_META[model].label.split(' ')[0]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {(() => {
               const modelColor = selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
