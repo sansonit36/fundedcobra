@@ -22,7 +22,7 @@ interface Review {
     package_name: string;
   };
   profile?: {
-    full_name: string;
+    name: string;
     email: string;
   };
 }
@@ -49,7 +49,7 @@ export default function EvaluationReviews() {
         .select(`
           *,
           account:trading_accounts!account_id(mt5_login, model_type, current_phase, balance, package_name),
-          profile:profiles!user_id(full_name, email)
+          profile:profiles!evaluation_reviews_profile_id_fkey(name, email)
         `)
         .order('created_at', { ascending: false });
 
@@ -175,7 +175,7 @@ export default function EvaluationReviews() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-sm font-bold text-white">{review.profile?.full_name || 'Unknown Trader'}</span>
+                        <span className="text-sm font-bold text-white">{review.profile?.name || 'Unknown Trader'}</span>
                         {statusBadge(review.status)}
                       </div>
                       <div className="flex items-center gap-3 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
