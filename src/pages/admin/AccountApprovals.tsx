@@ -602,6 +602,7 @@ const handleApprove = async () => {
                   </div>
                 </div>
 
+                <form onSubmit={(e) => { e.preventDefault(); handleApprove(); }}>
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">
                     MT5 Login ID
@@ -659,13 +660,14 @@ const handleApprove = async () => {
 
                 <div className="flex items-center space-x-3 pt-4">
                   <button
-                    onClick={handleApprove}
+                    type="submit"
                     disabled={processing || !mt5Credentials.login || !mt5Credentials.password}
                     className="flex-1 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
                   >
                     {processing ? 'Approving...' : 'Confirm Approval'}
                   </button>
                 </div>
+                </form>
               </div>
             </div>
           </div>
