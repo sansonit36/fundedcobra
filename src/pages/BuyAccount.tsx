@@ -80,7 +80,7 @@ export default function BuyAccount() {
   const [verificationStep, setVerificationStep] = useState(0);
   const [showExitIntent, setShowExitIntent] = useState(false);
   const [exitIntentShown, setExitIntentShown] = useState(false);
-  const [tickerIndex, setTickerIndex] = useState(0);
+
   const [rulePhaseTab, setRulePhaseTab] = useState<'p1' | 'p2' | 'funded'>('p1');
   const [countdown, setCountdown] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
@@ -107,18 +107,7 @@ export default function BuyAccount() {
     return { code: 'WELCOME10', discount: 10 };
   };
 
-  const payoutTicker = [
-    { trader: 'Ahmad R.', amount: '$380', time: '4 mins ago', pkg: '$5K account' },
-    { trader: 'Sara M.', amount: '$210', time: '11 mins ago', pkg: '$2.5K account' },
-    { trader: 'James K.', amount: '$650', time: '23 mins ago', pkg: '$10K account' },
-    { trader: 'Hira F.', amount: '$125', time: '31 mins ago', pkg: '$1.25K account' },
-    { trader: 'Carlos D.', amount: '$940', time: '47 mins ago', pkg: '$15K account' },
-  ];
 
-  useEffect(() => {
-    const t = setInterval(() => setTickerIndex(i => (i + 1) % payoutTicker.length), 3000);
-    return () => clearInterval(t);
-  }, []);
 
   // Countdown timer to midnight
   useEffect(() => {
@@ -301,19 +290,18 @@ export default function BuyAccount() {
         </div>
       )}
 
-      {/* URGENCY BAR */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(90deg, #dc2626 0%, #ef4444 30%, #f97316 70%, #dc2626 100%)' }}>
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)' }} />
+      {/* PROMOTION STRIP */}
+      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a1025 0%, #161B22 50%, #12161f 100%)' }}>
+        <div className="absolute inset-0 bg-[#8A2BE2]/[0.04]" />
         <div className="relative max-w-7xl mx-auto flex items-center justify-center gap-4 text-white text-sm font-semibold py-3 px-4" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-white animate-pulse" /> LIVE</span>
-          <span>Only <span className="bg-white/20 px-2 py-0.5 rounded-md font-black">{Math.floor(Math.random() * 8) + 3}</span> spots left</span>
-          <span className="hidden md:inline opacity-40">|</span>
-          <span className="flex items-center gap-1.5 md:gap-2">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="font-mono font-black">{String(countdown.hours).padStart(2,'0')}:{String(countdown.minutes).padStart(2,'0')}:{String(countdown.seconds).padStart(2,'0')}</span>
-            <span className="hidden md:inline">until price increase</span>
+          <span className="px-2.5 py-1 rounded-lg bg-[#8A2BE2]/15 text-[#c084fc] text-[10px] font-black tracking-wider border border-[#8A2BE2]/25">50% OFF</span>
+          <span className="text-[#8B949E] text-xs">Premium Instant accounts — limited time offer</span>
+          <span className="hidden md:inline text-[#484f58]">·</span>
+          <span className="hidden md:flex items-center gap-1.5 text-xs text-[#8B949E]">
+            <Clock className="w-3.5 h-3.5 text-[#c084fc]" />
+            <span className="font-mono font-bold text-white">{String(countdown.hours).padStart(2,'0')}:{String(countdown.minutes).padStart(2,'0')}:{String(countdown.seconds).padStart(2,'0')}</span>
+            <span>remaining</span>
           </span>
-          <span className="bg-white text-red-600 px-3 py-1 rounded-lg font-black text-xs shadow-lg">50% OFF</span>
         </div>
       </div>
 
@@ -447,7 +435,7 @@ export default function BuyAccount() {
                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Special Accounts</span>
                             <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">10% OFF</span>
                           </div>
-                          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                             {specialPkgs.map(renderCard)}
                           </div>
                         </div>
@@ -459,7 +447,7 @@ export default function BuyAccount() {
                             <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">🔥 50% OFF</span>
                             <span className="text-[9px] text-orange-400 font-bold">Most Popular</span>
                           </div>
-                          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                             {premiumPkgs.map(renderCard)}
                           </div>
                         </div>
@@ -473,7 +461,7 @@ export default function BuyAccount() {
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{categoryDiscount}% OFF</span>
                         )}
                       </div>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                         {selectedModelPackages.map(renderCard)}
                       </div>
                     </div>
@@ -760,21 +748,7 @@ export default function BuyAccount() {
               </div>
            </div>
 
-           {/* Social Proof */}
-           <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: 'linear-gradient(180deg, rgba(22,22,22,0.9), rgba(12,12,12,0.95))' }}>
-             <div className="flex items-center gap-2 mb-3">
-               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-500/30" />
-               <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Recent Purchases</span>
-             </div>
-             <div className="space-y-2.5">
-               {['Ahmed K. funded $25K — 3 min ago', 'Samira R. funded $10K — 8 min ago', 'Trader X funded $50K — 14 min ago'].map((txt, i) => (
-                 <div key={i} className="text-[11px] text-gray-500 flex items-center gap-2" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                   <CheckCircle className="w-3 h-3 text-emerald-500/40" />
-                   {txt}
-                 </div>
-               ))}
-             </div>
-           </div>
+
         </div>
       </div>
 
