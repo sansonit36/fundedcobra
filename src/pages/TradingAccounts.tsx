@@ -172,103 +172,83 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {filteredAccounts.map((account) => {
         const extended = extendedData[account.mt5_login];
+        const bal = extended?.running_balance || 0;
+        const eq = extended?.running_equity || 0;
+        const startBal = account.starting_balance || account.balance || 1;
+        const pnl = eq - startBal;
+        const pnlPct = startBal > 0 ? (pnl / startBal) * 100 : 0;
         
         return (
-          <div key={account.id} className="p-6 rounded-md bg-[#1e1e1e] border border-[#2A2A2A] shadow-sm">
-            <div className="flex flex-col lg:flex-row justify-between gap-6">
-              <div className="space-y-4 flex-1">
+          <div key={account.id} className="card-gradient rounded-2xl border border-white/5 overflow-hidden">
+            {/* Hero Header */}
+            <div className="p-6 pb-4">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${statusStyles[account.status]}`}>
+                    {statusIcons[account.status]}
+                    <span className="capitalize">{account.status}</span>
+                  </div>
+                  {account.package_name && <span className="text-xs text-gray-500 font-medium">{account.package_name}</span>}
+                </div>
+                <span className="text-xs text-gray-600">{new Date(account.created_at).toLocaleDateString()}</span>
+              </div>
+
+              {/* Balance Hero */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles[account.status]}`}>
-                      {statusIcons[account.status]}
-                      <span className="ml-2 text-sm font-medium capitalize">{account.status}</span>
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      Created: {new Date(account.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">MT5 Login</p>
-                      <div className="flex items-center space-x-2">
-                        <code className="text-primary-400 font-medium">{account.mt5_login}</code>
-                        <button
-                          onClick={() => copyToClipboard(account.mt5_login)}
-                          className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">MT5 Password</p>
-                      <div className="flex items-center space-x-2">
-                        <code className="text-primary-400 font-medium">
-                          {showPasswords[account.id] ? account.mt5_password : '••••••••'}
-                        </code>
-                        <button
-                          onClick={() => togglePasswordVisibility(account.id)}
-                          className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
-                        >
-                          {showPasswords[account.id] ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
-                        </button>
-                        {showPasswords[account.id] && (
-                          <button
-                            onClick={() => copyToClipboard(account.mt5_password)}
-                            className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">MT5 Server</p>
-                      <div className="flex items-center space-x-2">
-                        <code className="text-primary-400 font-medium">{account.mt5_server}</code>
-                        <button
-                          onClick={() => copyToClipboard(account.mt5_server)}
-                          className="p-1 rounded-lg hover:bg-white/10 transition-colors text-gray-400"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Balance</p>
+                  <p className="text-2xl font-bold text-white">${bal.toLocaleString()}</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-400 mb-1">Balance</p>
-                    <p className="text-xl font-semibold text-white">
-                      ${(extended?.running_balance || 0).toLocaleString()}
-                    </p>
-                    {extended?.last_updated && (
-                      <p className="text-xs text-gray-400">
-                        Updated: {new Date(extended.last_updated).toLocaleString()}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400 mb-1">Equity</p>
-                    <p className="text-xl font-semibold text-white">
-                      ${(extended?.running_equity || 0).toLocaleString()}
-                    </p>
-                  </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Equity</p>
+                  <p className="text-2xl font-bold text-white">${eq.toLocaleString()}</p>
                 </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">P&L</p>
+                  <p className={`text-2xl font-bold ${pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {pnl >= 0 ? '+' : ''}${pnl.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Return</p>
+                  <p className={`text-2xl font-bold ${pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Credentials Strip */}
+            <div className="px-6 py-3 bg-white/[0.02] border-y border-white/5 flex flex-wrap items-center gap-x-6 gap-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Login</span>
+                <code className="text-sm text-primary-400 font-semibold">{account.mt5_login}</code>
+                <button onClick={() => copyToClipboard(account.mt5_login)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300"><Copy className="w-3.5 h-3.5" /></button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Password</span>
+                <code className="text-sm text-primary-400 font-semibold">{showPasswords[account.id] ? account.mt5_password : '••••••••'}</code>
+                <button onClick={() => togglePasswordVisibility(account.id)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300">
+                  {showPasswords[account.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+                {showPasswords[account.id] && <button onClick={() => copyToClipboard(account.mt5_password)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300"><Copy className="w-3.5 h-3.5" /></button>}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Server</span>
+                <code className="text-sm text-primary-400 font-semibold">{account.mt5_server}</code>
+                <button onClick={() => copyToClipboard(account.mt5_server)} className="p-0.5 hover:bg-white/10 rounded transition-colors text-gray-500 hover:text-gray-300"><Copy className="w-3.5 h-3.5" /></button>
+              </div>
+            </div>
+
+            {/* Content area */}
+            <div className="p-6 pt-5 space-y-4">
+              <div className="flex-1 space-y-4">
 
                 {/* Enhanced Drawdown Limits Section */}
-                <div className="mt-6 space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-gray-300 flex items-center">
                       <Target className="w-4 h-4 mr-2 text-primary-400" />
@@ -278,7 +258,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Daily Drawdown */}
-                    <div className="p-4 rounded-md bg-[#161616] border border-[#2A2A2A]">
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Daily Guard</p>
@@ -310,7 +290,7 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                     </div>
 
                     {/* Overall Drawdown */}
-                    <div className="p-4 rounded-md bg-[#161616] border border-[#2A2A2A]">
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Max Safety</p>
@@ -803,7 +783,7 @@ export default function TradingAccounts() {
         {selectedTab === 'pending' && pendingAccounts.length > 0 && (
           <div className="space-y-4">
             {pendingAccounts.map((request) => (
-              <div key={request.id} className="p-6 rounded-md bg-[#1e1e1e] border border-[#2A2A2A]">
+              <div key={request.id} className="card-gradient p-6 rounded-2xl border border-white/5">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`inline-flex items-center px-3 py-1 rounded-full border ${statusStyles[request.status as keyof typeof statusStyles] || statusStyles.pending}`}>
                     {statusIcons[request.status as keyof typeof statusIcons] || statusIcons.pending}
