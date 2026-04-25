@@ -408,15 +408,15 @@ export default function BuyAccount() {
                   })}
                 </div>
 
-                {/* Phase Progression Visual */}
+                {/* Phase Progression — desktop only */}
                 {selectedModel !== 'instant' && (
-                  <div className="px-4 pt-3 pb-1">
+                  <div className="hidden md:block px-5 pt-4 pb-2">
                     <div className="flex items-center gap-2">
                       {phases.map((phase, i) => (
                         <React.Fragment key={i}>
                           <div className="flex items-center gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: phase.color }} />
-                            <span className="text-[9px] font-bold text-white uppercase tracking-wider">{phase.label}</span>
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: phase.color }} />
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">{phase.label}</span>
                           </div>
                           {i < phases.length - 1 && (
                             <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${phases[i].color}40, ${phases[i + 1].color}40)` }} />
@@ -427,25 +427,73 @@ export default function BuyAccount() {
                   </div>
                 )}
 
-                {/* Phase Rules Columns */}
-                <div className={`grid gap-0 ${phases.length === 1 ? 'grid-cols-1' : phases.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
+                {/* Mobile: Phase Tabs (show one phase at a time) */}
+                {phases.length > 1 && (() => {
+                  const activePhaseIdx = rulePhaseTab === 'p1' ? 0 : rulePhaseTab === 'p2' ? 1 : phases.length - 1;
+                  const safeIdx = Math.min(activePhaseIdx, phases.length - 1);
+                  return (
+                    <div className="md:hidden">
+                      <div className="flex border-b border-white/[0.04]">
+                        {phases.map((phase, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setRulePhaseTab(i === 0 ? 'p1' : i === 1 && phases.length === 3 ? 'p2' : 'funded')}
+                            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
+                              i === safeIdx ? 'text-white' : 'text-[#484f58] border-transparent'
+                            }`}
+                            style={i === safeIdx ? { borderBottomColor: phase.color } : {}}
+                          >
+                            {phase.label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="p-5">
+                        <div className="space-y-0">
+                          {phases[safeIdx].rules.map((rule, ruleIdx) => (
+                            <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
+                              <span className="text-sm text-[#8B949E]">{rule.label}</span>
+                              <span className="text-sm text-white font-bold">{rule.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Desktop: All Phase Columns side by side */}
+                <div className={`hidden md:grid gap-0 ${phases.length === 1 ? 'grid-cols-1' : phases.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                   {phases.map((phase, phaseIdx) => (
-                    <div key={phaseIdx} className={`px-4 py-3 ${phaseIdx > 0 ? 'border-t md:border-t-0 md:border-l border-white/[0.04]' : ''}`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-1 h-4 rounded-full" style={{ backgroundColor: phase.color }} />
-                        <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">{phase.label}</h4>
+                    <div key={phaseIdx} className={`px-5 py-4 ${phaseIdx > 0 ? 'border-l border-white/[0.04]' : ''}`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-1 h-5 rounded-full" style={{ backgroundColor: phase.color }} />
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">{phase.label}</h4>
                       </div>
                       <div className="space-y-0">
                         {phase.rules.map((rule, ruleIdx) => (
-                          <div key={ruleIdx} className="flex justify-between items-center py-[7px] border-b border-white/[0.03] last:border-0">
-                            <span className="text-xs text-[#8B949E]">{rule.label}</span>
-                            <span className="text-xs text-white font-bold">{rule.value}</span>
+                          <div key={ruleIdx} className="flex justify-between items-center py-2 border-b border-white/[0.03] last:border-0">
+                            <span className="text-sm text-[#8B949E]">{rule.label}</span>
+                            <span className="text-sm text-white font-bold">{rule.value}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   ))}
                 </div>
+
+                {/* Single phase (Instant) — shown on both mobile and desktop */}
+                {phases.length === 1 && (
+                  <div className="md:hidden p-5">
+                    <div className="space-y-0">
+                      {phases[0].rules.map((rule, ruleIdx) => (
+                        <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
+                          <span className="text-sm text-[#8B949E]">{rule.label}</span>
+                          <span className="text-sm text-white font-bold">{rule.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Footer */}
                 <div className="px-4 py-2.5 border-t border-white/[0.04] flex items-center justify-between">
