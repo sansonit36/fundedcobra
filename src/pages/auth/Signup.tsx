@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, AlertCircle, ArrowRight, Eye, EyeOff, Globe } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, ArrowRight, Eye, EyeOff, Globe, Shield, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { notifyAffiliateRegistration } from '../../affiliateApi';
@@ -104,30 +104,32 @@ export default function Signup() {
       {/* LEFT: Brand Panel */}
       <div className="auth-brand-panel" style={{ width: '45%', position: 'relative', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0 }}>
-          <div style={{ position: 'absolute', top: '25%', left: '20%', width: 500, height: 500, borderRadius: '50%', filter: 'blur(150px)', opacity: 0.2, background: '#bd4dd6' }} />
+          <div style={{ position: 'absolute', top: '20%', left: '20%', width: 500, height: 500, borderRadius: '50%', filter: 'blur(150px)', opacity: 0.2, background: '#bd4dd6' }} />
           <div style={{ position: 'absolute', bottom: '20%', right: '25%', width: 400, height: 400, borderRadius: '50%', filter: 'blur(120px)', opacity: 0.12, background: '#9333ea' }} />
         </div>
         <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
 
-        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 40px' }}>
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 48px' }}>
+          <img src="/auth-trader.png" alt="FundedCobra Trader" style={{ width: 380, height: 'auto', objectFit: 'contain', marginBottom: 32, filter: 'drop-shadow(0 20px 60px rgba(189,77,214,0.3))' }} />
+
           <h2 style={{ fontFamily: F.head, fontSize: 34, fontWeight: 700, color: '#fff', marginBottom: 12, lineHeight: 1.15, letterSpacing: '-0.03em' }}>
-            Your trading journey{' '}
-            <span style={{ background: 'linear-gradient(135deg, #bd4dd6, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>starts here.</span>
+            Trade with{' '}
+            <span style={{ background: 'linear-gradient(135deg, #bd4dd6, #e879f9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>our capital.</span>
           </h2>
-          <p style={{ fontFamily: F.body, fontSize: 15, fontWeight: 500, color: '#666', lineHeight: 1.6, maxWidth: 340, marginBottom: 28 }}>
-            Get instant access to funded accounts up to $200K. No experience required.
+          <p style={{ fontFamily: F.body, fontSize: 15, fontWeight: 500, color: '#666', lineHeight: 1.6, maxWidth: 340, marginBottom: 32 }}>
+            Join thousands of funded traders worldwide. Instant access to capital up to $200K.
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, width: '100%', maxWidth: 360, marginBottom: 32 }}>
-            {[{ n: '47K+', l: 'Traders' }, { n: '$12M+', l: 'Funded' }, { n: '120+', l: 'Countries' }].map((s, i) => (
-              <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontFamily: F.head, fontSize: 26, fontWeight: 700, color: '#fff', letterSpacing: '-0.03em' }}>{s.n}</div>
-                <div style={{ fontFamily: F.body, fontSize: 10, fontWeight: 700, color: '#555', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{s.l}</div>
-              </div>
-            ))}
+          <div style={{ display: 'flex', gap: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Shield style={{ width: 16, height: 16, color: 'rgba(189,77,214,0.5)' }} />
+              <span style={{ fontFamily: F.body, fontSize: 12, fontWeight: 600, color: '#555' }}>256-bit Encrypted</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Users style={{ width: 16, height: 16, color: 'rgba(189,77,214,0.5)' }} />
+              <span style={{ fontFamily: F.body, fontSize: 12, fontWeight: 600, color: '#555' }}>47,000+ Traders</span>
+            </div>
           </div>
-
-          <img src="/auth-team.png" alt="FundedCobra Team" style={{ width: '100%', maxWidth: 480, height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 20px 60px rgba(189,77,214,0.25))' }} />
         </div>
       </div>
 
