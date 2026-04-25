@@ -628,6 +628,7 @@ const handleApprove = async () => {
                       onChange={(e) => setMT5Credentials(prev => ({ ...prev, password: e.target.value }))}
                       className="w-full pl-4 pr-10 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-green-500/50"
                       placeholder="Enter MT5 password"
+                      autoComplete="off"
                       required
                     />
                     <button
