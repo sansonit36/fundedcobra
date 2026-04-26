@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History, Target, Send, Shield, Zap } from 'lucide-react';
+import { Plus, Search, Copy, Eye, EyeOff, ExternalLink, Clock, CheckCircle, AlertOctagon, List, ChevronDown, ChevronUp, History, Target, Send, Shield, Zap, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getTradingAccounts, getPendingAccounts, TradingAccount, AccountRequest } from '../lib/database';
 import { supabase } from '../lib/supabase';
@@ -543,32 +543,76 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                       </div>
 
                       {/* Profit Target / Withdrawal Target — depends on phase */}
-                      {!isFunded ? (
-                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-5">
-                          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Profit Target — {currentPhaseLabel}</p>
-                          <p className="text-2xl font-bold text-white">
-                            {account.current_phase === 1 ? rule.profit_target_phase1 : rule.profit_target_phase2}%
-                          </p>
-                          {mt === '2_step' && (
-                            <p className="text-[10px] text-gray-600 mt-1">
-                              Phase 1: {rule.profit_target_phase1}% → Phase 2: {rule.profit_target_phase2}% → Funded
-                            </p>
-                          )}
-                          {mt === '1_step' && (
-                            <p className="text-[10px] text-gray-600 mt-1">
-                              Phase 1: {rule.profit_target_phase1}% → Funded
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="p-4 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/10 mb-5">
-                          <p className="text-[10px] text-emerald-400/60 uppercase tracking-wider font-bold mb-1">Withdrawal Target — Funded Phase</p>
-                          <p className="text-2xl font-bold text-emerald-400">{rule.withdrawal_target_percent || 5}%</p>
-                          <p className="text-[10px] text-gray-600 mt-1">
-                            Reach this target to request a payout
-                          </p>
-                        </div>
-                      )}
+                      {!isFunded ? (() => {
+                        const phaseTarget = account.current_phase === 1 ? rule.profit_target_phase1 : rule.profit_target_phase2;
+                        const currentEquity = extended?.running_equity || eq;
+                        const profitPct = startBal > 0 ? ((currentEquity - startBal) / startBal) * 100 : 0;
+                        const progress = phaseTarget > 0 ? Math.min(100, Math.max(0, (profitPct / phaseTarget) * 100)) : 0;
+                        const targetMet = profitPct >= (phaseTarget || 0);
+                        return (
+                          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-5">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Profit Target — {currentPhaseLabel}</p>
+                                <p className="text-2xl font-bold text-white">{phaseTarget}%</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Current</p>
+                                <p className={`text-2xl font-bold ${profitPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%</p>
+                              </div>
+                            </div>
+                            <div className="relative h-3 bg-[#1e1e1e] rounded-full overflow-hidden mb-2">
+                              <div className="absolute top-0 left-0 h-full rounded-full transition-all duration-700"
+                                style={{ width: `${progress}%`, background: targetMet ? 'linear-gradient(90deg, #10B981, #34D399)' : 'linear-gradient(90deg, #ffffff20, #ffffff50)' }}
+                              />
+                            </div>
+                            <div className="flex justify-between items-center">
+                              {mt === '2_step' && (
+                                <p className="text-[10px] text-gray-600">Phase 1: {rule.profit_target_phase1}% → Phase 2: {rule.profit_target_phase2}% → Funded</p>
+                              )}
+                              {mt === '1_step' && (
+                                <p className="text-[10px] text-gray-600">Phase 1: {rule.profit_target_phase1}% → Funded</p>
+                              )}
+                              {!targetMet && <p className="text-[10px] text-gray-500 ml-auto">{(phaseTarget - profitPct).toFixed(2)}% remaining</p>}
+                              {targetMet && <p className="text-[10px] text-emerald-400 font-bold ml-auto">✓ Target Reached</p>}
+                            </div>
+                          </div>
+                        );
+                      })() : (() => {
+                        const withdrawalTarget = rule.withdrawal_target_percent || 5;
+                        const currentEquity = extended?.running_equity || eq;
+                        const profitPct = startBal > 0 ? ((currentEquity - startBal) / startBal) * 100 : 0;
+                        const progress = withdrawalTarget > 0 ? Math.min(100, Math.max(0, (profitPct / withdrawalTarget) * 100)) : 0;
+                        const targetMet = profitPct >= withdrawalTarget;
+                        return (
+                          <div className="p-4 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/10 mb-5">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <p className="text-[10px] text-emerald-400/60 uppercase tracking-wider font-bold mb-1">Withdrawal Target — Funded</p>
+                                <p className="text-2xl font-bold text-emerald-400">{withdrawalTarget}%</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Current Profit</p>
+                                <p className={`text-2xl font-bold ${profitPct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%</p>
+                              </div>
+                            </div>
+                            <div className="relative h-3 bg-[#1e1e1e] rounded-full overflow-hidden mb-2">
+                              <div className="absolute top-0 left-0 h-full rounded-full transition-all duration-700"
+                                style={{ width: `${progress}%`, background: targetMet ? 'linear-gradient(90deg, #10B981, #34D399)' : 'linear-gradient(90deg, #ffffff30, #ffffff60)' }}
+                              />
+                            </div>
+                            {!targetMet ? (
+                              <p className="text-[10px] text-gray-500">{(withdrawalTarget - profitPct).toFixed(2)}% remaining to unlock payout</p>
+                            ) : (
+                              <a href="/payouts"
+                                className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all bg-emerald-500 text-white hover:bg-emerald-400 active:scale-[0.99] shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+                              >
+                                <DollarSign className="w-4 h-4" /> Request Payout
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {/* Common Rules Grid */}
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
