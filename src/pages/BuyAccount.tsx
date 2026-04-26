@@ -401,6 +401,14 @@ export default function BuyAccount() {
                       >
                         <div className="flex flex-col items-center gap-1">
                           <span className="text-sm font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
+                          {(() => {
+                            const cr = categoryRules[model];
+                            const payoutLabel = cr?.daily_payout_enabled ? 'Daily Payouts' : cr?.weekly_payout_enabled ? 'Weekly Payouts' : null;
+                            if (!payoutLabel) return null;
+                            return (
+                              <span className="text-[11px] font-extrabold uppercase tracking-widest animate-pulse" style={{ color }}>{payoutLabel} ⚡</span>
+                            );
+                          })()}
                           <span className="text-[10px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
                         </div>
                       </button>
