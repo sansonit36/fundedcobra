@@ -399,9 +399,9 @@ export default function BuyAccount() {
                         }`}
                         style={active ? { borderBottomColor: color, background: `${color}08` } : {}}
                       >
-                        <div className="flex flex-col items-center gap-0.5">
-                          <span className="text-[11px] font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
-                          <span className="text-[8px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-sm font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
+                          <span className="text-[10px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
                         </div>
                       </button>
                     );
@@ -414,9 +414,9 @@ export default function BuyAccount() {
                     <div className="flex items-center gap-2">
                       {phases.map((phase, i) => (
                         <React.Fragment key={i}>
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: phase.color }} />
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider">{phase.label}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: phase.color }} />
+                            <span className="text-xs font-bold text-white uppercase tracking-wider">{phase.label}</span>
                           </div>
                           {i < phases.length - 1 && (
                             <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${phases[i].color}40, ${phases[i + 1].color}40)` }} />
@@ -438,7 +438,7 @@ export default function BuyAccount() {
                           <button
                             key={i}
                             onClick={() => setRulePhaseTab(i === 0 ? 'p1' : i === 1 && phases.length === 3 ? 'p2' : 'funded')}
-                            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
+                            className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider transition-all border-b-2 ${
                               i === safeIdx ? 'text-white' : 'text-[#484f58] border-transparent'
                             }`}
                             style={i === safeIdx ? { borderBottomColor: phase.color } : {}}
@@ -450,9 +450,9 @@ export default function BuyAccount() {
                       <div className="p-5">
                         <div className="space-y-0">
                           {phases[safeIdx].rules.map((rule, ruleIdx) => (
-                            <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
+                            <div key={ruleIdx} className="flex justify-between items-center py-3 border-b border-white/[0.03] last:border-0">
                               <span className="text-sm text-[#8B949E]">{rule.label}</span>
-                              <span className="text-sm text-white font-bold">{rule.value}</span>
+                              <span className="text-[15px] text-white font-bold">{rule.value}</span>
                             </div>
                           ))}
                         </div>
@@ -465,15 +465,15 @@ export default function BuyAccount() {
                 <div className={`hidden md:grid gap-0 ${phases.length === 1 ? 'grid-cols-1' : phases.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                   {phases.map((phase, phaseIdx) => (
                     <div key={phaseIdx} className={`px-5 py-4 ${phaseIdx > 0 ? 'border-l border-white/[0.04]' : ''}`}>
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-1 h-5 rounded-full" style={{ backgroundColor: phase.color }} />
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">{phase.label}</h4>
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: phase.color }} />
+                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">{phase.label}</h4>
                       </div>
                       <div className="space-y-0">
                         {phase.rules.map((rule, ruleIdx) => (
-                          <div key={ruleIdx} className="flex justify-between items-center py-2 border-b border-white/[0.03] last:border-0">
+                          <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
                             <span className="text-sm text-[#8B949E]">{rule.label}</span>
-                            <span className="text-sm text-white font-bold">{rule.value}</span>
+                            <span className="text-[15px] text-white font-bold">{rule.value}</span>
                           </div>
                         ))}
                       </div>
@@ -486,9 +486,9 @@ export default function BuyAccount() {
                   <div className="md:hidden p-5">
                     <div className="space-y-0">
                       {phases[0].rules.map((rule, ruleIdx) => (
-                        <div key={ruleIdx} className="flex justify-between items-center py-2.5 border-b border-white/[0.03] last:border-0">
+                        <div key={ruleIdx} className="flex justify-between items-center py-3 border-b border-white/[0.03] last:border-0">
                           <span className="text-sm text-[#8B949E]">{rule.label}</span>
-                          <span className="text-sm text-white font-bold">{rule.value}</span>
+                          <span className="text-[15px] text-white font-bold">{rule.value}</span>
                         </div>
                       ))}
                     </div>
@@ -496,13 +496,13 @@ export default function BuyAccount() {
                 )}
 
                 {/* Footer */}
-                <div className="px-4 py-2.5 border-t border-white/[0.04] flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-[10px] text-[#484f58]">
+                <div className="px-5 py-3.5 border-t border-white/[0.04] flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-xs text-[#484f58]">
                     <span>EAs: <span className="text-[#8B949E] font-semibold">Yes</span></span>
                     <span>News: <span className="text-[#8B949E] font-semibold">{r?.news_trading_allowed !== false ? 'Yes' : 'No'}</span></span>
                     <span>Leverage: <span className="text-[#8B949E] font-semibold">1:100</span></span>
                   </div>
-                  <button onClick={() => setShowRules(true)} className="text-[10px] font-semibold uppercase tracking-wider hover:text-white transition-colors" style={{ color: modelColor }}>
+                  <button onClick={() => setShowRules(true)} className="text-xs font-bold uppercase tracking-wider hover:text-white transition-colors" style={{ color: modelColor }}>
                     Full rules →
                   </button>
                 </div>
