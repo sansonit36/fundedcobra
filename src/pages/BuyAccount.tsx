@@ -298,7 +298,7 @@ export default function BuyAccount() {
                 label: 'Funded Account',
                 color: modelColor,
                 rules: [
-                  { label: 'Profit Target', value: 'No Target' },
+                  { label: 'Withdrawal Target', value: `${r?.withdrawal_target_percent ?? 5}%` },
                   { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%` },
                   { label: 'Max Drawdown', value: `${r?.overall_drawdown_funded ?? r?.overall_drawdown_percent ?? 12}%` },
                   { label: 'Drawdown Type', value: fmtType(r?.daily_drawdown_type_funded) },
