@@ -521,42 +521,78 @@ function AccountsTab({ accounts, searchQuery, type }: AccountsTabProps) {
                   );
                 })()}
 
-                {/* Account Rules */}
+                {/* Account Rules — Phase-Aware */}
                 {(() => {
                   const mt = account.model_type || 'instant';
                   const rule = masterRules[mt];
                   if (!rule) return null;
                   const mc = mt === 'instant' ? '#bd4dd6' : mt === '1_step' ? '#3B82F6' : '#10B981';
                   const ml = mt === 'instant' ? 'Instant' : mt === '1_step' ? '1-Step' : '2-Step';
+                  const maxPhase = mt === '1_step' ? 2 : mt === '2_step' ? 3 : 1;
+                  const isFunded = mt === 'instant' || account.current_phase >= maxPhase;
+                  const currentPhaseLabel = isFunded ? 'Funded' : mt === '2_step' ? (account.current_phase === 1 ? 'Phase 1' : 'Phase 2') : 'Phase 1';
+                  const phaseColor = isFunded ? '#10B981' : '#F59E0B';
+
                   return (
                     <div className="rounded-2xl bg-[#141414] border border-[#1e1e1e] p-6">
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-2 mb-5">
                         <Shield className="w-4 h-4 text-gray-500" />
                         <span className="text-sm font-semibold text-gray-300">Account Rules</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style={{ backgroundColor: `${mc}15`, color: mc }}>{ml}</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ backgroundColor: `${phaseColor}15`, color: phaseColor }}>{currentPhaseLabel}</span>
                       </div>
+
+                      {/* Profit Target / Withdrawal Target — depends on phase */}
+                      {!isFunded ? (
+                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 mb-5">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Profit Target — {currentPhaseLabel}</p>
+                          <p className="text-2xl font-bold text-white">
+                            {account.current_phase === 1 ? rule.profit_target_phase1 : rule.profit_target_phase2}%
+                          </p>
+                          {mt === '2_step' && (
+                            <p className="text-[10px] text-gray-600 mt-1">
+                              Phase 1: {rule.profit_target_phase1}% → Phase 2: {rule.profit_target_phase2}% → Funded
+                            </p>
+                          )}
+                          {mt === '1_step' && (
+                            <p className="text-[10px] text-gray-600 mt-1">
+                              Phase 1: {rule.profit_target_phase1}% → Funded
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="p-4 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/10 mb-5">
+                          <p className="text-[10px] text-emerald-400/60 uppercase tracking-wider font-bold mb-1">Withdrawal Target — Funded Phase</p>
+                          <p className="text-2xl font-bold text-emerald-400">{rule.withdrawal_target_percent || 5}%</p>
+                          <p className="text-[10px] text-gray-600 mt-1">
+                            Reach this target to request a payout
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Common Rules Grid */}
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Daily Drawdown</p>
+                          <p className="text-sm font-bold text-white">{rule.daily_drawdown_percent || 5}%</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Max Drawdown</p>
+                          <p className="text-sm font-bold text-white">{rule.max_drawdown_percent || 12}%</p>
+                        </div>
                         <div>
                           <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Profit Split</p>
                           <p className="text-sm font-bold text-white">{rule.payout_split_percent || 80}%</p>
                         </div>
                         <div>
-                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Withdrawal Target</p>
-                          <p className="text-sm font-bold text-white">{rule.withdrawal_target_percent || 5}%</p>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Min Trading Days</p>
+                          <p className="text-sm font-bold text-white">{rule.minimum_trading_days || 0}</p>
                         </div>
                         <div>
-                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Min Withdrawal</p>
-                          <p className="text-sm font-bold text-white">${rule.minimum_withdrawal_amount || 50}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Schedule</p>
+                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Payout Schedule</p>
                           <p className="text-sm font-bold text-white">
                             {rule.daily_payout_enabled ? 'Daily' : rule.weekly_payout_enabled ? 'Weekly' : '—'}
                           </p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Min Days</p>
-                          <p className="text-sm font-bold text-white">{rule.minimum_trading_days || 0}</p>
                         </div>
                       </div>
                     </div>
