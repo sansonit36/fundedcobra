@@ -403,10 +403,9 @@ export default function BuyAccount() {
                           <span className="text-sm font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
                           {(() => {
                             const cr = categoryRules[model];
-                            const payoutLabel = cr?.daily_payout_enabled ? 'Daily Payouts' : cr?.weekly_payout_enabled ? 'Weekly Payouts' : null;
-                            if (!payoutLabel) return null;
+                            const payoutLabel = cr?.daily_payout_enabled ? 'Daily Payouts' : cr?.weekly_payout_enabled ? 'Weekly Payouts' : cr?.bi_weekly_payout_enabled ? 'Bi-Weekly Payouts' : 'Weekly Payouts';
                             return (
-                              <span className="text-[11px] font-extrabold uppercase tracking-widest animate-pulse" style={{ color }}>{payoutLabel} ⚡</span>
+                              <span className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color }}>{payoutLabel} ⚡</span>
                             );
                           })()}
                           <span className="text-[10px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
@@ -839,25 +838,6 @@ export default function BuyAccount() {
                <button onClick={() => setShowRules(false)} className="text-gray-500 hover:text-white">✕</button>
             </div>
             <div className="overflow-y-auto p-10 space-y-12 custom-scrollbar">
-               {['instant', '1_step', '2_step'].map((m) => {
-                 const model = m as AccountModelType;
-                 const pkg = packages.find(p => getPackageModel(p) === model);
-                 if (!pkg) return null;
-                 const rules = getRulesForPackage(pkg);
-                 return (
-                   <div key={m} className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6">
-                      <h4 className="text-white font-black uppercase tracking-widest text-sm flex items-center gap-3">
-                         <div className="w-2 h-2 rounded-full bg-[#bd4dd6]"></div> {MODEL_META[model].label} Protocol
-                      </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Trailing Loss</p><p className="font-black text-sm">{rules?.daily_drawdown_funded ?? rules?.daily_drawdown_percent ?? 5}% Daily</p></div>
-                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Static Loss</p><p className="font-black text-sm">{rules?.overall_drawdown_funded ?? rules?.overall_drawdown_percent ?? 12}% Overall</p></div>
-                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Profit Share</p><p className="text-emerald-400 font-black text-sm">{rules?.payout_split_percent}%</p></div>
-                         <div className="space-y-1"><p className="text-[9px] text-gray-600 font-black uppercase">Cycle</p><p className="font-black text-sm uppercase">{rules?.daily_payout_enabled ? 'Daily' : 'Weekly'}</p></div>
-                      </div>
-                   </div>
-                 );
-               })}
                {/* Not Allowed */}
                <div className="p-8 rounded-[2rem] bg-red-500/5 border border-red-500/20 space-y-4">
                   <h4 className="text-red-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
