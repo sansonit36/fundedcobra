@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../lib/supabase';
 import { BookOpen, Plus, Edit2, Trash2, Eye, EyeOff, ChevronDown, ChevronUp, Search, Star, StarOff, ArrowLeft, Code, FileText, GripVertical, ExternalLink } from 'lucide-react';
 
 interface Category {

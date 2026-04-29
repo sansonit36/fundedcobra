@@ -756,6 +756,7 @@ export default function BuyAccount() {
                 )}
               </div>
            </div>
+           </div>
         </div>
       </div>
 

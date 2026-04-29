@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabase';
 import { Search, BookOpen, ChevronRight, ArrowLeft, Eye, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Category {
