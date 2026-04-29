@@ -270,12 +270,12 @@ export default function BuyAccount() {
       )}
 
       {/* PAGE HEADER */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 md:pt-10 pb-6">
-        <div className="flex items-center gap-2 text-xs text-[#484f58] mb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 md:pt-14 pb-8">
+        <div className="flex items-center gap-2 text-sm text-[#484f58] mb-5">
           <span>Trader</span><span>/</span><span className="text-white font-medium">Get Funded</span>
         </div>
-        <h1 className="text-xl md:text-2xl font-bold text-white mb-1" style={{ fontFamily: 'Outfit, sans-serif' }}>Start Your FundedCobra Challenge</h1>
-        <p className="text-sm text-[#8B949E]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your account type, configure your setup, and start trading with our capital.</p>
+        <h1 className="text-3xl md:text-4xl font-black text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-1px' }}>Start Your FundedCobra Challenge</h1>
+        <p className="text-base text-[#8B949E]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Choose your account type, configure your setup, and start trading with our capital.</p>
       </div>
 
       {/* MAIN GRID */}
@@ -394,21 +394,21 @@ export default function BuyAccount() {
                           const modelPkgs = packages.filter(p => (p.account_type || 'instant') === model);
                           setSelectedPackage(modelPkgs.length > 0 ? modelPkgs[0] : null);
                         }}
-                        className={`flex-1 px-3 py-3 transition-all border-b-2 ${
+                        className={`flex-1 px-4 py-5 transition-all border-b-2 ${
                           active ? 'text-white' : 'text-[#484f58] hover:text-[#8B949E] border-transparent'
                         }`}
                         style={active ? { borderBottomColor: color, background: `${color}08` } : {}}
                       >
-                        <div className="flex flex-col items-center gap-1">
-                          <span className="text-sm font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
+                        <div className="flex flex-col items-center gap-1.5">
+                          <span className="text-base font-bold uppercase tracking-wider">{MODEL_META[model].label}</span>
                           {(() => {
                             const cr = categoryRules[model];
                             const payoutLabel = cr?.daily_payout_enabled ? 'Daily Payouts' : cr?.weekly_payout_enabled ? 'Weekly Payouts' : cr?.bi_weekly_payout_enabled ? 'Bi-Weekly Payouts' : 'Weekly Payouts';
                             return (
-                              <span className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color }}>{payoutLabel} ⚡</span>
+                              <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color }}>{payoutLabel} ⚡</span>
                             );
                           })()}
-                          <span className="text-[10px] text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
+                          <span className="text-xs text-[#484f58] font-medium hidden md:block">{MODEL_META[model].subtitle}</span>
                         </div>
                       </button>
                     );
@@ -519,10 +519,10 @@ export default function BuyAccount() {
 
           {/* ACCOUNT BALANCE */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-5">
               <div>
-                <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Account Balance</h3>
-                <p className="text-[10px] text-[#484f58] font-medium mt-0.5">Trading Account Currency: <span className="text-[#8B949E]">USD</span></p>
+                <h3 className="text-xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Account Balance</h3>
+                <p className="text-sm text-[#484f58] font-medium mt-1">Trading Account Currency: <span className="text-[#8B949E]">USD</span></p>
               </div>
               {/* Inline type switcher */}
               <div className="flex gap-1 p-0.5 rounded-lg border border-white/[0.06]" style={{ background: '#0D1117' }}>
@@ -556,7 +556,7 @@ export default function BuyAccount() {
               const allPkgs = selectedModelPackages;
 
               return (
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-5">
                   {allPkgs.map((pkg) => {
                     const isSelected = selectedPackage?.id === pkg.id;
                     const model = getPackageModel(pkg);
@@ -589,19 +589,19 @@ export default function BuyAccount() {
                             <CheckCircle className="w-3.5 h-3.5 text-[#bd4dd6]" />
                           </div>
                         )}
-                        <div className="text-xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.5px' }}>{balanceLabel}</div>
-                        <div className="mt-auto space-y-0.5">
-                          <div className="text-lg font-bold text-[#bd4dd6]" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                        <div className="text-2xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-1px' }}>{balanceLabel}</div>
+                        <div className="mt-auto space-y-1">
+                          <div className="text-2xl font-black text-[#bd4dd6]" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.5px' }}>
                             ${finalPrice.toFixed(0)}
                           </div>
                           {fullDiscount > 0 && (
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] text-[#484f58] line-through">${pkg.price}</span>
-                              <span className="text-[9px] font-bold text-[#bd4dd6] bg-[#bd4dd6]/10 px-1.5 py-0.5 rounded-full">-{fullDiscount}%</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-[#484f58] line-through">${pkg.price}</span>
+                              <span className="text-xs font-bold text-[#bd4dd6] bg-[#bd4dd6]/10 px-2 py-0.5 rounded-full">-{fullDiscount}%</span>
                             </div>
                           )}
                         </div>
-                        <div className="text-[9px] text-[#484f58] font-medium uppercase tracking-wide">One-time</div>
+                        <div className="text-xs text-[#484f58] font-medium uppercase tracking-wide">One-time fee</div>
                       </button>
                     );
                   })}
@@ -612,51 +612,51 @@ export default function BuyAccount() {
 
           {/* PLATFORM & SERVER */}
           <div>
-            <h3 className="text-sm font-bold text-white mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>Platform</h3>
+            <h3 className="text-xl font-bold text-white mb-5" style={{ fontFamily: 'Outfit, sans-serif' }}>Platform & Server</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="rounded-xl border border-white/[0.06] p-4" style={{ background: '#161B22' }}>
-                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-3">Trading Platform</p>
+              <div className="rounded-xl border border-white/[0.06] p-5" style={{ background: '#161B22' }}>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Trading Platform</p>
                 <button
                   onClick={() => setSelectedPlatform('MT5')}
-                  className={`w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all ${
                     selectedPlatform === 'MT5' ? 'border-[#8A2BE2] bg-[#8A2BE2]/5' : 'border-[#333] hover:border-white/20'
                   }`}
                 >
-                  <img src="/mt5-logo.png" alt="MetaTrader 5" className="w-9 h-9 rounded object-contain flex-shrink-0 bg-white/5" />
+                  <img src="/mt5-logo.png" alt="MetaTrader 5" className="w-11 h-11 rounded object-contain flex-shrink-0 bg-white/5" />
                   <div className="text-left flex-1">
-                    <p className="text-xs font-bold text-white">MetaTrader 5</p>
-                    <p className="text-[10px] text-gray-500">Industry standard</p>
+                    <p className="text-base font-bold text-white">MetaTrader 5</p>
+                    <p className="text-sm text-gray-500">Industry standard</p>
                   </div>
-                  {selectedPlatform === 'MT5' ? <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
+                  {selectedPlatform === 'MT5' ? <CheckCircle className="w-5 h-5 text-[#bd4dd6] flex-shrink-0" /> : <div className="w-5 h-5 rounded-full border border-gray-600 flex-shrink-0" />}
                 </button>
               </div>
 
               {/* Server */}
-              <div className="bg-[#161616] rounded-lg border border-[#2A2A2A] p-4">
-                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-3">Broker / Server</p>
-                <div className="space-y-2">
+              <div className="rounded-xl border border-white/[0.06] p-5" style={{ background: '#161B22' }}>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Broker / Server</p>
+                <div className="space-y-3">
                   <button
                     onClick={() => setSelectedServer('Exness')}
-                    className={`w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all ${
                       selectedServer === 'Exness' ? 'border-[#8A2BE2] bg-[#8A2BE2]/5' : 'border-[#333] hover:border-white/20'
                     }`}
                   >
-                    <img src="/exness-logo.jpeg" alt="Exness" className="w-9 h-9 rounded object-cover flex-shrink-0" />
+                    <img src="/exness-logo.jpeg" alt="Exness" className="w-11 h-11 rounded object-cover flex-shrink-0" />
                     <div className="text-left flex-1">
-                      <p className="text-xs font-bold text-white">Exness</p>
-                      <p className="text-[10px] text-[#bd4dd6] font-bold">● Available</p>
+                      <p className="text-base font-bold text-white">Exness</p>
+                      <p className="text-sm text-[#bd4dd6] font-bold">● Available</p>
                     </div>
-                    {selectedServer === 'Exness' ? <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
+                    {selectedServer === 'Exness' ? <CheckCircle className="w-5 h-5 text-[#bd4dd6] flex-shrink-0" /> : <div className="w-5 h-5 rounded-full border border-gray-600 flex-shrink-0" />}
                   </button>
-                  <div className="w-full flex items-center gap-3 p-2.5 rounded-lg border border-[#222] opacity-40 cursor-not-allowed">
-                    <div className="w-9 h-9 rounded bg-gradient-to-br from-purple-700 to-purple-900 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-[8px] font-black">FC</span>
+                  <div className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#222] opacity-40 cursor-not-allowed">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-700 to-purple-900 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-xs font-black">FC</span>
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-xs font-bold text-white">FundedCobra</p>
-                      <p className="text-[10px] text-red-400 font-bold">● Server Full</p>
+                      <p className="text-base font-bold text-white">FundedCobra</p>
+                      <p className="text-sm text-red-400 font-bold">● Server Full</p>
                     </div>
-                    <Lock className="w-3.5 h-3.5 text-gray-700 flex-shrink-0" />
+                    <Lock className="w-4 h-4 text-gray-700 flex-shrink-0" />
                   </div>
                 </div>
               </div>
@@ -670,35 +670,35 @@ export default function BuyAccount() {
            <div className="relative">
              <div className="absolute inset-0 rounded-2xl" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(138,43,226,0.2) 0%, transparent 70%)', filter: 'blur(20px)', transform: 'translateY(8px)' }} />
            <div className="relative rounded-2xl border overflow-hidden" style={{ background: 'linear-gradient(180deg, #161B22 0%, #0D1117 100%)', borderColor: 'rgba(255,255,255,0.08)' }}>
-              <div className="px-5 py-4 border-b border-white/[0.06]">
-                <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Summary</h3>
+              <div className="px-6 py-5 border-b border-white/[0.06]">
+                <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Order Summary</h3>
               </div>
               
-              <div className="p-5 space-y-5">
+              <div className="p-6 space-y-6">
                 {selectedPackage ? (
                   <>
                     <div>
-                      <div className="text-xs text-[#8B949E] font-medium">FundedCobra Challenge</div>
-                      <div className="text-lg font-bold text-white mt-0.5" style={{ fontFamily: 'Outfit, sans-serif' }}>${selectedPackage.balance.toLocaleString()} account</div>
+                      <div className="text-sm text-[#8B949E] font-medium">FundedCobra Challenge</div>
+                      <div className="text-2xl font-black text-white mt-1" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.5px' }}>${selectedPackage.balance.toLocaleString()} Account</div>
                     </div>
 
-                    <div className="space-y-2.5 py-3 border-y border-white/[0.04]">
-                      <div className="flex justify-between text-xs">
+                    <div className="space-y-3.5 py-4 border-y border-white/[0.04]">
+                      <div className="flex justify-between text-sm">
                         <span className="text-[#8B949E]">Type</span>
                         <span className="text-white font-semibold">{MODEL_META[selectedModel].label}</span>
                       </div>
-                      <div className="flex justify-between text-xs">
+                      <div className="flex justify-between text-sm">
                         <span className="text-[#8B949E]">Platform</span>
                         <span className="text-white font-semibold">{selectedPlatform || '—'}</span>
                       </div>
-                      <div className="flex justify-between text-xs">
+                      <div className="flex justify-between text-sm">
                         <span className="text-[#8B949E]">Server</span>
                         <span className="text-white font-semibold">{selectedServer || '—'}</span>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                       <div className="flex justify-between text-xs">
+                    <div className="space-y-3">
+                       <div className="flex justify-between text-sm">
                           <span className="text-[#8B949E]">Price</span>
                           <span className="text-white font-semibold">${selectedPackage.price}</span>
                        </div>
