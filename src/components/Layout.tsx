@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, BarChart2, Wallet, DollarSign, Settings, Book, X, User, LogOut, Shield, Users, MessageCircle, Trophy } from 'lucide-react';
+import { Menu, BarChart2, Wallet, DollarSign, Settings, Book, X, User, LogOut, Shield, Users, MessageCircle, Trophy, HelpCircle } from 'lucide-react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -58,6 +58,7 @@ export default function Layout() {
     { icon: Trophy, text: 'Leaderboard', path: '/leaderboard' },
     { icon: User, text: 'My Profile', path: '/my-profile' },
     { icon: Settings, text: 'Settings', path: '/settings' },
+    { icon: HelpCircle, text: 'Help Center', path: '/help' },
     { icon: MessageCircle, text: 'Live Support', path: '/live-support' }
   ];
 

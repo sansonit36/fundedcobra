@@ -22,6 +22,7 @@ const navItems = [
   { icon: Package, text: 'Packages & Offers', path: '/admin/packages-offers' },
   { icon: Award, text: 'Certificates', path: '/admin/certificates' },
   { icon: UserCheck, text: 'Trader Profiles', path: '/admin/trader-profiles' },
+  { icon: BookOpen, text: 'Help Center', path: '/admin/help-center' },
   { icon: Settings, text: 'Settings', path: '/admin/settings' }
 ];
 

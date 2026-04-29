@@ -21,14 +21,14 @@ const MODEL_META: Record<AccountModelType, { label: string; subtitle: string; ac
   '1_step': {
     label: '1-Step Evaluation',
     subtitle: 'Single objective phase to pass',
-    accent: 'text-blue-300',
-    accentBorder: 'border-blue-500/40 bg-blue-500/10'
+    accent: 'text-[#bd4dd6]',
+    accentBorder: 'border-[#bd4dd6]/40 bg-[#bd4dd6]/10'
   },
   '2_step': {
     label: '2-Step Evaluation',
     subtitle: 'Two milestones before funding',
-    accent: 'text-emerald-300',
-    accentBorder: 'border-emerald-500/40 bg-emerald-500/10'
+    accent: 'text-[#bd4dd6]',
+    accentBorder: 'border-[#bd4dd6]/40 bg-[#bd4dd6]/10'
   }
 };
 
@@ -287,7 +287,7 @@ export default function BuyAccount() {
           {/* ACCOUNT TYPE + PHASE RULES */}
           {(() => {
             const r = categoryRules[selectedModel];
-            const modelColor = selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+            const modelColor = '#8A2BE2';
             const fmtType = (t: string | undefined | null) => { const v = t || 'static'; return v.charAt(0).toUpperCase() + v.slice(1); };
 
             // Build phase columns based on model type
@@ -312,7 +312,7 @@ export default function BuyAccount() {
               phases.push(
                 {
                   label: 'Phase 1 — Evaluation',
-                  color: '#3B82F6',
+                  color: '#8A2BE2',
                   rules: [
                     { label: 'Profit Target', value: `${r?.profit_target_phase1 ?? 10}%` },
                     { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_phase1 ?? r?.daily_drawdown_percent ?? 5}%` },
@@ -325,7 +325,7 @@ export default function BuyAccount() {
                 },
                 {
                   label: 'Funded Account',
-                  color: '#10B981',
+                  color: '#bd4dd6',
                   rules: [
                     { label: 'Profit Target', value: 'No Target' },
                     { label: 'Daily Loss Limit', value: `${r?.daily_drawdown_funded ?? r?.daily_drawdown_percent ?? 5}%` },
@@ -385,7 +385,7 @@ export default function BuyAccount() {
                   {['instant', '1_step', '2_step'].map((type) => {
                     const model = type as AccountModelType;
                     const active = selectedModel === model;
-                    const color = model === 'instant' ? '#8A2BE2' : model === '1_step' ? '#3B82F6' : '#10B981';
+                    const color = '#8A2BE2';
                     return (
                       <button
                         key={type}
@@ -551,7 +551,7 @@ export default function BuyAccount() {
             </div>
 
             {(() => {
-              const modelColor = selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981';
+              const modelColor = '#8A2BE2';
               const categoryDiscount = categoryRules[selectedModel]?.discount_percent || 0;
               const allPkgs = selectedModelPackages;
 
@@ -570,41 +570,38 @@ export default function BuyAccount() {
                       <button
                         key={pkg.id}
                         onClick={() => setSelectedPackage(pkg)}
-                        className={`relative rounded-xl border-2 p-4 text-left transition-all duration-200 group flex flex-col ${
+                        className={`relative rounded-2xl p-4 text-left transition-all duration-200 flex flex-col gap-3 ${
                           isSelected
-                            ? 'border-current shadow-lg scale-[1.02]'
-                            : 'border-white/[0.06] hover:border-white/20 hover:bg-white/[0.02]'
+                            ? 'scale-[1.02]'
+                            : 'hover:bg-white/[0.03]'
                         }`}
                         style={{
-                          background: isSelected ? `${modelColor}10` : '#0D1117',
-                          color: isSelected ? modelColor : 'inherit',
-                          borderColor: isSelected ? modelColor : undefined,
+                          background: isSelected ? 'rgba(138,43,226,0.08)' : '#0D1117',
+                          border: isSelected ? '1.5px solid #8A2BE2' : '1.5px solid rgba(255,255,255,0.06)',
+                          boxShadow: isSelected ? '0 0 20px rgba(138,43,226,0.15)' : 'none',
                         }}
                       >
                         {isPremium && (
-                          <span className="absolute -top-2 left-3 px-1.5 py-0.5 rounded text-[8px] font-black bg-red-500/90 text-white shadow-sm shadow-red-500/20">SALE</span>
+                          <span className="absolute -top-2 left-3 px-2 py-0.5 rounded-full text-[9px] font-black bg-[#8A2BE2] text-white tracking-wider">SALE</span>
                         )}
                         {isSelected && (
-                          <div className="absolute top-2 right-2">
-                            <CheckCircle className="w-4 h-4" style={{ color: modelColor }} />
+                          <div className="absolute top-3 right-3">
+                            <CheckCircle className="w-3.5 h-3.5 text-[#bd4dd6]" />
                           </div>
                         )}
-                        <div className="text-lg md:text-xl font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>{balanceLabel}</div>
-                        <div className="space-y-0.5 mt-auto">
-                          <div className="text-lg font-bold flex items-center justify-between" style={{ color: modelColor, fontFamily: 'Outfit, sans-serif' }}>
+                        <div className="text-xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.5px' }}>{balanceLabel}</div>
+                        <div className="mt-auto space-y-0.5">
+                          <div className="text-lg font-bold text-[#bd4dd6]" style={{ fontFamily: 'Outfit, sans-serif' }}>
                             ${finalPrice.toFixed(0)}
-                            {!isSelected && (
-                              <span className="text-[10px] font-semibold text-[#8B949E] opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
-                            )}
                           </div>
                           {fullDiscount > 0 && (
                             <div className="flex items-center gap-1.5">
                               <span className="text-[10px] text-[#484f58] line-through">${pkg.price}</span>
-                              <span className="text-[9px] font-bold text-emerald-400">-{fullDiscount}%</span>
+                              <span className="text-[9px] font-bold text-[#bd4dd6] bg-[#bd4dd6]/10 px-1.5 py-0.5 rounded-full">-{fullDiscount}%</span>
                             </div>
                           )}
                         </div>
-                        <div className="text-[9px] text-[#484f58] mt-1.5 font-medium">One-time payment</div>
+                        <div className="text-[9px] text-[#484f58] font-medium uppercase tracking-wide">One-time</div>
                       </button>
                     );
                   })}
@@ -622,7 +619,7 @@ export default function BuyAccount() {
                 <button
                   onClick={() => setSelectedPlatform('MT5')}
                   className={`w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
-                    selectedPlatform === 'MT5' ? 'border-emerald-500 bg-emerald-500/5' : 'border-[#333] hover:border-white/20'
+                    selectedPlatform === 'MT5' ? 'border-[#8A2BE2] bg-[#8A2BE2]/5' : 'border-[#333] hover:border-white/20'
                   }`}
                 >
                   <img src="/mt5-logo.png" alt="MetaTrader 5" className="w-9 h-9 rounded object-contain flex-shrink-0 bg-white/5" />
@@ -630,7 +627,7 @@ export default function BuyAccount() {
                     <p className="text-xs font-bold text-white">MetaTrader 5</p>
                     <p className="text-[10px] text-gray-500">Industry standard</p>
                   </div>
-                  {selectedPlatform === 'MT5' ? <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
+                  {selectedPlatform === 'MT5' ? <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
                 </button>
               </div>
 
@@ -641,15 +638,15 @@ export default function BuyAccount() {
                   <button
                     onClick={() => setSelectedServer('Exness')}
                     className={`w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all ${
-                      selectedServer === 'Exness' ? 'border-emerald-500 bg-emerald-500/5' : 'border-[#333] hover:border-white/20'
+                      selectedServer === 'Exness' ? 'border-[#8A2BE2] bg-[#8A2BE2]/5' : 'border-[#333] hover:border-white/20'
                     }`}
                   >
                     <img src="/exness-logo.jpeg" alt="Exness" className="w-9 h-9 rounded object-cover flex-shrink-0" />
                     <div className="text-left flex-1">
                       <p className="text-xs font-bold text-white">Exness</p>
-                      <p className="text-[10px] text-emerald-400 font-bold">● Available</p>
+                      <p className="text-[10px] text-[#bd4dd6] font-bold">● Available</p>
                     </div>
-                    {selectedServer === 'Exness' ? <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
+                    {selectedServer === 'Exness' ? <CheckCircle className="w-4 h-4 text-[#bd4dd6] flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-gray-600 flex-shrink-0" />}
                   </button>
                   <div className="w-full flex items-center gap-3 p-2.5 rounded-lg border border-[#222] opacity-40 cursor-not-allowed">
                     <div className="w-9 h-9 rounded bg-gradient-to-br from-purple-700 to-purple-900 flex items-center justify-center flex-shrink-0">
@@ -670,7 +667,9 @@ export default function BuyAccount() {
 
         {/* RIGHT COLUMN — Summary */}
         <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-           <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: '#161B22' }}>
+           <div className="relative">
+             <div className="absolute inset-0 rounded-2xl" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(138,43,226,0.2) 0%, transparent 70%)', filter: 'blur(20px)', transform: 'translateY(8px)' }} />
+           <div className="relative rounded-2xl border overflow-hidden" style={{ background: 'linear-gradient(180deg, #161B22 0%, #0D1117 100%)', borderColor: 'rgba(255,255,255,0.08)' }}>
               <div className="px-5 py-4 border-b border-white/[0.06]">
                 <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Summary</h3>
               </div>
@@ -710,16 +709,16 @@ export default function BuyAccount() {
                          if (totalDiscount <= 0) return null;
                          return (
                            <div className="flex justify-between text-xs">
-                              <span className="text-emerald-400">Discount ({totalDiscount}%)</span>
-                              <span className="text-emerald-400 font-semibold">-${(selectedPackage.price * totalDiscount / 100).toFixed(0)}</span>
+                              <span className="text-[#bd4dd6]">Discount ({totalDiscount}%)</span>
+                              <span className="text-[#bd4dd6] font-semibold">-${(selectedPackage.price * totalDiscount / 100).toFixed(0)}</span>
                            </div>
                          );
                        })()}
                        <div className="pt-3 border-t border-white/[0.06] flex justify-between items-center">
                           <span className="text-sm font-bold text-white">Total</span>
                           <div className="text-right">
-                            <span className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
-                            <div className="text-[9px] text-[#484f58]">Incl. VAT</div>
+                             <span className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif', letterSpacing: '-1px' }}>${calculateFinalPrice(selectedPackage.price).toFixed(0)}</span>
+                             <div className="text-[9px] text-[#484f58] uppercase tracking-wider">USD · One-time</div>
                           </div>
                        </div>
                     </div>
@@ -738,7 +737,7 @@ export default function BuyAccount() {
                       }`}
                       style={{
                         fontFamily: 'Outfit, sans-serif',
-                        background: selectedModel === 'instant' ? '#8A2BE2' : selectedModel === '1_step' ? '#3B82F6' : '#10B981',
+                        background: 'linear-gradient(135deg, #8A2BE2, #bd4dd6)',
                       }}
                     >
                       Continue to Payment

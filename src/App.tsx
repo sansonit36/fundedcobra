@@ -44,10 +44,12 @@ import PackagesAndOffers from './pages/admin/PackagesAndOffers';
 import EvaluationReviews from './pages/admin/EvaluationReviews';
 import AdminCertificateManager from './pages/admin/CertificateManager';
 import AdminTraderProfiles from './pages/admin/TraderProfiles';
+import HelpCenterAdmin from './pages/admin/HelpCenterAdmin';
 import CertificateVerification from './pages/public/CertificateVerification';
 import TraderProfile from './pages/public/TraderProfile';
 import PublicLeaderboard from './pages/public/Leaderboard';
 import LeaderboardPage from './pages/LeaderboardPage';
+import HelpCenter from './pages/HelpCenter';
 import MyProfile from './pages/MyProfile';
 import { initFacebookPixel } from './utils/FacebookTracking';
 
@@ -197,6 +199,13 @@ export default function App() {
                 </AdminLayout>
               </AdminRoute>
             } />
+            <Route path="/admin/help-center" element={
+              <AdminRoute>
+                <AdminLayout>
+                  <HelpCenterAdmin />
+                </AdminLayout>
+              </AdminRoute>
+            } />
 
             {/* Root redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -237,6 +246,9 @@ export default function App() {
             <Route path="/verify/:certificateId" element={<CertificateVerification />} />
             <Route path="/trader/:userId" element={<TraderProfile />} />
             <Route path="/public/leaderboard" element={<PublicLeaderboard />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/help/:categorySlug" element={<HelpCenter />} />
+            <Route path="/help/:categorySlug/:articleSlug" element={<HelpCenter />} />
 
             {/* Catch all */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
